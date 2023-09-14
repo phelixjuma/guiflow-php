@@ -5,8 +5,8 @@
   "license": "MIT",
   "require": {
     "php": ">=8.0",
-    "justinrainbow/json-schema": "^5.2",
     "ext-json": "*",
+    "justinrainbow/json-schema": "^5.2",
     "wyndow/fuzzywuzzy": "^0.6.0"
   },
   "scripts": {

@@ -9,6 +9,17 @@ use PhelixJuma\DataTransformer\Utils\PathResolver;
 
 class FunctionAction implements ActionInterface
 {
+    const SUPPORTED_FUNCTIONS = [
+        'strtolower', 'strtoupper', 'trim', 'ucwords','strlen', 'explode', 'implode', 'nl2br', 'number_format',
+        'levenshtein', 'similar_text', 'soundex','str_contains', 'str_ireplace', 'str_replace', 'substr', 'strtr',
+        'strtotime',
+        'sort',
+        'round', 'floor', 'ceil', 'abs', 'exp', 'max', 'min', 'pow', 'sqrt', 'array_sum','count', 'sizeof',
+        'json_encode', 'json_decode',
+        'intval', 'floatval',
+        'preg_match', 'preg_replace'
+    ];
+
     private $path;
     private $function;
     private $args;
@@ -63,7 +74,11 @@ class FunctionAction implements ActionInterface
         } elseif (isset($this->function[1]) && $this->function['1'] == 'model_mapping') {
             $newValue = ModelMapper::transform(...$paramValues);
         } elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
-            $newValue = $this->function['1'](...$paramValues);
+            if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {
+                $newValue = $this->function['1'](...$paramValues);
+            } else {
+                $newValue = "";
+            }
         } else {
             $newValue = call_user_func_array($this->function, $paramValues);
         }
