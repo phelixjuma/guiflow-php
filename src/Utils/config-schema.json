@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "rule": {
+        "type": "string",
+        "description": "A string that represents the name or description of the rule."
+      },
+      "condition": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "path": {"type": "string"},
+              "operator": {"type": "string", "enum": ["exists"]}
+            },
+            "required": ["path", "operator"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "path": {"type": "string"},
+              "operator": {"type": "string"},
+              "value": {"type": ["string", "integer", "boolean", "array", "object"]}
+            },
+            "required": ["path", "operator", "value"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "operator": {"type": "string", "enum": ["AND", "OR"]},
+              "conditions": {
+                "type": "array",
+                "items": {"$ref": "#/items/properties/condition"}
+              }
+            },
+            "required": ["operator", "conditions"]
+          },
+          {
+            "type": "string"
+          }
+        ]
+      },
+      "actions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": ["add", "subtract", "multiply", "divide", "set", "delete", "function"],
+              "description": "The operation to be performed."
+            },
+            "path": {
+              "type": "string",
+              "description": "The field to be used as the argument for the operation."
+            },
+            "value": {
+              "type": ["string", "integer", "boolean", "array", "object"],
+              "description": "The value to be used as the argument for the operation. This is optional and is only used for 'set', 'add', 'subtract', 'multiply', 'divide' actions."
+            },
+            "valueFromField": {
+              "type": "string",
+              "description": "The field to be used as the argument for the operation. This is optional and is only used for 'set' action."
+            },
+            "valueMapping": {
+              "type": "object",
+              "description": "An object that maps values of the valueFromField to values of the field. This is optional and is only used for 'set' action with valueFromField."
+            },
+            "args": {
+              "type": "object",
+              "description": "An object that specifies the arguments for the operation. This is optional and is only used for 'function' and 'customFunction' actions."
+            },
+            "newField": {
+              "type": "string",
+              "description": "The field to store the result of the operation."
+            },
+            "function": {
+              "type": "string",
+              "description": "The name of the function to be executed. This is optional and is only used for 'function' and 'customFunction' actions."
+            }
+          },
+          "required": ["action", "path"],
+          "dependencies": {
+            "value": ["path"],
+            "valueFromField": ["path"],
+            "valueMapping": ["valueFromField"],
+            "args": ["function"],
+            "newField": ["path"],
+            "function": ["args"]
+          }
+        },
+        "description": "An array of actions to be executed in order."
+      }
+    },
+    "required": ["rule", "condition", "actions"]
+  }
+}

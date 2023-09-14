@@ -1,0 +1,158 @@
+[
+  {
+    "rule": "Get customers list",
+    "condition": "always",
+    "actions": [
+      {
+        "action": "function",
+        "path": "customers_list",
+        "function": "getCustomersList",
+        "args":{}
+      }
+    ]
+  },
+  {
+    "rule": "Match customer",
+    "condition": "always",
+    "actions": [
+      {
+        "action": "function",
+        "path": "customer_name",
+        "function": "getMatchedCustomer",
+        "args":{"customer_name":{"path":"customer_name"}, "customers_list": {"path":"customers_list"}}
+      }
+    ]
+  },
+  {
+    "rule": "Get customer's historical products",
+    "condition": {"path":"customer_name.matched_value", "operator": "exists"},
+    "actions": [
+      {
+        "action": "function",
+        "path": "customer_products",
+        "function": "getCustomerProducts",
+        "args":{"customer_id":{"path":"customer_name.matched_value.customer_id"}}
+      }
+    ]
+  },
+  {
+    "rule": "Match Products",
+    "condition": {"operator": "AND", "conditions": [{"path":"items", "operator": "exists"}, {"path":"customer_products", "operator": "exists"}]},
+    "actions": [
+      {
+        "action": "function",
+        "path": "items",
+        "function": "getMatchedProducts",
+        "args":{"products":{"path":"items"}, "customer_products":{"path":"customer_products"}}
+      }
+    ]
+  },
+  {
+    "rule": "Get Quantity Conversion Table",
+    "condition": "always",
+    "actions": [
+      {
+        "action": "function",
+        "path": "quantity_conversion_table",
+        "function": "getUnitConversionTable",
+        "args":{}
+      }
+    ]
+  },
+  {
+    "rule": "Convert Quantity & Units",
+    "condition": {"operator": "AND", "conditions": [{"path":"items", "operator": "exists"}, {"path":"quantity_conversion_table", "operator": "exists"}]},
+    "actions": [
+      {
+        "action": "function",
+        "path": "items.*.quantity_conversion",
+        "function": "convertUnitOfMeasurement",
+        "args":{"quantity":{"path":"items.*.original_value.quantity"}, "from_uom": {"path": "items.*.original_value.uom"}, "to_uom": {"path": "items.*.matched_value.uom"}}
+      }
+    ]
+  },
+  {
+    "rule": "Get Shipping Addresses",
+    "condition": "always",
+    "actions": [
+      {
+        "action": "function",
+        "path": "customer_shipping_addresses",
+        "function": "getCustomerShippingAddresses",
+        "args":{"customer_id":{"path":"customer_name.matched_value.customer_id"}}
+      }
+    ]
+  },
+  {
+    "rule": "Match Shipping Address",
+    "condition": {"operator": "AND", "conditions": [{"path":"customer_shipping_addresses", "operator": "exists"}, {"path":"delivery_location", "operator": "exists"}]},
+    "actions": [
+      {
+        "action": "function",
+        "path": "delivery_location",
+        "function": "getMatchedShippingAddress",
+        "args":{"delivery_location":{"path":"delivery_location"}, "shipping_addresses":{"path":"customer_shipping_addresses"}}
+      }
+    ]
+  },
+  {
+    "rule": "Get Customer Contacts",
+    "condition": "always",
+    "actions": [
+      {
+        "action": "function",
+        "path": "customer_contacts",
+        "function": "getCustomerContacts",
+        "args":{"customer_id":{"path":"customer_name.matched_value.customer_id"}}
+      }
+    ]
+  },
+  {
+    "rule": "Match Contact",
+    "condition": {"path":"customer_contacts", "operator": "exists"},
+    "actions": [
+      {
+        "action": "function",
+        "path": "contact",
+        "function": "getMatchedContact",
+        "args":{"customer_contacts":{"path":"customer_contacts"}, "delivery_location":{"path":"delivery_location.matched_value.name"}, "customer": {"path":"customer.matched_value.name"}}
+      }
+    ]
+  },
+  {
+    "rule": "Get Delivery Schedule",
+    "condition": "always",
+    "actions": [
+      {
+        "action": "function",
+        "path": "delivery_schedule",
+        "function": "getRegionDeliverySchedule",
+        "args":{"region":{"path":"delivery_location.matched_value.region"}}
+      }
+    ]
+  },
+  {
+    "rule": "Set Promised Delivery Date",
+    "condition": "always",
+    "actions": [
+      {
+        "action": "function",
+        "path": "delivery_date",
+        "function": "getPromisedDeliveryDate",
+        "args":{"delivery_date": {"path":"delivery_date"},"delivery_schedule":{"path":"delivery_schedule"}, "products": {"path":"items.*.matched_value"}}
+      }
+    ]
+  },
+  {
+    "rule": "Model Mapping",
+    "condition": "always",
+    "actions": [
+      {
+        "action": "function",
+        "path": "",
+        "function": "model_mapping",
+        "args":{"model":  {"customer_no":  "customer_name.matched_value.no", "items": "items"}, "invert":  false}
+      }
+    ]
+  }
+]

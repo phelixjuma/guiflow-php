@@ -1,0 +1,28 @@
+{
+  "name": "phelixjuma/php-data-transformer",
+  "description": "A PHP package to transform data based on a set of configurable rules.",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.0",
+    "justinrainbow/json-schema": "^5.2",
+    "ext-json": "*",
+    "wyndow/fuzzywuzzy": "^0.6.0"
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit"
+  },
+  "autoload": {
+    "psr-4": {
+      "PhelixJuma\\DataTransformer\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "PhelixJuma\\DataTransformer\\Tests\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.3"
+  }
+}
