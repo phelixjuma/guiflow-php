@@ -112,7 +112,7 @@ class DataTransformerTest extends TestCase
         $dataTransformer = new DataTransformer($config, $this);
         $dataTransformer->transform($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($expectedData, $data);
     }
