@@ -9,7 +9,6 @@ class ConfigurationValidatorTest extends TestCase
 {
     public function testValidate()
     {
-        $validator = new ConfigurationValidator();
 
         $data = json_decode('[
                   {
@@ -36,7 +35,7 @@ class ConfigurationValidatorTest extends TestCase
 
         //print_r($data);
 
-        $this->assertTrue($validator->validate($data));
+        $this->assertTrue(ConfigurationValidator::validate($data));
     }
 
 }

@@ -9,7 +9,7 @@ use JsonSchema\Constraints\Constraint;
 
 class ConfigurationValidator
 {
-    public function validate($data)
+    public static function validate($data): bool
     {
 
         $schema = self::getSchema();

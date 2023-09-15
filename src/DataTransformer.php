@@ -20,7 +20,6 @@ class DataTransformer
     private array $config;
     private object $functionsClass;
     private PathResolver $pathResolver;
-    private ConfigurationValidator $configValidator;
 
 
     public function __construct(array $config, object $functionsClass)
@@ -28,10 +27,9 @@ class DataTransformer
         $this->config = $config;
         $this->functionsClass = $functionsClass;
         $this->pathResolver = new PathResolver();
-        $this->configValidator = new ConfigurationValidator();
 
         // Validate the configuration against the schema
-        $this->configValidator->validate($this->config);
+        ConfigurationValidator::validate($this->config);
     }
 
     /**
