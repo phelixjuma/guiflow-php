@@ -4,6 +4,7 @@ namespace PhelixJuma\DataTransformer\Actions;
 
 use PhelixJuma\DataTransformer\Utils\Filter;
 use PhelixJuma\DataTransformer\Utils\ModelMapper;
+use PhelixJuma\DataTransformer\Utils\UnitConverter;
 use PhelixJuma\DataTransformer\Utils\Utils;
 use PhelixJuma\DataTransformer\Utils\PathResolver;
 
@@ -78,6 +79,10 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::concat($paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'concat_multi_array_assoc') {
             $newValue = Utils::concat_multi_array_assoc(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit') {
+            $newValue = UnitConverter::convert(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit_multi') {
+            $newValue = UnitConverter::convert_multiple(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'model_mapping') {
             $newValue = ModelMapper::transform(...$paramValues);
         } elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {

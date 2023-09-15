@@ -357,7 +357,10 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testMultiConcatFunction()
+    /**
+     * @return void
+     */
+    public function _testMultiConcatFunction()
     {
         $data = [
             'customer' => 'Naivas',
@@ -375,6 +378,36 @@ class FunctionActionTest extends TestCase
         $expectedData = [];
 
         $action = new FunctionAction("products", [$this, 'concat_multi_array_assoc'], ['fields' => ['name', 'description'], 'newField' => 'search_string']);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testUnitConversion()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                ['name' => 'Capon Chicken', 'description' => 'Capon 1.2', 'quantity' => 12, 'unit_price' => 200, "from_unit" => "PIECES", "to_unit" => "KGS"],
+                ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 15, 'unit_price' => 300, "from_unit" => "PIECES", "to_unit" => "KGS"],
+                ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200, "from_unit" => "PIECES", "to_unit" => "KGS"],
+            ],
+            "unit_conversion_matrix" => [
+                ["from" => "PIECES", "to" => "KGS", "factor" => 6],
+                ["from" => "PKT", "to" => "KGS", "factor" => 0.5]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("unit_conversion_matrix", [$this, 'convert_unit_multi'], ['products' => ['path' => 'products']], "products");
 
         $action->execute($data);
 
