@@ -81,6 +81,9 @@ class DataTransformer
             case 'set':
                 $actionInstance = new $actionClass($action['path'], $action['value'] ?? null, $action['valueFromField'] ?? null, $action['valueMapping'] ?? null);
                 break;
+            case 'delete':
+                $actionInstance = new $actionClass($action['path']);
+                break;
             case 'function':
                 $actionInstance = new $actionClass($action['path'], [$this->functionsClass, $action['function']], $action['args'] ?? [], $action['newField'] ?? null);
                 break;
