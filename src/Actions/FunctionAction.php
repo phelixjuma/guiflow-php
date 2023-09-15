@@ -50,6 +50,7 @@ class FunctionAction implements ActionInterface
         // Prepare function parameters:  We set the current values data as the first param
         $paramValues = [$currentValues];
 
+
         foreach ($this->args as $param) {
             if (is_array($param) && isset($param['path'])) {
 
@@ -71,6 +72,12 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::sortMultiAssocArrayByKey(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'format_date') {
             $newValue = Utils::format_date(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'concat') {
+            $newValue = Utils::concat($paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'concat') {
+            $newValue = Utils::concat($paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'concat_multi_array_assoc') {
+            $newValue = Utils::concat_multi_array_assoc(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'model_mapping') {
             $newValue = ModelMapper::transform(...$paramValues);
         } elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {

@@ -331,6 +331,58 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
+    public function _testConcatFunction()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                ['name' => 'Capon Chicken', 'description' => 'Capon 1.2', 'quantity' => 2, 'unit_price' => 200],
+                ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
+                ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200],
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("location.address", [$this, 'concat'], ['region' => ['path' => 'location.region']], 'location.full_address');
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testMultiConcatFunction()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                ['name' => 'Capon Chicken', 'description' => 'Capon 1.2', 'quantity' => 2, 'unit_price' => 200],
+                ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
+                ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200],
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("products", [$this, 'concat_multi_array_assoc'], ['fields' => ['name', 'description'], 'newField' => 'search_string']);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
 
     public function summate($data) {
         return array_sum($data);

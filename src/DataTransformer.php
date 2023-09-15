@@ -38,7 +38,7 @@ class DataTransformer
      * @param $data
      * @return void
      */
-    public function transform(&$data)
+    public function transform(&$data): void
     {
         $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 

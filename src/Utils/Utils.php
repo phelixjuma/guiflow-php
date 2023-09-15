@@ -31,7 +31,29 @@ class Utils
         return date($format, $date);
     }
 
-    public static function model_mapping() {
+    public static function concat(array $strings) {
+        return implode(" ", $strings);
+    }
 
+    /**
+     * @param array $data
+     * @param array $fields
+     * @param $newField
+     * @return array
+     */
+    public static function concat_multi_array_assoc(array $data, array $fields, $newField): array
+    {
+
+        array_walk($data, function (&$value, $key) use($fields, $newField) {
+            $dataToConcat = [];
+            foreach ($value as $key => $v) {
+                if (in_array($key, $fields)) {
+                    $dataToConcat[] = $v;
+                }
+            }
+            $value[$newField] = self::concat($dataToConcat);
+        });
+
+        return $data;
     }
 }
