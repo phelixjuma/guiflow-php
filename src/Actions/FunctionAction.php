@@ -92,7 +92,7 @@ class FunctionAction implements ActionInterface
                 $newValue = "";
             }
         } else {
-            $newValue = call_user_func_array($this->function, ...$paramValues);
+            $newValue = call_user_func_array($this->function, $paramValues);
         }
 
         if (empty($this->targetPath)) {
