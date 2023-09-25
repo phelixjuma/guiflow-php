@@ -27,11 +27,13 @@ class Utils
      * @param $format
      * @return string
      */
-    public static function format_date($date, $format) {
+    public static function format_date($date, $format): string
+    {
         return date($format, $date);
     }
 
-    public static function concat(array $strings) {
+    public static function concat(array $strings): string
+    {
         return implode(" ", $strings);
     }
 
@@ -55,5 +57,16 @@ class Utils
         });
 
         return $data;
+    }
+
+    /**
+     * @param $data
+     * @param $pattern
+     * @param $replacement
+     * @return string
+     */
+    public static function custom_preg_replace($data, $pattern, $replacement): string
+    {
+        return preg_replace($pattern, $replacement, $data);
     }
 }
