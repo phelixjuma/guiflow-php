@@ -67,9 +67,6 @@ class Utils
      */
     public static function custom_preg_replace($data, $pattern, $replacement): string
     {
-        print "pattern: $pattern\n";
-        print "replacement: $replacement\n";
-        print "data: $data\n";
         return preg_replace($pattern, $replacement, $data);
     }
 }
