@@ -28,7 +28,8 @@ class PathResolver
                     $values[] = self::getValueByPath($item, implode('.', array_slice($parts, $currentPosition + 1)));
                 }
 
-                return $acceptListReturn ? $values : $values[0];
+//                return $acceptListReturn ? $values : $values[0];
+                return $values;
             }
 
             if (is_array($current)) {
@@ -59,15 +60,20 @@ class PathResolver
         $current = &$data;
 
         foreach ($parts as $key => $part) {
+
             if ($part === '*') {
+
                 if ($key === count($parts) - 1) {
-                    foreach ($current as &$item) {
-                        $item = $value;
+
+                    foreach ($current as $cKey => &$item) {
+                        $item = is_array($value) ? $value[$cKey] : $value;
                     }
                 } else {
+
                     $nextPath = implode('.', array_slice($parts, $key + 1));
-                    foreach ($current as &$item) {
-                        self::setValueByPath($item, $nextPath, $value);
+
+                    foreach ($current as $cKey => &$item) {
+                        self::setValueByPath($item, $nextPath, (is_array($value) ? $value[$cKey] : $value));
                     }
                 }
                 return;  // Exit after processing the wildcard

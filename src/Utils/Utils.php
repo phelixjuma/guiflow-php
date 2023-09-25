@@ -63,10 +63,18 @@ class Utils
      * @param $data
      * @param $pattern
      * @param $replacement
-     * @return string
+     * @return array|string|string[]|null
      */
-    public static function custom_preg_replace($data, $pattern, $replacement): string
+    public static function custom_preg_replace($data, $pattern, $replacement): array|string|null
     {
-        return preg_replace($pattern, $replacement, $data);
+        $newData = null;
+        if (is_array($data)) {
+            foreach ($data as $d) {
+                $newData[] = preg_replace($pattern, $replacement, $d);
+            }
+        } else {
+            $newData = preg_replace($pattern, $replacement, $data);
+        }
+        return $newData;
     }
 }
