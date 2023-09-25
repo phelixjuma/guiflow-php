@@ -152,7 +152,7 @@ class Filter
 
     public static function splitByPath(array $data, string $path): array {
 
-        $valuesForPath = PathResolver::getValueByPath($data, $path);
+        $valuesForPath = PathResolver::getValueByPath($data, $path, true);
         $uniqueValues = array_unique($valuesForPath);
 
         $pathParts = explode('.', $path);

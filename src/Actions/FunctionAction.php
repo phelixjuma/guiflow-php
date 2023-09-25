@@ -39,7 +39,7 @@ class FunctionAction implements ActionInterface
         $this->function = $function;
         $this->args = $args;
         $this->newField = $newField;
-        $this->targetPath = $this->newField ?? $this->path;
+        $this->targetPath = !empty($this->newField) ? $this->newField : $this->path;
     }
 
     public function execute(&$data)

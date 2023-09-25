@@ -5,7 +5,7 @@ namespace PhelixJuma\DataTransformer\Utils;
 class PathResolver
 {
 
-    public static function getValueByPath($data, string $path)
+    public static function getValueByPath($data, string $path, $acceptListReturn = false)
     {
         $parts = explode('.', $path);
         $current = $data;
@@ -28,7 +28,7 @@ class PathResolver
                     $values[] = self::getValueByPath($item, implode('.', array_slice($parts, $currentPosition + 1)));
                 }
 
-                return $values;
+                return $acceptListReturn ? $values : $values[0];
             }
 
             if (is_array($current)) {
