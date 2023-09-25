@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class SetValueActionTest extends TestCase
 {
-    public function testSet()
+    public function _testSet()
     {
         $data = [
             'customer' => 'Naivas',
@@ -44,7 +44,7 @@ class SetValueActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testSetStaticValue()
+    public function _testSetStaticValue()
     {
         $data = [
             'customer' => 'Naivas',

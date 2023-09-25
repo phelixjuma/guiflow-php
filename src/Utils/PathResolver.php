@@ -28,7 +28,7 @@ class PathResolver
                     $values[] = self::getValueByPath($item, implode('.', array_slice($parts, $currentPosition + 1)));
                 }
 
-                return $values[0];
+                return $values;
             }
 
             if (is_array($current)) {

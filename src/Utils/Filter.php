@@ -41,6 +41,10 @@ class Filter
     private static function matchValueAgainstFilter($value, $term, $mode, int $similarityThreshold=self::DEFAULT_THRESHOLD): bool|int
     {
 
+        if (empty($value)) {
+            return false;
+        }
+
         $term = is_array($term) ? array_map('strtolower', $term) : strtolower($term);
         $value = strtolower($value);
         $fuzz = new Fuzz();
@@ -79,7 +83,7 @@ class Filter
 
             // For an associative array, we get value based on key
             if (is_array($value) && array_keys($value) !== range(0, count($value) - 1)) {
-                $value = !empty($filters['key']) ? $value[$filters['key']] : "";
+                $value = !empty($filters['key']) && isset($value[$filters['key']]) ? $value[$filters['key']] : "";
             }
 
             return self::matchValueAgainstFilter($value,
@@ -122,6 +126,7 @@ class Filter
         foreach ($array as $key => $value) {
 
             if (is_array($value)) {
+
                 // Check if it's an associative array (object)
                 if (array_keys($value) !== range(0, count($value) - 1)) {
 
@@ -144,4 +149,42 @@ class Filter
         }
         return array_values($array);  // Resetting the keys
     }
+
+    public static function splitByPath(array $data, string $path): array {
+
+        $valuesForPath = PathResolver::getValueByPath($data, $path);
+        $uniqueValues = array_unique($valuesForPath);
+
+        $pathParts = explode('.', $path);
+
+        // Extract the attribute by which we are grouping
+        $attribute = array_pop($pathParts);
+
+        $result = [];
+
+        foreach ($uniqueValues as $value) {
+
+            $dataCopy = $data;
+
+            $subData = &$dataCopy;
+
+            // Traverse down the data copy structure to get the data we want to modify
+            foreach ($pathParts as $part) {
+                if ($part !== '*') {
+                    $subData = &$subData[$part];
+                }
+            }
+
+            // Apply the filter dynamically
+            $subData = array_values(array_filter($subData, function($item) use ($value, $attribute) {
+                return $item[$attribute] === $value;
+            }));
+
+            $result[] = $dataCopy;
+        }
+
+        return $result;
+    }
+
+
 }

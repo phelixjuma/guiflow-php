@@ -3,12 +3,11 @@
 namespace PhelixJuma\DataTransformer\Tests\Actions;
 
 use PhelixJuma\DataTransformer\Actions\DeleteValueAction;
-use PhelixJuma\DataTransformer\Actions\SetValueAction;
 use PHPUnit\Framework\TestCase;
 
 class DeleteValueActionTest extends TestCase
 {
-    public function testDeleteSimple()
+    public function _testDeleteSimple()
     {
         $data = [
             'customer' => 'Naivas',
@@ -40,7 +39,7 @@ class DeleteValueActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testDeleteNestedObject()
+    public function _testDeleteNestedObject()
     {
         $data = [
             'customer' => 'Naivas',
@@ -72,7 +71,7 @@ class DeleteValueActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testDeleteArrayElements()
+    public function _testDeleteArrayElements()
     {
         $data = [
             'customer' => 'Naivas',

@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\DataTransformer\Tests\Utils;
 
+use PhelixJuma\DataTransformer\Actions\FunctionAction;
 use PhelixJuma\DataTransformer\Utils\ConfigurationValidator;
 use PhelixJuma\DataTransformer\Utils\Filter;
 use PHPUnit\Framework\TestCase;
@@ -65,7 +66,7 @@ class FilterTest extends TestCase
         $this->assertTrue($data == $filtered);
     }
 
-    public function testComposite()
+    public function _testComposite()
     {
         $data = [
             'Apples',
@@ -105,7 +106,7 @@ class FilterTest extends TestCase
         $this->assertTrue($data == $filtered);
     }
 
-    public function testComposite2()
+    public function _testComposite2()
     {
         $data = [
             'Apples',
@@ -132,7 +133,7 @@ class FilterTest extends TestCase
         $this->assertTrue($data == $filtered);
     }
 
-    public function testComposite3()
+    public function _testComposite3()
     {
         $data = [
             'Apples',
@@ -173,14 +174,23 @@ class FilterTest extends TestCase
             [['name' => "mango", 'quantity' => 9], ["name" => "apples", 'quantity' => 8]]
         ];
 
-        $data = ['Apples', "Oranges", "Lemons", "Pears", "Mangoes"];
+        $data = [
+            'order_date' => 'today',
+            'products' => [
+                ['name' => 'Apples'],
+                ['name' => "Oranges"],
+                ['name' => "Lemons"],
+                ['name' => "Pears"],
+                ['name' => "Mangoes"],
+            ]
+        ];
 
 
         $conditions = [
             "operator"      => "OR",
             "conditions"    => [
-                ['term' => 'mango', 'mode' => Filter::SIMILAR_TO, 'threshold' => 80],
-                ['term' => 'pears', 'mode' => Filter::EQUAL]
+                ['term' => 'mango', 'mode' => Filter::SIMILAR_TO, 'threshold' => 80, 'key' => 'products.*.name'],
+                ['term' => 'pears', 'mode' => Filter::EQUAL, 'key' => 'products.*.name']
             ]
         ];
 

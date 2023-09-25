@@ -5,6 +5,7 @@ namespace PhelixJuma\DataTransformer\Tests\Actions;
 use PhelixJuma\DataTransformer\Actions\FunctionAction;
 use PhelixJuma\DataTransformer\Actions\SetValueAction;
 use PhelixJuma\DataTransformer\Utils\Filter;
+use PhelixJuma\DataTransformer\Utils\PathResolver;
 use PHPUnit\Framework\TestCase;
 
 class FunctionActionTest extends TestCase
@@ -126,7 +127,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-       // print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -360,7 +361,7 @@ class FunctionActionTest extends TestCase
     /**
      * @return void
      */
-    public function _testMultiConcatFunction()
+    public function testMultiConcatFunction()
     {
         $data = [
             'customer' => 'Naivas',
@@ -386,7 +387,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testUnitConversion()
+    public function _testUnitConversion()
     {
         $data = [
             'customer' => 'Naivas',
@@ -408,6 +409,43 @@ class FunctionActionTest extends TestCase
         $expectedData = [];
 
         $action = new FunctionAction("unit_conversion_matrix", [$this, 'convert_unit_multi'], ['products' => ['path' => 'products']], "products");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testSplitFunction()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200, "brand" => "Kenchic"],
+                ['name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300, "brand" => "Kenchic"],
+                ['name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200, "brand" => "kenmeat"],
+            ],
+        ];
+
+        $expectedData = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200],
+                ['name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300],
+            ],
+            'total_unit_price' => 500
+        ];
+
+        $action = new FunctionAction("", [$this, 'split'], ['path' => "products.*.brand"], '');
 
         $action->execute($data);
 

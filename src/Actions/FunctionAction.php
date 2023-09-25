@@ -51,7 +51,6 @@ class FunctionAction implements ActionInterface
         // Prepare function parameters:  We set the current values data as the first param
         $paramValues = [$currentValues];
 
-
         foreach ($this->args as $param) {
             if (is_array($param) && isset($param['path'])) {
 
@@ -68,7 +67,9 @@ class FunctionAction implements ActionInterface
         }
 
         if (isset($this->function[1]) && $this->function['1'] == 'filter') {
-            $newValue = self::dataFilterFunction(...$paramValues);
+            $newValue = Filter::filterArray(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'split') {
+            $newValue = Filter::splitByPath(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'sort_multi_by_key') {
             $newValue = Utils::sortMultiAssocArrayByKey(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'format_date') {
@@ -102,16 +103,6 @@ class FunctionAction implements ActionInterface
             // Otherwise, we only update the relevant parts
             PathResolver::setValueByPath($data, $this->targetPath, $newValue);
         }
-    }
-
-    /**
-     * @param $data
-     * @param $filters
-     * @return array
-     */
-    private static function dataFilterFunction($data, $filters): array
-    {
-        return Filter::filterArray($data, $filters);
     }
 
     /**
