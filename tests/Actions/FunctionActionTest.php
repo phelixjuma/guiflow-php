@@ -500,9 +500,30 @@ class FunctionActionTest extends TestCase
                 'region' => 'Nairobi'
             ],
             'products' => [
-                ['code' => "DEL001", 'name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200, "brand" => "Kenchic"],
-                ['code' => "DEL002",'name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300, "brand" => "Kenchic"],
-                ['code' => "PIL003", 'name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200, "brand" => "kenmeat"],
+                [
+                    'original_value' => [
+                        'name' => 'Capon Chicken',
+                        'unit_of_measure' => [
+                            [
+                                'selling_quantity' => 2,
+                                'selling_unit'    => 'Pieces'
+                            ]
+                        ],
+                        'unit_price' => 200
+                    ]
+                ],
+                [
+                    'original_value' => [
+                        'name' => 'Chicken Sausages',
+                        'unit_of_measure' => [
+                            [
+                                'selling_quantity' => 3,
+                                'selling_unit'    => 'Cases'
+                            ]
+                        ],
+                        'unit_price' => 300
+                    ]
+                ],
             ],
         ];
 
@@ -513,17 +534,39 @@ class FunctionActionTest extends TestCase
                 'region' => 'Nairobi'
             ],
             'products' => [
-                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200],
-                ['name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300],
+                [
+                    'original_value' => [
+                        'name' => 'Capon Chicken',
+                        'unit_of_measure' => [
+                          [
+                              'selling_quantity' => 2,
+                              'selling_unit'    => 'Pieces'
+                          ]
+                        ],
+                        'unit_price' => 200
+                    ]
+                ],
+                [
+                    'original_value' => [
+                        'name' => 'Chicken Sausages',
+                        'unit_of_measure' => [
+                            [
+                                'selling_quantity' => 3,
+                                'selling_unit'    => 'Pieces'
+                            ]
+                        ],
+                        'unit_price' => 300
+                    ]
+                ],
             ],
             'total_unit_price' => 500
         ];
 
-        $action = new FunctionAction("products", [$this, 'assoc_array_find'], ['condition_field' => "name", "condition_operator" => "like", "condition_value" => "Capon", "name"], 'product_name');
+        $action = new FunctionAction("products.*.original_value.unit_of_measure", [$this, 'assoc_array_find'], ['condition_field' => "selling_unit", "condition_operator" => "similar_to", "condition_value" => "Pieces - PCS", "condition_threshold" => 80, "return_key" => "selling_quantity"], 'products.*.original_value.number_of_pieces');
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

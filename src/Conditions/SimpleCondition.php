@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\DataTransformer\Conditions;
 
+use FuzzyWuzzy\Fuzz;
 use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
 use PhelixJuma\DataTransformer\Utils\PathResolver;
 
@@ -32,17 +33,18 @@ class SimpleCondition implements ConditionInterface
 
         $operator = $this->condition['operator'];
         $value = $this->condition['value'] ?? null;
+        $similarityThreshold = $this->condition['similarity_threshold'] ?? null;
 
         // Handle wildcard paths
         if (is_array($pathValues)) {
             foreach ($pathValues as $pathValue) {
-                if (self::compare($pathValue, $operator, $value)) {
+                if (self::compare($pathValue, $operator, $value, $similarityThreshold)) {
                     return true; // Return true as soon as one match is found
                 }
             }
             return false; // If no match is found, return false
         } else {
-            return self::compare($pathValues, $operator, $value);
+            return self::compare($pathValues, $operator, $value, $similarityThreshold);
         }
     }
 
@@ -53,8 +55,10 @@ class SimpleCondition implements ConditionInterface
      * @return bool
      * @throws UnknownOperatorException
      */
-    public static function compare($pathValue, $operator, $value): bool
+    public static function compare($pathValue, $operator, $value, $similarityThreshold = null): bool
     {
+        $fuzz = new Fuzz();
+
         // The existing switch case logic...
         switch ($operator) {
             case '==':
@@ -86,6 +90,10 @@ class SimpleCondition implements ConditionInterface
             case 'like':
                 $pattern = str_replace('%', '.*', $value);
                 return preg_match("/$pattern/", $pathValue) === 1;
+            case 'similar_to':
+                //$ratio = $fuzz->partialRatio($pathValue, $value);
+                //print "ratio of $pathValue to $value = $ratio with threshold of $similarityThreshold \n";
+                return $fuzz->partialRatio($pathValue, $value) >= $similarityThreshold;
             default:
                 throw new UnknownOperatorException("Unknown operator: $operator");
         }

@@ -5,7 +5,6 @@ namespace PhelixJuma\DataTransformer;
 use PhelixJuma\DataTransformer\Actions\AddAction;
 use PhelixJuma\DataTransformer\Actions\DeleteValueAction;
 use PhelixJuma\DataTransformer\Actions\DivideAction;
-use PhelixJuma\DataTransformer\Actions\ModelMappingAction;
 use PhelixJuma\DataTransformer\Actions\FunctionAction;
 use PhelixJuma\DataTransformer\Actions\MultiplyAction;
 use PhelixJuma\DataTransformer\Actions\SetValueAction;
