@@ -59,6 +59,10 @@ class SimpleCondition implements ConditionInterface
     {
         $fuzz = new Fuzz();
 
+        // lowercase
+        $pathValue = is_string($pathValue) ? strtolower($pathValue) : $pathValue;
+        $value = is_string($value) ? strtolower($value)  :$value;
+
         // The existing switch case logic...
         switch ($operator) {
             case '==':
@@ -80,9 +84,9 @@ class SimpleCondition implements ConditionInterface
             case 'regex':
                 return preg_match($value, $pathValue) === 1;
             case 'in':
-                return in_array($pathValue, $value);
+                return in_array($pathValue, (array)$value);
             case 'not in':
-                return !in_array($pathValue, $value);
+                return !in_array($pathValue, (array)$value);
             case 'true':
                 return $pathValue === true;
             case 'false':
