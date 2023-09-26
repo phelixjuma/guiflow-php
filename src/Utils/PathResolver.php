@@ -63,8 +63,19 @@ class PathResolver
 
             if ($part === '*') {
 
-                if ($key === count($parts) - 1) {
+                // Ensure that the current item is an array
+                if (!is_array($current)) {
+                    $current = [];
+                }
 
+                // If $current is empty and $value is an array, initialize $current with the same structure
+                if (empty($current) && is_array($value)) {
+                    foreach ($value as $v) {
+                        $current[] = [];
+                    }
+                }
+
+                if ($key === count($parts) - 1) {
                     foreach ($current as $cKey => &$item) {
                         $item = is_array($value) ? $value[$cKey] : $value;
                     }
@@ -73,6 +84,10 @@ class PathResolver
                     $nextPath = implode('.', array_slice($parts, $key + 1));
 
                     foreach ($current as $cKey => &$item) {
+                        // Ensure that the subsequent nested structures exist
+                        if (!isset($item[$parts[$key + 1]])) {
+                            $item[$parts[$key + 1]] = [];
+                        }
                         self::setValueByPath($item, $nextPath, (is_array($value) ? $value[$cKey] : $value));
                     }
                 }
@@ -85,7 +100,6 @@ class PathResolver
             if (!isset($current[$part]) && $key !== count($parts) - 1) {
                 $current[$part] = [];
             }
-
             // Move the pointer
             $current = &$current[$part];
         }

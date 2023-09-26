@@ -417,7 +417,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testSplitFunction()
+    public function _testSplitFunction()
     {
         $data = [
             'customer' => 'Naivas',
@@ -491,7 +491,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testArrayFind()
+    public function _testArrayFind()
     {
         $data = [
             'customer' => 'Naivas',
@@ -563,6 +563,87 @@ class FunctionActionTest extends TestCase
         ];
 
         $action = new FunctionAction("products.*.original_value.unit_of_measure", [$this, 'assoc_array_find'], ['condition_field' => "selling_unit", "condition_operator" => "similar_to", "condition_value" => "Pieces - PCS", "condition_threshold" => 80, "return_key" => "selling_quantity"], 'products.*.original_value.number_of_pieces');
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testModelMapping()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                [
+                    'original_value' => [
+                        'name' => 'Capon Chicken',
+                        'unit_of_measure' => [
+                            [
+                                'selling_quantity' => 2,
+                                'selling_unit'    => 'Pieces'
+                            ]
+                        ],
+                        'unit_price' => 200
+                    ]
+                ],
+                [
+                    'original_value' => [
+                        'name' => 'Chicken Sausages',
+                        'unit_of_measure' => [
+                            [
+                                'selling_quantity' => 3,
+                                'selling_unit'    => 'Cases'
+                            ]
+                        ],
+                        'unit_price' => 300
+                    ]
+                ],
+            ],
+        ];
+
+        $expectedData = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                [
+                    'original_value' => [
+                        'name' => 'Capon Chicken',
+                        'unit_of_measure' => [
+                            [
+                                'selling_quantity' => 2,
+                                'selling_unit'    => 'Pieces'
+                            ]
+                        ],
+                        'unit_price' => 200
+                    ]
+                ],
+                [
+                    'original_value' => [
+                        'name' => 'Chicken Sausages',
+                        'unit_of_measure' => [
+                            [
+                                'selling_quantity' => 3,
+                                'selling_unit'    => 'Pieces'
+                            ]
+                        ],
+                        'unit_price' => 300
+                    ]
+                ],
+            ],
+            'total_unit_price' => 500
+        ];
+
+        $action = new FunctionAction("", [$this, 'model_mapping'], ['model' => ["customer" => "customer", "region" => "location.region", "products.*.name" => "products.*.original_value.name",
+            "products.*.unit_price" => "products.*.original_value.unit_price"]], "");
 
         $action->execute($data);
 

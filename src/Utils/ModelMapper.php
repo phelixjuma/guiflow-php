@@ -17,13 +17,13 @@ class ModelMapper {
 
         $result = [];
 
-        foreach ($mapping as $key => $path) {
+        foreach ($mapping as $targetPath => $originPath) {
             if ($inverted) {
-                $value = PathResolver::getValueByPath($data, $key);
-                PathResolver::setValueByPath($result, $path, $value);
+                $value = PathResolver::getValueByPath($data, $targetPath);
+                PathResolver::setValueByPath($result, $originPath, $value);
             } else {
-                $value = PathResolver::getValueByPath($data, $path);
-                PathResolver::setValueByPath($result, $key, $value);
+                $value = PathResolver::getValueByPath($data, $originPath);
+                PathResolver::setValueByPath($result, $targetPath, $value);
             }
         }
         return $result;
