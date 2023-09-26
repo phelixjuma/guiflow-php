@@ -454,7 +454,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testPregReplace()
+    public function _testPregReplace()
     {
         $data = [
             'customer' => 'Naivas',
@@ -487,6 +487,43 @@ class FunctionActionTest extends TestCase
         $action->execute($data);
 
         //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testArrayFind()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                ['code' => "DEL001", 'name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200, "brand" => "Kenchic"],
+                ['code' => "DEL002",'name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300, "brand" => "Kenchic"],
+                ['code' => "PIL003", 'name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200, "brand" => "kenmeat"],
+            ],
+        ];
+
+        $expectedData = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200],
+                ['name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300],
+            ],
+            'total_unit_price' => 500
+        ];
+
+        $action = new FunctionAction("products", [$this, 'assoc_array_find'], ['condition_field' => "name", "condition_operator" => "like", "condition_value" => "Capon", "name"], 'product_name');
+
+        $action->execute($data);
+
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

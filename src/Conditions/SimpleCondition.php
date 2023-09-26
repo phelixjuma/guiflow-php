@@ -36,13 +36,13 @@ class SimpleCondition implements ConditionInterface
         // Handle wildcard paths
         if (is_array($pathValues)) {
             foreach ($pathValues as $pathValue) {
-                if ($this->compare($pathValue, $operator, $value)) {
+                if (self::compare($pathValue, $operator, $value)) {
                     return true; // Return true as soon as one match is found
                 }
             }
             return false; // If no match is found, return false
         } else {
-            return $this->compare($pathValues, $operator, $value);
+            return self::compare($pathValues, $operator, $value);
         }
     }
 
@@ -53,7 +53,7 @@ class SimpleCondition implements ConditionInterface
      * @return bool
      * @throws UnknownOperatorException
      */
-    private function compare($pathValue, $operator, $value)
+    public static function compare($pathValue, $operator, $value): bool
     {
         // The existing switch case logic...
         switch ($operator) {

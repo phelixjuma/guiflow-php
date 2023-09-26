@@ -2,6 +2,9 @@
 
 namespace PhelixJuma\DataTransformer\Utils;
 
+use PhelixJuma\DataTransformer\Conditions\SimpleCondition;
+use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
+
 class Utils
 {
 
@@ -76,5 +79,55 @@ class Utils
             $newData = preg_replace($pattern, $replacement, $data);
         }
         return $newData;
+    }
+
+    /**
+     * @param $data
+     * @param $conditionField
+     * @param $conditionOperator
+     * @param $conditionValue
+     * @param $sumField
+     * @return mixed
+     * @throws UnknownOperatorException
+     */
+    public static function assoc_array_sum_if($data, $conditionField, $conditionOperator, $conditionValue, $sumField): mixed
+    {
+
+        $sum = 0;
+
+        if (!empty($data) && is_array($data)) {
+            foreach ($data as $d) {
+                if (SimpleCondition::compare($d[$conditionField], $conditionOperator, $conditionValue)) {
+                    $sum += $d[$sumField];
+                }
+            }
+        }
+        return $sum;
+    }
+
+    /**
+     * @param $data
+     * @param $conditionField
+     * @param $conditionOperator
+     * @param $conditionValue
+     * @param $returnKey
+     * @return mixed
+     * @throws UnknownOperatorException
+     */
+    public static function assoc_array_find($data, $conditionField, $conditionOperator, $conditionValue, $returnKey = null): mixed
+    {
+
+        if (!empty($data) && is_array($data)) {
+            foreach ($data as $d) {
+
+                if (SimpleCondition::compare($d[$conditionField], $conditionOperator, $conditionValue)) {
+                    if (!empty($returnKey)) {
+                        return $d[$returnKey];
+                    }
+                    return $d;
+                }
+            }
+        }
+        return null;
     }
 }
