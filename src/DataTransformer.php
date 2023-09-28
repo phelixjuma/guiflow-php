@@ -55,17 +55,13 @@ class DataTransformer
                         foreach ($actions as $action) {
                             try {
                                 $this->executeAction($data, $action);
-                            } catch (\Exception $e) {
-                            }
+                            } catch (\Exception|\Throwable $e ) {}
                         }
                     }
-
-                } catch (\Exception $e) {
-                }
+                } catch (\Exception|\Throwable $e ) {}
             }
 
-        } catch (\Exception $e) {
-        }
+        } catch (\Exception|\Throwable $e ) {}
     }
 
     private function evaluateCondition($data, $condition)
