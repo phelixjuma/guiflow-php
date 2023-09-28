@@ -54,7 +54,13 @@ class DataTransformer
                         // Execute the actions
                         foreach ($actions as $action) {
                             try {
-                                $this->executeAction($data, $action);
+                                if (self::isObject($data)) {
+                                    $this->executeAction($data, $action);
+                                } else {
+                                    array_walk($data, function (&$value, $key) use($action) {
+                                        $this->executeAction($value, $action);
+                                    });
+                                }
                             } catch (\Exception|\Throwable $e ) {}
                         }
                     }
@@ -62,6 +68,10 @@ class DataTransformer
             }
 
         } catch (\Exception|\Throwable $e ) {}
+    }
+
+    private static function isObject($data) {
+        return  array_keys($data) !== range(0, count($data) - 1);
     }
 
     private function evaluateCondition($data, $condition)
