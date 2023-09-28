@@ -37,20 +37,34 @@ class DataTransformer
      */
     public function transform(&$data): void
     {
-        $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 
-        foreach ($config as $rule) {
+        try {
 
-            $condition = $rule['condition'];
-            $actions = $rule['actions'];
+            $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 
-            // Evaluate the condition
-            if ($this->evaluateCondition($data, $condition)) {
-                // Execute the actions
-                foreach ($actions as $action) {
-                    $this->executeAction($data, $action);
+            foreach ($config as $rule) {
+
+                try {
+
+                    $condition = $rule['condition'];
+                    $actions = $rule['actions'];
+
+                    // Evaluate the condition
+                    if ($this->evaluateCondition($data, $condition)) {
+                        // Execute the actions
+                        foreach ($actions as $action) {
+                            try {
+                                $this->executeAction($data, $action);
+                            } catch (\Exception $e) {
+                            }
+                        }
+                    }
+
+                } catch (\Exception $e) {
                 }
             }
+
+        } catch (\Exception $e) {
         }
     }
 
