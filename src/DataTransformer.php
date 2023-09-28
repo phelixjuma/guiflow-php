@@ -31,11 +31,48 @@ class DataTransformer
         ConfigurationValidator::validate($this->config);
     }
 
+    public function transform(&$data) {
+
+        $dataCopy = $data;
+        $data = [];
+
+        if (self::isObject($dataCopy)) {
+
+            // For an object, we transform it
+            $this->transformObject($dataCopy);
+
+            // Set the response into data: checking if the response has been split or not.
+            if (self::isObject($dataCopy)) {
+                $data[] = $dataCopy;
+            } else {
+                $data = $dataCopy;
+            }
+
+        } else {
+            // it's an array, we loop
+            foreach ($dataCopy as $item) {
+
+                $this->transformObject($item);
+
+                // Set the response into data: checking if the response has been split or not.
+                if (self::isObject($item)) {
+                    $data[] = $item;
+                } else {
+                    // For a split response, we flatten by adding each item to data
+                    foreach ($item as $it) {
+                        $data[] = $it;
+                    }
+                }
+            }
+        }
+
+    }
+
     /**
      * @param $data
      * @return void
      */
-    public function transform(&$data): void
+    public function transformObject(&$data): void
     {
 
         try {

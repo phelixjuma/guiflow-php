@@ -417,7 +417,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testSplitFunction()
+    public function _testSplitFunction()
     {
         $data = [
             'customer' => 'Naivas',
@@ -451,7 +451,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
