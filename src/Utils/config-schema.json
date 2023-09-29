@@ -50,7 +50,7 @@
           "properties": {
             "action": {
               "type": "string",
-              "enum": ["add", "subtract", "multiply", "divide", "set", "delete", "function"],
+              "enum": ["add", "subtract", "multiply", "divide", "set", "delete", "remove_path", "function"],
               "description": "The operation to be performed."
             },
             "path": {
