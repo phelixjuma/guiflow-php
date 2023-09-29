@@ -139,7 +139,9 @@ class PathResolver
             }
 
             // If the part doesn't exist, exit early
-            if (!isset($current[$part])) {
+            if (is_array($current) && !array_key_exists($part, $current)) {
+                return;
+            } elseif (is_object($current) && !property_exists($current, $part)) {
                 return;
             }
 
