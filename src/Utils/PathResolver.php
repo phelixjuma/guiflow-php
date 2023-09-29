@@ -108,4 +108,51 @@ class PathResolver
         $current = $value;
     }
 
+    public static function removePath(array &$data, string $path)
+    {
+        $parts = explode('.', $path);
+        $current = &$data;
+
+        foreach ($parts as $key => $part) {
+
+            if ($part === '*') {
+
+                // Ensure that the current item is an array
+                if (!is_array($current)) {
+                    return;
+                }
+
+                if ($key === count($parts) - 1) {
+                    // If wildcard is the last part, unset all items in the current array
+                    foreach ($current as &$item) {
+                        unset($item);
+                    }
+                } else {
+                    $nextPath = implode('.', array_slice($parts, $key + 1));
+                    foreach ($current as &$item) {
+                        self::removePath($item, $nextPath);
+                    }
+                }
+                return;  // Exit after processing the wildcard
+            } elseif (is_numeric($part)) {
+                $part = (int)$part;
+            }
+
+            // If the part doesn't exist, exit early
+            if (!isset($current[$part])) {
+                return;
+            }
+
+            // If it's the last part of the path, unset it
+            if ($key === count($parts) - 1) {
+                unset($current[$part]);
+                return;
+            }
+
+            // Move the pointer
+            $current = &$current[$part];
+        }
+    }
+
+
 }

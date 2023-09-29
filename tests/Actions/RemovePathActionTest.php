@@ -3,11 +3,12 @@
 namespace PhelixJuma\DataTransformer\Tests\Actions;
 
 use PhelixJuma\DataTransformer\Actions\DeleteValueAction;
+use PhelixJuma\DataTransformer\Actions\RemovePathAction;
 use PHPUnit\Framework\TestCase;
 
-class DeleteValueActionTest extends TestCase
+class RemovePathActionTest extends TestCase
 {
-    public function _testDeleteSimple()
+    public function testRemovePathSimple()
     {
         $data = [
             'customer' => 'Naivas',
@@ -16,21 +17,13 @@ class DeleteValueActionTest extends TestCase
                 'region' => 'Nairobi'
             ],
             'products' => [
-                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 100]
+                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 100],
+                ['name' => 'Capon Chicken 2', 'quantity' => 3, 'unit_price' => 300],
             ],
         ];
-        $expectedData = [
-            'customer' => null,
-            'location' => [
-                'address' => 'Kilimani',
-                'region' => 'Nairobi'
-            ],
-            'products' => [
-                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 100]
-            ]
-        ];
+        $expectedData = [];
 
-        $action = new DeleteValueAction("customer");
+        $action = new RemovePathAction("products.1.quantity");
 
         $action->execute($data);
 

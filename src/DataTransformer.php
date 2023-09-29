@@ -7,6 +7,7 @@ use PhelixJuma\DataTransformer\Actions\DeleteValueAction;
 use PhelixJuma\DataTransformer\Actions\DivideAction;
 use PhelixJuma\DataTransformer\Actions\FunctionAction;
 use PhelixJuma\DataTransformer\Actions\MultiplyAction;
+use PhelixJuma\DataTransformer\Actions\RemovePathAction;
 use PhelixJuma\DataTransformer\Actions\SetValueAction;
 use PhelixJuma\DataTransformer\Actions\SubtractAction;
 use PhelixJuma\DataTransformer\Conditions\CompositeCondition;
@@ -137,6 +138,7 @@ class DataTransformer
             case 'set':
                 $actionInstance = new $actionClass($action['path'], $action['value'] ?? null, $action['valueFromField'] ?? null, $action['valueMapping'] ?? null);
                 break;
+            case 'remove_path':
             case 'delete':
                 $actionInstance = new $actionClass($action['path']);
                 break;
@@ -174,6 +176,8 @@ class DataTransformer
                 return SetValueAction::class;
             case 'delete':
                 return DeleteValueAction::class;
+            case 'remove_path':
+                return RemovePathAction::class;
             case 'function':
                 return FunctionAction::class;
             default:
