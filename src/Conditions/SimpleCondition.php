@@ -85,13 +85,13 @@ class SimpleCondition implements ConditionInterface
             case '<=':
                 return $pathValue <= $value;
             case 'contains':
-                return strpos($pathValue, $value) !== false;
+                return str_contains($pathValue, $value);
             case 'not contains':
                 return strpos($pathValue, $value) == false;
             case 'exists':
                 return $pathValue == 0 || !empty($pathValue);
             case 'not exists':
-                return $pathValue != 0 || empty($pathValue);
+                return !($pathValue == 0 || !empty($pathValue));
             case 'regex':
                 return preg_match($value, $pathValue) === 1;
             case 'in':
