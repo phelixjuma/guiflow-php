@@ -72,7 +72,7 @@ class DataTransformer
      * @param $data
      * @return void
      */
-    public function transformObject(&$data): void
+    private function transformObject(&$data): void
     {
 
         try {
@@ -141,7 +141,7 @@ class DataTransformer
                 $actionInstance = new $actionClass($action['path']);
                 break;
             case 'function':
-                $actionInstance = new $actionClass($action['path'], [$this->functionsClass, $action['function']], $action['args'] ?? [], $action['newField'] ?? null);
+                $actionInstance = new $actionClass($action['path'], [$this->functionsClass, $action['function']], $action['args'] ?? [], $action['newField'] ?? null, $action['strict'] ?? null);
                 break;
             default:
                 throw new \InvalidArgumentException('Unknown action type: ' . $action['action']);

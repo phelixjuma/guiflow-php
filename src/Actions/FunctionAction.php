@@ -25,6 +25,7 @@ class FunctionAction implements ActionInterface
     private $function;
     private $args;
     private $newField;
+    private $strict;
     private $targetPath;
 
     /**
@@ -33,12 +34,13 @@ class FunctionAction implements ActionInterface
      * @param array $args
      *
      */
-    public function __construct(string $path, $function, array $args, $newField = null)
+    public function __construct(string $path, $function, array $args, $newField = null, $strict = 0)
     {
         $this->path = $path;
         $this->function = $function;
         $this->args = $args;
         $this->newField = $newField;
+        $this->strict = $strict != 0;
         $this->targetPath = !empty($this->newField) ? $this->newField : $this->path;
     }
 
@@ -102,12 +104,16 @@ class FunctionAction implements ActionInterface
             $newValue = call_user_func_array($this->function, $paramValues);
         }
 
-        if (empty($this->targetPath)) {
-            // If target path is not set, it means the whole data is to be updated
-            $data = $newValue;
-        } else {
-            // Otherwise, we only update the relevant parts
-            PathResolver::setValueByPath($data, $this->targetPath, $newValue);
+        // If strict is set, we only set data when new value is not empty
+        if (!$this->strict || (!empty($newValue))) {
+
+            if (empty($this->targetPath)) {
+                // If target path is not set, it means the whole data is to be updated
+                $data = $newValue;
+            } else {
+                // Otherwise, we only update the relevant parts
+                PathResolver::setValueByPath($data, $this->targetPath, $newValue);
+            }
         }
     }
 
