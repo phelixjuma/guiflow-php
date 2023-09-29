@@ -111,11 +111,13 @@ class Utils
      * @param $conditionField
      * @param $conditionOperator
      * @param $conditionValue
+     * @param $conditionSimilarityThreshold
+     * @param $conditionSimilarityTokenize
      * @param $returnKey
      * @return mixed
      * @throws UnknownOperatorException
      */
-    public static function assoc_array_find($data, $conditionField, $conditionOperator, $conditionValue, $conditionSimilarityThreshold = 80, $returnKey = null): mixed
+    public static function assoc_array_find($data, $conditionField, $conditionOperator, $conditionValue, $conditionSimilarityThreshold = 80, $conditionSimilarityTokenize= false, $returnKey = null): mixed
     {
 
         $response = null;
@@ -125,7 +127,7 @@ class Utils
             if (array_key_exists($conditionField, $data[0])) {
                 foreach ($data as $d) {
 
-                    if (SimpleCondition::compare($d[$conditionField], $conditionOperator, $conditionValue, $conditionSimilarityThreshold)) {
+                    if (SimpleCondition::compare($d[$conditionField], $conditionOperator, $conditionValue, $conditionSimilarityThreshold, $conditionSimilarityTokenize)) {
                         if (!empty($returnKey)) {
                             return $d[$returnKey];
                         }
@@ -134,7 +136,7 @@ class Utils
                 }
             } else {
                 foreach ($data as $d) {
-                    $response[] = self::assoc_array_find($d, $conditionField, $conditionOperator, $conditionValue, $conditionSimilarityThreshold, $returnKey);
+                    $response[] = self::assoc_array_find($d, $conditionField, $conditionOperator, $conditionValue, $conditionSimilarityThreshold, $conditionSimilarityTokenize, $returnKey);
                 }
             }
         }

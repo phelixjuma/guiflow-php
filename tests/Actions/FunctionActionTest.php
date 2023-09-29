@@ -332,7 +332,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testConcatFunction()
+    public function testConcatFunction()
     {
         $data = [
             'customer' => 'Naivas',
@@ -353,7 +353,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -564,7 +564,7 @@ class FunctionActionTest extends TestCase
             'total_unit_price' => 500
         ];
 
-        $action = new FunctionAction("products.*.original_value.unit_of_measure", [$this, 'assoc_array_find'], ['condition_field' => "selling_unit", "condition_operator" => "similar_to", "condition_value" => "Pieces - PCS", "condition_threshold" => 80, "return_key" => "selling_quantity"], 'products.*.original_value.number_of_pieces');
+        $action = new FunctionAction("products.*.original_value.unit_of_measure", [$this, 'assoc_array_find'], ['condition_field' => "selling_unit", "condition_operator" => "similar_to", "condition_value" => "Pieces - PCS", "condition_threshold" => 80, "condition_tokenize" => false, "return_key" => "selling_quantity"], 'products.*.original_value.number_of_pieces');
 
         $action->execute($data);
 
@@ -623,11 +623,11 @@ class FunctionActionTest extends TestCase
             'products' => []
         ];
 
-        $action = new FunctionAction("brands", [$this, 'assoc_array_find'], ['condition_field' => "acc", "condition_operator" => "==", "condition_value" => ["path" => "principal_code"], "condition_threshold" => 80, "return_key" => ""], 'brand_details');
+        $action = new FunctionAction("brands", [$this, 'assoc_array_find'], ['condition_field' => "acc", "condition_operator" => "==", "condition_value" => ["path" => "principal_code"], "condition_threshold" => 80, "condition_tokenize" => false, "return_key" => ""], 'brand_details');
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

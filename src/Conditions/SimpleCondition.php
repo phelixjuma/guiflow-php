@@ -62,7 +62,7 @@ class SimpleCondition implements ConditionInterface
      * @return bool
      * @throws UnknownOperatorException
      */
-    public static function compare($pathValue, $operator, $value, $similarityThreshold = null): bool
+    public static function compare($pathValue, $operator, $value, $similarityThreshold = null, $tokenizeSimilarity = false): bool
     {
         $fuzz = new Fuzz();
 
@@ -106,6 +106,9 @@ class SimpleCondition implements ConditionInterface
                 $pattern = str_replace('%', '.*', $value);
                 return preg_match("/$pattern/", $pathValue) === 1;
             case 'similar_to':
+                if ($tokenizeSimilarity) {
+                    return $fuzz->tokenSortPartialRatio($pathValue, $value) >= $similarityThreshold;
+                }
                 return $fuzz->partialRatio($pathValue, $value) >= $similarityThreshold;
             default:
                 throw new UnknownOperatorException("Unknown operator: $operator");
