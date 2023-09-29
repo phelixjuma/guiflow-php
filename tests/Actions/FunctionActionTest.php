@@ -573,6 +573,65 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
+    public function testArrayFindValueFromPath()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                [
+                    'original_value' => [
+                        'name' => 'Capon Chicken',
+                        'unit_of_measure' => [
+                            [
+                                'selling_quantity' => 2,
+                                'selling_unit'    => 'Pieces'
+                            ]
+                        ],
+                        'unit_price' => 200
+                    ]
+                ],
+                [
+                    'original_value' => [
+                        'name' => 'Chicken Sausages',
+                        'unit_of_measure' => [
+                            [
+                                'selling_quantity' => 3,
+                                'selling_unit'    => 'Cases'
+                            ]
+                        ],
+                        'unit_price' => 300
+                    ]
+                ],
+            ],
+            "principal_code" => "WEET",
+            "brands" => [
+                ["name" => "Weetabix", "acc" => "WEET"],
+                ["name" => "UPFIELD", "acc" => "UP"],
+            ]
+        ];
+
+        $expectedData = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => []
+        ];
+
+        $action = new FunctionAction("brands", [$this, 'assoc_array_find'], ['condition_field' => "acc", "condition_operator" => "==", "condition_value" => ["path" => "principal_code"], "condition_threshold" => 80, "return_key" => ""], 'brand_details');
+
+        $action->execute($data);
+
+        print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
     public function _testModelMapping()
     {
         $data = [

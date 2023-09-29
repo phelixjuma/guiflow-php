@@ -33,7 +33,13 @@ class SimpleCondition implements ConditionInterface
         $pathValues = $this->pathResolver::getValueByPath($data, $this->condition['path']);
 
         $operator = $this->condition['operator'];
-        $value = $this->condition['value'] ?? null;
+        $conditionValue = $this->condition['value'] ?? null;
+
+        if (isset($conditionValue['path'])) {
+            $value = $this->pathResolver::getValueByPath($data, $conditionValue['path']);
+        } else {
+            $value = $conditionValue;
+        }
         $similarityThreshold = $this->condition['similarity_threshold'] ?? null;
 
         // Handle wildcard paths
