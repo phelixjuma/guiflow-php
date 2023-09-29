@@ -140,4 +140,25 @@ class Utils
         }
         return $response;
     }
+
+    /**
+     * @param $text
+     * @return string
+     */
+    public static function cleanText($text): string
+    {
+        // Convert text to lowercase
+        $text = strtolower($text);
+
+        // Remove URLs
+        $text = preg_replace('/https?:\/\/\S+/', '', $text);
+
+        // Remove or replace special characters (excluding spaces)
+        $text = preg_replace('/[^a-z0-9\s]/', '', $text);
+
+        // Remove extra spaces
+        $text = preg_replace('/\s+/', ' ', $text);
+        return trim($text);
+    }
+
 }

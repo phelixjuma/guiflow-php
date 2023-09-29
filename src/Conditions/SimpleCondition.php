@@ -5,6 +5,7 @@ namespace PhelixJuma\DataTransformer\Conditions;
 use FuzzyWuzzy\Fuzz;
 use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
 use PhelixJuma\DataTransformer\Utils\PathResolver;
+use PhelixJuma\DataTransformer\Utils\Utils;
 
 class SimpleCondition implements ConditionInterface
 {
@@ -60,8 +61,8 @@ class SimpleCondition implements ConditionInterface
         $fuzz = new Fuzz();
 
         // lowercase
-        $pathValue = is_string($pathValue) ? strtolower($pathValue) : $pathValue;
-        $value = is_string($value) ? strtolower($value)  :$value;
+        $pathValue = is_string($pathValue) ? Utils::cleanText($pathValue) : $pathValue;
+        $value = is_string($value) ? Utils::cleanText($value)  : $value;
 
         // The existing switch case logic...
         switch ($operator) {
@@ -95,8 +96,6 @@ class SimpleCondition implements ConditionInterface
                 $pattern = str_replace('%', '.*', $value);
                 return preg_match("/$pattern/", $pathValue) === 1;
             case 'similar_to':
-                //$ratio = $fuzz->partialRatio($pathValue, $value);
-                //print "ratio of $pathValue to $value = $ratio with threshold of $similarityThreshold \n";
                 return $fuzz->partialRatio($pathValue, $value) >= $similarityThreshold;
             default:
                 throw new UnknownOperatorException("Unknown operator: $operator");
