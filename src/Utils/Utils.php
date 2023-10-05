@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\DataTransformer\Utils;
 
+use PhelixJuma\DataTransformer\Actions\FunctionAction;
 use PhelixJuma\DataTransformer\Conditions\SimpleCondition;
 use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
 
@@ -164,6 +165,11 @@ class Utils
     }
 
     public static function transform_data($data, $transformFunction, $args = [], $targetKeys=[]) {
+
+        if (!in_array($transformFunction, FunctionAction::SUPPORTED_FUNCTIONS)) {
+            throw new UnknownOperatorException();
+        }
+
         $specialFunctions = [
             'str_replace' => function($subject, $search, $replace) {
                 return str_replace($search, $replace, $subject);
