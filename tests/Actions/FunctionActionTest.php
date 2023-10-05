@@ -6,6 +6,7 @@ use PhelixJuma\DataTransformer\Actions\FunctionAction;
 use PhelixJuma\DataTransformer\Actions\SetValueAction;
 use PhelixJuma\DataTransformer\Utils\Filter;
 use PhelixJuma\DataTransformer\Utils\PathResolver;
+use PhelixJuma\DataTransformer\Utils\Utils;
 use PHPUnit\Framework\TestCase;
 
 class FunctionActionTest extends TestCase
@@ -709,6 +710,59 @@ class FunctionActionTest extends TestCase
         $action->execute($data);
 
         //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testAbs()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                [
+                    'original_value' => [
+                        'name' => 'Capon Chicken',
+                        'unit_of_measure' => [
+                            [
+                                'selling_quantity' => -2,
+                                'selling_unit'    => 'Cases'
+                            ],
+                            [
+                                'selling_quantity' => 1,
+                                'selling_unit'    => 'Pieces'
+                            ]
+                        ],
+                        'unit_price' => -200
+                    ]
+                ],
+                [
+                    'original_value' => [
+                        'name' => 'Chicken Sausages',
+                        'unit_of_measure' => [
+                            [
+                                'selling_quantity' => 3,
+                                'selling_unit'    => 'Cases'
+                            ]
+                        ],
+                        'unit_price' => 300
+                    ]
+                ],
+            ],
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("products.*.original_value", [$this, "transform"], ["abs", "args" => [], "target_keys" => ["selling_quantity", "unit_price"]]);
+
+        //$response = Utils::transform_data($data['products'], "abs", [], ['selling_quantity']);
+        //print_r($response);
+        $action->execute($data);
+
+       // print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

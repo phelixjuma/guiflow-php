@@ -76,6 +76,8 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::sortMultiAssocArrayByKey(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'format_date') {
             $newValue = Utils::format_date(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'transform') {
+            $newValue = Utils::transform_data(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'concat') {
             $newValue = Utils::concat($paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'concat_multi_array_assoc') {

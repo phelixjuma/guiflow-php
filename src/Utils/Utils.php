@@ -163,4 +163,41 @@ class Utils
         return trim($text);
     }
 
+    public static function transform_data($data, $transformFunction, $args = [], $targetKeys=[]) {
+        $specialFunctions = [
+            'str_replace' => function($subject, $search, $replace) {
+                return str_replace($search, $replace, $subject);
+            },
+            'preg_replace' => function($subject, $pattern, $replacement) {
+                return preg_replace($pattern, $replacement, $subject);
+            }
+        ];
+
+        // Extract options
+
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                if (is_array($value)) {
+                    $data[$key] = self::transform_data($value, $transformFunction, $args, $targetKeys);
+                } else {
+                    if (empty($targetKeys) || in_array($key, $targetKeys)) {
+                        if (isset($specialFunctions[$transformFunction])) {
+                            $data[$key] = $specialFunctions[$transformFunction]($value, ...$args);
+                        } else {
+                            $data[$key] = !empty($args) ? $transformFunction($value, ...$args) : $transformFunction($value);
+                        }
+                    }
+                }
+            }
+        } elseif (empty($targetKeys)) {
+            return isset($specialFunctions[$transformFunction])
+                ? $specialFunctions[$transformFunction]($data, ...$args)
+                : (!empty($args) ? $transformFunction($data, ...$args) : $transformFunction($data));
+        }
+
+        return $data;
+    }
+
+
+
 }

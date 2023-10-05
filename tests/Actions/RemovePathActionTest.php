@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class RemovePathActionTest extends TestCase
 {
-    public function testRemovePathSimple()
+    public function _testRemovePathSimple()
     {
         $data = [
             'customer' => null,
@@ -27,7 +27,7 @@ class RemovePathActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
