@@ -781,6 +781,7 @@ class FunctionActionTest extends TestCase
                     ["ItemName" => "BOKOMO N/SOURCE SUPER QUICK MORNING OATS 500G"],
                 ]
             ];
+
         $expectedData = [];
 
         $valueMapping = [
@@ -806,23 +807,40 @@ class FunctionActionTest extends TestCase
                     'region' => 'Nairobi'
                 ],
                 'products' => [
-                    ["ItemName" => "Luc Boost Buzz 1l Tet X12"],
-                    ["ItemName" => "Radiant Hair Shampoo Strawberry 1l New"],
-                    ["ItemName" => "Pride Liquid 1l"],
-                    ["ItemName" => "Tropikal Tc Citrus 1 Ltr Free Gift"],
-                    ["ItemName" => "Fruit Pardise Tp 1 Ltr"],
-                    ["ItemName" => "CERES SEASON'S TREASURES JUICE 1L-"],
-                    ["ItemName" => "BOKOMO N/SOURCE SUPER QUICK MORNING OATS 500G"],
+                    ["ItemName" => "Ribena Cordial 50cl Pet Cordial"],
                     ["ItemName" => "Ribena Dil Bc 300ml Gla X12"],
+                    ["ItemName" => "Ribena Dil Bc 600ml Gla X12"],
+                    ["ItemName" => "Ribena Rtd Bc 1l Tet X12"],
+                    ["ItemName" => "Ribena Rtd Bc 250ml Tet X24"],
                     ["ItemName" => "Ribena Rtd Bc&S/Berry 1l Tet X12"],
-                    ["ItemName" => "Blueband Lf Mayonnaise 12x295ml Botdbke"],
+                    ["ItemName" => "Ribena Rtd Bc&S/Berry 250ml Tet X24"],
+                    ["ItemName" => "Rib Rtd Bc 25cl Pet 2x24"],
+                    ["ItemName" => "Rib Rtd Bc 50cl Pet X12"],
+                    ["ItemName" => "Rib Spark Bc Can Regular 325ml X24"],
+                    ["ItemName" => "Ribena Cordial 1l Pet Cordial"],
+                    ["ItemName" => "Grape Blackberry-250ml"],
+                    ["ItemName" => "Lucozade Boost Buzz 1l Pet X12"],
+                    ["ItemName" => "Lucozade Nrg Boost 250ml Tet X24"],
+                    ["ItemName" => "Lucozade Nrg Original 300ml Gla X12"],
+                    ["ItemName" => "Lucozade Nrg Original 600ml Gla X12"],
+                    ["ItemName" => "WEETABIX STANDARD - 48 PCS-210GMS"],
+                    ["ItemName" => "WEETABIX JUMBO OATS 500G"],
+                    ["ItemName" => "WEETABIX JUMBO OATS 1KG"],
+                    ["ItemName" => "WEETABIX MINIS - CHOCOLATE 450G"],
+                    ["ItemName" => "WEETABIX JUMBO OATS 500G"],
+                    ["ItemName" => "CERES PASSION FRUIT JUICE 1L"],
+                    ["ItemName" => "CERES CRANBERRY/KIWI JUICE 1L -"]
                 ]
             ];
 
         $mapping = [
             "Dil"    => "Diluted",
             "Bc"    => "Black Currant",
+            "Rtd"    => "Ready to Drink",
+            "Nrg"    => "Energy",
             "S/Berry"   => "Straw Berry",
+            "Rib"   => "Ribena",
+            "Luc"   => "Lucozade",
             "Gla" => "",
             "Tet" => "",
             "X12" => "",
@@ -833,7 +851,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("products.*.ItemName", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "isCaseSensitive" => false], "target_keys" => []]);
+        $action = new FunctionAction("products.*.ItemName", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "isCaseSensitive" => false, 'retainSearch' => true], "target_keys" => []]);
 
         $action->execute($data);
 

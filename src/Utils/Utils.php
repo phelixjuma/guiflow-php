@@ -182,9 +182,10 @@ class Utils
                 $mappings = array_change_key_case($mappings, CASE_LOWER);
                 return $mappings[strtolower($value)] ?? $value;
             },
-            'regex_mapper' => function($value, $mappings, $isCaseSensitive = false) {
+            'regex_mapper' => function($value, $mappings, $isCaseSensitive = false, $retainSearch=true) {
                 $modifier = !$isCaseSensitive ? 'i' : '';
                 foreach ($mappings as $search => $replace) {
+                    $replace = $retainSearch && !empty($replace) ? "$search ($replace)" : $replace;
                     $value = preg_replace('/\b' . preg_quote($search, '/') . '\b/' . $modifier, $replace, $value);
                 }
                 return preg_replace('/\s+/', ' ', $value);
