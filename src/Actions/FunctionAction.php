@@ -21,7 +21,7 @@ class FunctionAction implements ActionInterface
         'intval', 'floatval',
         'preg_match', 'preg_replace',
         // custom functions
-        'dictionary_mapper'
+        'dictionary_mapper', 'regex_mapper'
     ];
 
     private $path;

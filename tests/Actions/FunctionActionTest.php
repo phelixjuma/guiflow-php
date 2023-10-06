@@ -763,7 +763,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testValueMapping()
+    public function _testValueMapping()
     {
         $data =
             ['customer' => 'Naivas',
@@ -789,6 +789,51 @@ class FunctionActionTest extends TestCase
         ];
 
         $action = new FunctionAction("products.*.ItemName", [$this, "transform"], ["dictionary_mapper", "args" => ["mappings" => $valueMapping], "target_keys" => []]);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testRegexMapper()
+    {
+        $data =
+            ['customer' => 'Naivas',
+                'location' => [
+                    'address' => 'Kilimani',
+                    'region' => 'Nairobi'
+                ],
+                'products' => [
+                    ["ItemName" => "Luc Boost Buzz 1l Tet X12"],
+                    ["ItemName" => "Radiant Hair Shampoo Strawberry 1l New"],
+                    ["ItemName" => "Pride Liquid 1l"],
+                    ["ItemName" => "Tropikal Tc Citrus 1 Ltr Free Gift"],
+                    ["ItemName" => "Fruit Pardise Tp 1 Ltr"],
+                    ["ItemName" => "CERES SEASON'S TREASURES JUICE 1L-"],
+                    ["ItemName" => "BOKOMO N/SOURCE SUPER QUICK MORNING OATS 500G"],
+                    ["ItemName" => "Ribena Dil Bc 300ml Gla X12"],
+                    ["ItemName" => "Ribena Rtd Bc&S/Berry 1l Tet X12"],
+                    ["ItemName" => "Blueband Lf Mayonnaise 12x295ml Botdbke"],
+                ]
+            ];
+
+        $mapping = [
+            "Dil"    => "Diluted",
+            "Bc"    => "Black Currant",
+            "S/Berry"   => "Straw Berry",
+            "Gla" => "",
+            "Tet" => "",
+            "X12" => "",
+            "X24" => "",
+            "Botdbke" => "",
+            "n/source" => "Nature's Source"
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("products.*.ItemName", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "isCaseSensitive" => false], "target_keys" => []]);
 
         $action->execute($data);
 

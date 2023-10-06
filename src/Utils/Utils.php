@@ -181,6 +181,13 @@ class Utils
                 // Set keys to lower case
                 $mappings = array_change_key_case($mappings, CASE_LOWER);
                 return $mappings[strtolower($value)] ?? $value;
+            },
+            'regex_mapper' => function($value, $mappings, $isCaseSensitive = false) {
+                $modifier = !$isCaseSensitive ? 'i' : '';
+                foreach ($mappings as $search => $replace) {
+                    $value = preg_replace('/\b' . preg_quote($search, '/') . '\b/' . $modifier, $replace, $value);
+                }
+                return preg_replace('/\s+/', ' ', $value);
             }
         ];
 
