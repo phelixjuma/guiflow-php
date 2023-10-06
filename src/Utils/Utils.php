@@ -176,6 +176,11 @@ class Utils
             },
             'preg_replace' => function($subject, $pattern, $replacement) {
                 return preg_replace($pattern, $replacement, $subject);
+            },
+            'dictionary_mapper' => function($value, $mappings) {
+                // Set keys to lower case
+                $mappings = array_change_key_case($mappings, CASE_LOWER);
+                return $mappings[strtolower($value)] ?? $value;
             }
         ];
 

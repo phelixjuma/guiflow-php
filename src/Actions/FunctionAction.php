@@ -11,6 +11,7 @@ use PhelixJuma\DataTransformer\Utils\PathResolver;
 class FunctionAction implements ActionInterface
 {
     const SUPPORTED_FUNCTIONS = [
+        // php functions
         'strtolower', 'strtoupper', 'trim', 'ucwords','strlen', 'explode', 'implode', 'nl2br', 'number_format',
         'levenshtein', 'similar_text', 'soundex','str_contains', 'str_ireplace', 'str_replace', 'substr', 'strtr',
         'strtotime',
@@ -18,7 +19,9 @@ class FunctionAction implements ActionInterface
         'round', 'floor', 'ceil', 'abs', 'exp', 'max', 'min', 'pow', 'sqrt', 'array_sum','count', 'sizeof',
         'json_encode', 'json_decode',
         'intval', 'floatval',
-        'preg_match', 'preg_replace'
+        'preg_match', 'preg_replace',
+        // custom functions
+        'dictionary_mapper'
     ];
 
     private $path;

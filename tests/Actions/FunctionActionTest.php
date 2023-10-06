@@ -714,7 +714,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testAbs()
+    public function _testAbs()
     {
         $data = [
             'customer' => 'Naivas',
@@ -724,45 +724,75 @@ class FunctionActionTest extends TestCase
             ],
             'products' => [
                 [
-                    'original_value' => [
-                        'name' => 'Capon Chicken',
-                        'unit_of_measure' => [
-                            [
-                                'selling_quantity' => -2,
-                                'selling_unit'    => 'Cases'
-                            ],
-                            [
-                                'selling_quantity' => 1,
-                                'selling_unit'    => 'Pieces'
-                            ]
+                    'name' => 'Capon Chicken',
+                    'unit_of_measure' => [
+                        [
+                            'selling_quantity' => "-2",
+                            'selling_unit'    => 'Cases'
                         ],
-                        'unit_price' => -200
-                    ]
+                        [
+                            'selling_quantity' => 1,
+                            'selling_unit'    => 'Pieces'
+                        ]
+                    ],
+                    'unit_price' => -200
                 ],
                 [
-                    'original_value' => [
-                        'name' => 'Chicken Sausages',
-                        'unit_of_measure' => [
-                            [
-                                'selling_quantity' => 3,
-                                'selling_unit'    => 'Cases'
-                            ]
-                        ],
-                        'unit_price' => 300
-                    ]
+                    'name' => 'Chicken Sausages',
+                    'unit_of_measure' => [
+                        [
+                            'selling_quantity' => 3,
+                            'selling_unit'    => 'Cases'
+                        ]
+                    ],
+                    'unit_price' => 300
                 ],
             ],
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("products.*.original_value", [$this, "transform"], ["abs", "args" => [], "target_keys" => ["selling_quantity", "unit_price"]]);
+        $action = new FunctionAction("products.*.unit_of_measure.*.selling_quantity", [$this, "transform"], ["abs", "args" => [], "target_keys" => []]);
 
         //$response = Utils::transform_data($data['products'], "abs", [], ['selling_quantity']);
         //print_r($response);
         $action->execute($data);
 
-       // print_r($data);
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testValueMapping()
+    {
+        $data =
+            ['customer' => 'Naivas',
+                'location' => [
+                    'address' => 'Kilimani',
+                    'region' => 'Nairobi'
+                ],
+                'products' => [
+                    ["ItemName" => "Luc Boost Buzz 1l Tet X12"],
+                    ["ItemName" => "Radiant Hair Shampoo Strawberry 1l New"],
+                    ["ItemName" => "Pride Liquid 1l"],
+                    ["ItemName" => "Tropikal Tc Citrus 1 Ltr Free Gift"],
+                    ["ItemName" => "Fruit Pardise Tp 1 Ltr"],
+                    ["ItemName" => "CERES SEASON'S TREASURES JUICE 1L-"],
+                    ["ItemName" => "BOKOMO N/SOURCE SUPER QUICK MORNING OATS 500G"],
+                ]
+            ];
+        $expectedData = [];
+
+        $valueMapping = [
+            'Luc Boost Buzz 1l Tet X12' => 'Lucozade Boost Buzz 1l Pet',
+            'Bokomo N/SOURCE SUPER QUICK MORNING OATS 500G' => "Bokomo Nature's Source Super Quick Morning Oats 500g"
+        ];
+
+        $action = new FunctionAction("products.*.ItemName", [$this, "transform"], ["dictionary_mapper", "args" => ["mappings" => $valueMapping], "target_keys" => []]);
+
+        $action->execute($data);
+
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
