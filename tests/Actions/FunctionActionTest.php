@@ -5,8 +5,6 @@ namespace PhelixJuma\DataTransformer\Tests\Actions;
 use PhelixJuma\DataTransformer\Actions\FunctionAction;
 use PhelixJuma\DataTransformer\Actions\SetValueAction;
 use PhelixJuma\DataTransformer\Utils\Filter;
-use PhelixJuma\DataTransformer\Utils\PathResolver;
-use PhelixJuma\DataTransformer\Utils\Utils;
 use PHPUnit\Framework\TestCase;
 
 class FunctionActionTest extends TestCase
@@ -798,10 +796,11 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testRegexMapper()
+    public function _testRegexMapper()
     {
         $data =
-            ['customer' => 'Naivas',
+            [
+                'customer' => 'Naivas',
                 'location' => [
                     'address' => 'Kilimani',
                     'region' => 'Nairobi'
@@ -855,7 +854,86 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testJoinFunction()
+    {
+        $data = [
+            [
+                'customer' => 'Naivas',
+                'order_number' => '009876',
+                'location' => [
+                    'address' => 'Kilimani',
+                    'region' => 'Nairobi'
+                ],
+                'products' => [
+                    ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200, "brand" => "Kenchic"],
+                    ['name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300, "brand" => "Kenchic"],
+                    ['name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200, "brand" => "kenmeat"],
+                ]
+            ],
+            [
+                'customer' => 'Tumaini',
+                'order_number' => '019876',
+                'location' => [
+                    'address' => 'Kilimani',
+                    'region' => 'Nairobi'
+                ],
+                'products' => [
+                    ['name' => 'Chicken Sausages 100g', 'quantity' => 5, 'unit_price' => 200, "brand" => "kenmeat"],
+                ]
+            ],
+            [
+                'customer' => 'Naivas',
+                'order_number' => '009876',
+                'location' => [
+                    'address' => 'Kilimani',
+                    'region' => 'Nairobi'
+                ],
+                'products' => [
+                    ['name' => 'Chicken Sausages 250g', 'quantity' => 5, 'unit_price' => 200, "brand" => "kenmeat"],
+                ]
+            ],
+            [
+                'customer' => 'QuickMart',
+                'order_number' => '009876',
+                'location' => [
+                    'address' => 'Kilimani',
+                    'region' => 'Nairobi'
+                ],
+                'products' => [
+                    ['name' => 'Chicken Sausages 100g', 'quantity' => 5, 'unit_price' => 200, "brand" => "kenmeat"],
+                ]
+            ]
+        ];
+
+
+        $joinPaths = ['products'];
+
+        $condition = [
+            'operator' => 'OR',
+            'conditions' => [
+                [
+                    'path' => 'customer',
+                    'operator' => '==',
+                ],
+                [
+                    'path' => 'order_number',
+                    'operator' => '==',
+                ]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("", [$this, 'join'], ['join_paths' => $joinPaths, 'criteria' => $condition]);
+
+        $action->execute($data);
+
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

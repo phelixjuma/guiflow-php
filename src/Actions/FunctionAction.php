@@ -2,6 +2,8 @@
 
 namespace PhelixJuma\DataTransformer\Actions;
 
+use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
+use PhelixJuma\DataTransformer\Utils\DataJoiner;
 use PhelixJuma\DataTransformer\Utils\Filter;
 use PhelixJuma\DataTransformer\Utils\ModelMapper;
 use PhelixJuma\DataTransformer\Utils\UnitConverter;
@@ -47,6 +49,11 @@ class FunctionAction implements ActionInterface
         $this->targetPath = !empty($this->newField) ? $this->newField : $this->path;
     }
 
+    /**
+     * @param $data
+     * @return void
+     * @throws UnknownOperatorException
+     */
     public function execute(&$data)
     {
 
@@ -65,8 +72,9 @@ class FunctionAction implements ActionInterface
 
             } else {
 
-                $param = self::getFilterCriteria($data, $param);
-
+                if ($this->function['1'] != 'join') {
+                    $param = self::getFilterCriteria($data, $param);
+                }
                 $paramValues[] = $param;
             }
         }
@@ -75,6 +83,8 @@ class FunctionAction implements ActionInterface
             $newValue = Filter::filterArray(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'split') {
             $newValue = Filter::splitByPath(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'join') {
+            $newValue = (new DataJoiner(...$paramValues))->mergeData();
         } elseif (isset($this->function[1]) && $this->function['1'] == 'sort_multi_by_key') {
             $newValue = Utils::sortMultiAssocArrayByKey(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'format_date') {
