@@ -77,7 +77,6 @@ class DataJoiner
         return $datum1;
     }
 
-
     /**
      * @param array $datum1
      * @param array $datum2
@@ -96,9 +95,8 @@ class DataJoiner
 
         // Handling simple condition
         if (empty($operator) || empty($conditions)) {
-
-            $path = $condition['path'];
-            $compareOperator = $condition['operator'];
+            $path = $condition['path'] ?? null;
+            $compareOperator = $condition['operator'] ?? null;
 
             $value1 = $this->pathResolver->getValueByPath($datum1, $path);
             $value2 = $this->pathResolver->getValueByPath($datum2, $path);
@@ -113,35 +111,32 @@ class DataJoiner
 
         // Handling composite condition
         if (!empty($operator) && !empty($conditions)) {
-            $results = [];
-            foreach ($conditions as $cond) {
-                $results[] = $this->evaluateCondition($datum1, $datum2, $cond);
+            // Handling 'AND' operator
+            if (strtolower($operator) === 'and') {
+                foreach ($conditions as $cond) {
+                    if (!$this->evaluateCondition($datum1, $datum2, $cond)) {
+                        return false;
+                    }
+                }
+                return true;
             }
-            return $operator === 'and' ? self::all($results) : self::any($results);
+
+            // Handling 'OR' operator
+            elseif (strtolower($operator) === 'or') {
+                foreach ($conditions as $cond) {
+                    if ($this->evaluateCondition($datum1, $datum2, $cond)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            // Invalid Operator
+            else {
+                throw new UnknownOperatorException('Invalid operator in condition');
+            }
         }
 
         throw new UnknownOperatorException('Invalid condition format');
-    }
-
-    /**
-     * @param array $input
-     * @return bool
-     */
-    private function all(array $input): bool
-    {
-        return array_reduce($input, function ($carry, $item) {
-            return $carry && $item;
-        }, true);
-    }
-
-    /**
-     * @param array $input
-     * @return bool
-     */
-    private function any(array $input): bool
-    {
-        return array_reduce($input, function ($carry, $item) {
-            return $carry || $item;
-        }, false);
     }
 }

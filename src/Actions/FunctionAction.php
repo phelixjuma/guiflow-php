@@ -64,17 +64,19 @@ class FunctionAction implements ActionInterface
         $paramValues = [$currentValues];
 
         foreach ($this->args as $param) {
-            if (is_array($param) && isset($param['path'])) {
 
-                $paramPath = $param['path'];
-                $paramValue = PathResolver::getValueByPath($data, $paramPath);
-                $paramValues[] = $paramValue;
+            if ($this->function['1'] != 'join') {
 
-            } else {
+                if (is_array($param) && isset($param['path'])) {
 
-                if ($this->function['1'] != 'join') {
-                    $param = self::getFilterCriteria($data, $param);
+                    $paramPath = $param['path'];
+                    $paramValue = PathResolver::getValueByPath($data, $paramPath);
+                    $paramValues[] = $paramValue;
+
+                } else {
+                    $paramValues[] = self::getFilterCriteria($data, $param);
                 }
+            } else {
                 $paramValues[] = $param;
             }
         }

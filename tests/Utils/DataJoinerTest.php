@@ -66,15 +66,24 @@ class DataJoinerTest extends TestCase
         $joinPaths = ['products'];
 
         $condition = [
-            'operator' => 'OR',
+            'operator' => 'AND',
             'conditions' => [
                 [
-                    'path' => 'customer',
+                    'path' => 'location.address',
                     'operator' => '==',
                 ],
                 [
-                    'path' => 'order_number',
-                    'operator' => '==',
+                    'operator' => 'OR',
+                    'conditions' => [
+                        [
+                            'path' => 'customer',
+                            'operator' => '==',
+                        ],
+                        [
+                            'path' => 'order_number',
+                            'operator' => '==',
+                        ]
+                    ]
                 ]
             ]
         ];
