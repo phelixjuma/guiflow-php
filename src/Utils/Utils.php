@@ -172,9 +172,15 @@ class Utils
 
         $specialFunctions = [
             'str_replace' => function($subject, $search, $replace) {
+                if (str_contains($subject, $replace)) {
+                    return $subject;
+                }
                 return str_replace($search, $replace, $subject);
             },
             'preg_replace' => function($subject, $pattern, $replacement) {
+                if (str_contains($subject, $replacement)) {
+                    return $subject;
+                }
                 return preg_replace($pattern, $replacement, $subject);
             },
             'dictionary_mapper' => function($value, $mappings) {
@@ -185,8 +191,12 @@ class Utils
             'regex_mapper' => function($value, $mappings, $isCaseSensitive = false, $retainSearch=true) {
                 $modifier = !$isCaseSensitive ? 'i' : '';
                 foreach ($mappings as $search => $replace) {
+
                     $replace = $retainSearch && !empty($replace) ? "$search ($replace)" : $replace;
-                    $value = preg_replace('/\b' . preg_quote($search, '/') . '\b/' . $modifier, $replace, $value);
+
+                    if (!str_contains($value, $replace)) {
+                        $value = preg_replace('/\b' . preg_quote($search, '/') . '\b/' . $modifier, $replace, $value);
+                    }
                 }
                 return preg_replace('/\s+/', ' ', $value);
             }
