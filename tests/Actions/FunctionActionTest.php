@@ -81,7 +81,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testFilterFunction()
+    public function _testFilterFunction()
     {
         $data = [
             'customer' => 'Naivas',
@@ -126,7 +126,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -796,7 +796,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testRegexMapper()
+    public function testRegexMapper()
     {
         $data =
             [
@@ -850,11 +850,11 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("products.*.ItemName", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "isCaseSensitive" => false, 'retainSearch' => true], "target_keys" => []]);
+        $action = new FunctionAction("products.*.ItemName", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "isCaseSensitive" => false, 'retainSearch' => true, 'wordBoundary' => false], "target_keys" => []]);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

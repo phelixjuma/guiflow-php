@@ -194,6 +194,18 @@ class Utils
         return $defaultChoice;
     }
 
+    private static function  custom_preg_escape($input) {
+
+        // Define characters to escape
+        $charsToEscape = ['/',"'", '"'];  // Add any other characters you'd like to escape
+
+        // Escape each character
+        foreach ($charsToEscape as $char) {
+            $input = str_replace($char, '\\' . $char, $input);
+        }
+
+        return $input;
+    }
     public static function transform_data($data, $transformFunction, $args = [], $targetKeys=[]) {
 
         if (!in_array($transformFunction, FunctionAction::SUPPORTED_FUNCTIONS)) {
@@ -218,14 +230,15 @@ class Utils
                 $mappings = array_change_key_case($mappings, CASE_LOWER);
                 return $mappings[strtolower($value)] ?? $value;
             },
-            'regex_mapper' => function($value, $mappings, $isCaseSensitive = false, $retainSearch=true) {
+            'regex_mapper' => function($value, $mappings, $isCaseSensitive = false, $retainSearch=true, $wordBoundary = true) {
                 $modifier = !$isCaseSensitive ? 'i' : '';
                 foreach ($mappings as $search => $replace) {
 
                     $replace = $retainSearch && !empty($replace) ? "$search ($replace)" : $replace;
 
                     if (!str_contains($value, $replace)) {
-                        $value = preg_replace('/\b' . preg_quote($search, '/') . '\b/' . $modifier, $replace, $value);
+                        $pattern = $wordBoundary ? '/\b' . self::custom_preg_escape($search, '/') . '\b/' : '/' . self::custom_preg_escape($search, '/') . '/';
+                        $value = preg_replace($pattern . $modifier, $replace, $value);
                     }
                 }
                 return preg_replace('/\s+/', ' ', $value);
