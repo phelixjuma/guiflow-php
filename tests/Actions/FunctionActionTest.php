@@ -848,9 +848,21 @@ class FunctionActionTest extends TestCase
             "n/source" => "Nature's Source"
         ];
 
+        $data = [
+            'products' => [
+                ['ItemName' => 'NAIVAS JUJA SHOP-JUJA SH']
+            ]
+        ];
+
+        $mapping = [
+            "(?:s|sh|sho|shop)" => "Shop",
+            "(?:d|de|del|deli)" => "Deli",
+            "(?:b|bu|but|butc|butch|butche|butcher|butchery)" => "Butchery"
+        ];
+
         $expectedData = [];
 
-        $action = new FunctionAction("products.*.ItemName", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "isCaseSensitive" => false, 'retainSearch' => true, 'wordBoundary' => false], "target_keys" => []]);
+        $action = new FunctionAction("products.*.ItemName", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "isCaseSensitive" => false, 'wordBoundary' => true], "target_keys" => []]);
 
         $action->execute($data);
 

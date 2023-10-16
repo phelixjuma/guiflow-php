@@ -230,11 +230,9 @@ class Utils
                 $mappings = array_change_key_case($mappings, CASE_LOWER);
                 return $mappings[strtolower($value)] ?? $value;
             },
-            'regex_mapper' => function($value, $mappings, $isCaseSensitive = false, $retainSearch=true, $wordBoundary = true) {
+            'regex_mapper' => function($value, $mappings, $isCaseSensitive = false, $wordBoundary = true) {
                 $modifier = !$isCaseSensitive ? 'i' : '';
                 foreach ($mappings as $search => $replace) {
-
-                    $replace = $retainSearch && !empty($replace) ? "$search ($replace)" : $replace;
 
                     if (!str_contains($value, $replace)) {
                         $pattern = $wordBoundary ? '/\b' . self::custom_preg_escape($search, '/') . '\b/' : '/' . self::custom_preg_escape($search, '/') . '/';
