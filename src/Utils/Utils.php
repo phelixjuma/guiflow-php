@@ -2,6 +2,8 @@
 
 namespace PhelixJuma\DataTransformer\Utils;
 
+use FuzzyWuzzy\Fuzz;
+use FuzzyWuzzy\Process;
 use PhelixJuma\DataTransformer\Actions\FunctionAction;
 use PhelixJuma\DataTransformer\Conditions\SimpleCondition;
 use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
@@ -162,6 +164,29 @@ class Utils
         // Remove extra spaces
         $text = preg_replace('/\s+/', ' ', $text);
         return trim($text);
+    }
+
+    /**
+     * @param $query
+     * @param $choices
+     * @return mixed|null
+     */
+    public static function fuzzy_extract_one($query, $choices, $minScore=50, $defaultChoice="", $fuzzyMethod = 'tokenSetRatio') {
+
+        $fuzz = new Fuzz();
+        $fuzzProcess = new Process();
+
+        $result = $fuzzProcess->extractOne($query, $choices, null, [$fuzz, $fuzzyMethod]);
+
+        if (!empty($result)) {
+            $choice = $result[0];
+            $score = $result[1];
+
+            if ($score >= $minScore) {
+                return $choice;
+            }
+        }
+        return $defaultChoice;
     }
 
     public static function transform_data($data, $transformFunction, $args = [], $targetKeys=[]) {

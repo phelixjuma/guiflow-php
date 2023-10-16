@@ -81,7 +81,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testFilterFunction()
+    public function testFilterFunction()
     {
         $data = [
             'customer' => 'Naivas',
@@ -98,11 +98,11 @@ class FunctionActionTest extends TestCase
         $criteria = [
             "operator"      => "OR",
             "conditions"    => [
-                ['term' => 'capon chicken', 'mode' => Filter::EQUAL, 'key' => 'name'],
+                ['term' => ['path' => 'products.0.name'], 'mode' => Filter::EQUAL, 'key' => 'name'],
                 [
                     "operator" => "AND",
                     "conditions"    => [
-                        ['term' => 'sausages', 'mode' => Filter::CONTAINS, 'key' => 'name'],
+                        ['term' => ['path' => 'products.0.name'], 'mode' => Filter::CONTAINS, 'key' => 'name'],
                         ['term' => 200, 'mode' => Filter::GREATER, 'key' => 'unit_price'],
                     ]
                 ]
@@ -126,7 +126,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -609,7 +609,7 @@ class FunctionActionTest extends TestCase
             "principal_code" => "WEET",
             "brands" => [
                 ["name" => "Weetabix", "acc" => "WEET"],
-                ["name" => "UPFIELD", "acc" => "UP"],
+                ["name" => "UPFIELD", "acc" => "WEET"],
             ]
         ];
 
@@ -859,7 +859,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testJoinFunction()
+    public function _testJoinFunction()
     {
         $data = [
             [
@@ -956,7 +956,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

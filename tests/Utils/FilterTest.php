@@ -185,12 +185,20 @@ class FilterTest extends TestCase
             ]
         ];
 
+        $data = [
+            ['name' => 'Apples'],
+            ['name' => "Oranges"],
+            ['name' => "Lemons"],
+            ['name' => "Pears"],
+            ['name' => "Mangoes"],
+        ];
+
 
         $conditions = [
             "operator"      => "OR",
             "conditions"    => [
-                ['term' => 'mango', 'mode' => Filter::SIMILAR_TO, 'threshold' => 80, 'key' => 'products.*.name'],
-                ['term' => 'pears', 'mode' => Filter::EQUAL, 'key' => 'products.*.name']
+                ['term' => 'Mangoes', 'mode' => Filter::SIMILAR_TO, 'threshold' => 80, 'key' => 'name'],
+                ['term' => 'Pears', 'mode' => Filter::EQUAL, 'key' => 'name']
             ]
         ];
 

@@ -8,12 +8,12 @@ class Filter
 {
 
     // operators
-    const EQUAL = 'equal';
-    const NOT_EQUAL = 'not equal';
-    const GREATER = 'greater';
-    const GREATER_OR_EQUAL = 'greater or equal';
-    const LESS = 'less';
-    const LESS_OR_EQUAL = 'less or equal';
+    const EQUAL = '==';
+    const NOT_EQUAL = '!=';
+    const GREATER = '>';
+    const GREATER_OR_EQUAL = '>=';
+    const LESS = '<';
+    const LESS_OR_EQUAL = '<=';
     const IN = 'in';
     const NOT_IN = 'not in';
     const REGEX = 'regex';
