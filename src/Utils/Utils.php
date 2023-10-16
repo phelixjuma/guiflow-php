@@ -38,9 +38,14 @@ class Utils
         return date($format, $date);
     }
 
-    public static function concat(array $strings): string
+    /**
+     * @param array $strings
+     * @param $separator
+     * @return string
+     */
+    public static function concat(array $strings, $separator = " "): string
     {
-        return implode(" ", $strings);
+        return implode($separator, $strings);
     }
 
     /**
@@ -49,17 +54,17 @@ class Utils
      * @param $newField
      * @return array
      */
-    public static function concat_multi_array_assoc(array $data, array $fields, $newField): array
+    public static function concat_multi_array_assoc(array $data, array $fields, $newField, $separator = " "): array
     {
 
-        array_walk($data, function (&$value, $key) use($fields, $newField) {
-            $dataToConcat = [];
+        array_walk($data, function (&$value, $key) use($fields, $newField, $separator) {
+            $dataToConcat = array_flip($fields);
             foreach ($value as $key => $v) {
                 if (in_array($key, $fields)) {
-                    $dataToConcat[] = $v;
+                    $dataToConcat[$key] = $v;
                 }
             }
-            $value[$newField] = self::concat($dataToConcat);
+            $value[$newField] = self::concat(array_values($dataToConcat), $separator);
         });
 
         return $data;
