@@ -50,7 +50,6 @@ class DataReducer
 
         if (sizeof($values) ==1 ) {
             // Only one modal value, we return it
-            print_r($values);
             return array_values(array_flip($values))[0];
         }
 
