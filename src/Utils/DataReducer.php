@@ -41,8 +41,11 @@ class DataReducer
         $values = (array_count_values($data));
         // We sort the values in desc order
         arsort($values);
+
         // We get the first value
-        $firstVal = next($values);
+        $firstVal = $values;
+        $firstVal = array_values(array_splice($firstVal, 0, 1))[0];
+
         // We get all the items in the array that have the same value as the first (modal values can be multiple)
         $values = array_filter($values, function($v) use($firstVal) {
             return $v == $firstVal;

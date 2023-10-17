@@ -963,7 +963,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("sections", [$this, "reducer"], ["reducer" => "modal_value", 'priority' => ['Deli' => 1, 'Shop' => 2], "default" => 'Butchery'], "section");
+        $action = new FunctionAction("sections", [$this, "reducer"], ["reducer" => "modal_value", 'priority' => ['Shop' => 1, 'Deli' => 2, 'Butchery' => 3], "default" => 'Shop'], "section");
 
         $action->execute($data);
 
