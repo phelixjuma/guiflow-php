@@ -849,20 +849,28 @@ class FunctionActionTest extends TestCase
         ];
 
         $data = [
-            'products' => [
-                ['ItemName' => 'NAIVAS JUJA SHOP-JUJA SH']
+            'items' => [
+                [
+                    'description' => [
+                        'meta_data' => [
+                            'other_details' => [
+                                'Shipping_Address' => 'NAIVAS JUJA SHOP-JUJA SH'
+                            ]
+                        ]
+                    ]
+                ]
             ]
         ];
 
         $mapping = [
-            "\b(?:s|sh|sho|shop)\b" => "Shop",
-            "\b(?:d|de|del|deli)\b" => "Deli",
+            "\b(?:s|sh|sho|shop)\b" => "Shops",
+            "\b(?:d|de|del|deli)\b" => "Delis",
             "\b(?:b|bu|but|butc|butch|butche|butcher|butchery)\b" => "Butchery"
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("products.*.ItemName", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "isCaseSensitive" => false], "target_keys" => []]);
+        $action = new FunctionAction("items.*.description.meta_data.other_details.Shipping_Address", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "isCaseSensitive" => false], "target_keys" => []]);
 
         $action->execute($data);
 

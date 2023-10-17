@@ -194,6 +194,10 @@ class Utils
         return $defaultChoice;
     }
 
+    public static function full_unescape($string) {
+        return html_entity_decode(htmlspecialchars_decode($string, ENT_QUOTES), ENT_QUOTES);
+    }
+
     private static function  custom_preg_escape($input) {
 
         // Define characters to escape
@@ -233,21 +237,17 @@ class Utils
             'regex_mapper' => function($value, $mappings, $isCaseSensitive = false) {
                 $modifier = !$isCaseSensitive ? 'i' : '';
 
-                print_r($mappings);
                 foreach ($mappings as $search => $replace) {
 
-                    print  "search: ".$search;
-                    print  "replace: ".$replace;
-
                     if (!str_contains($value, $replace)) {
-                        $pattern = '/' . self::custom_preg_escape($search, '/') . '/';
+
+                        print "\n Before value: $value\n";
+
+                        $pattern = '/' . self::custom_preg_escape(self::full_unescape($search), '/') . '/';
                         $value = preg_replace($pattern . $modifier, $replace, $value);
 
-                        print "pattern: $pattern";
-                        print "value: $value";
-
-                    } else {
-                        print "Skipped; replacement already exists";
+                        print "\n Pattern: $pattern\n";
+                        print "\n After value: $value\n";
                     }
                 }
                 return preg_replace('/\s+/', ' ', $value);
