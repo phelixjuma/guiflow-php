@@ -76,7 +76,7 @@ class FuzzySearch
      * @param $method
      * @return int|mixed
      */
-    private function getSimilarity($query, $target, $method="weightedRatio"): mixed
+    private function getSimilarity($query, $target, $method="tokenSetRatio"): mixed
     {
 
         // clean before search
@@ -101,7 +101,7 @@ class FuzzySearch
      * @param $scoringMethod
      * @return array
      */
-    private function search($query, $similarityThreshold, int $topN = 1, $scoringMethod="weightedRatio"): array
+    private function search($query, $similarityThreshold, int $topN = 1, $scoringMethod="tokenSetRatio"): array
     {
 
         // We get cosine similarity of embeddings for every item
@@ -159,7 +159,7 @@ class FuzzySearch
      * @param $scoringMethod
      * @return array
      */
-    public function fuzzyMatch($dataToMatch, $searchKey, $matchKey, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="weightedRatio"): array
+    public function fuzzyMatch($dataToMatch, $searchKey, $matchKey, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio"): array
     {
         // We set the corpus
         $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType);
@@ -214,7 +214,7 @@ class FuzzySearch
      * @param $scoringMethod
      * @return mixed
      */
-    public function fuzzySearch($searchPhrase, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="weightedRatio"): mixed
+    public function fuzzySearch($searchPhrase, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio"): mixed
     {
 
         // We set the corpus
