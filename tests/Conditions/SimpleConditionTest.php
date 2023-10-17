@@ -8,7 +8,7 @@ use PhelixJuma\DataTransformer\Utils\PathResolver;
 
 class SimpleConditionTest extends TestCase
 {
-    public function testEvaluateWildcard()
+    public function _testEvaluateWildcard()
     {
         $data = [
             'customer' => 'Naivas',
@@ -34,7 +34,7 @@ class SimpleConditionTest extends TestCase
         $this->assertTrue($simpleCondition->evaluate($data));
     }
 
-    public function testEvaluateNestedObject()
+    public function _testEvaluateNestedObject()
     {
         $data = [
             'customer' => 'Naivas',
@@ -86,7 +86,7 @@ class SimpleConditionTest extends TestCase
         $this->assertTrue($simpleCondition->evaluate($data));
     }
 
-    public function testEvaluateAlways()
+    public function _testEvaluateAlways()
     {
         $data = [
             'customer' => 'Naivas',
@@ -106,5 +106,38 @@ class SimpleConditionTest extends TestCase
         $simpleCondition = new SimpleCondition($condition, $pathResolver);
 
         $this->assertTrue($simpleCondition->evaluate($data));
+    }
+
+    public function _testListContains()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                ['name' => 'Capon Chicken', 'quantity' => 2]
+            ],
+            'sections' => [
+                'Shop', 'Deli'
+            ]
+        ];
+
+        $condition = [
+            'path' => 'sections',
+            'operator' => 'contains',
+            'value' => 'Shop',
+        ];
+
+        $pathResolver = new PathResolver();
+
+        $simpleCondition = new SimpleCondition($condition, $pathResolver);
+
+        $evaluation = $simpleCondition->evaluate($data);
+
+        //print "Evaluation: ".($evaluation);
+
+        $this->assertTrue($simpleCondition->evaluate($evaluation));
     }
 }

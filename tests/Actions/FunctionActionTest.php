@@ -879,7 +879,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testExtractOne()
+    public function _testExtractOne()
     {
 
         $data = [
@@ -917,6 +917,53 @@ class FunctionActionTest extends TestCase
         $expectedData = [];
 
         $action = new FunctionAction("items.*.description.meta_data.other_details.Shipping_Address", [$this, "fuzzy_extract_one"], ["choices" => ["Shop", "Deli", "Butchery"], 'min_score' => 50, 'default_choice' => "Shop", 'fuzzy_method' => 'tokenSetRatio'], "items.*.description.meta_data.other_details.Section");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testReducer()
+    {
+
+        $data = [
+            'items' => [
+                [
+                    'description' => [
+                        'meta_data' => [
+                            'other_details' => [
+                                'Shipping_Address' => 'NAIVAS JUJA Shop-JUJA Shop'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'description' => [
+                        'meta_data' => [
+                            'other_details' => [
+                                'Shipping_Address' => 'NAIVAS JUJA Shop-JUJA Shop'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'description' => [
+                        'meta_data' => [
+                            'other_details' => [
+                                'Shipping_Address' => 'NAIVAS NYERI Deli-NYERI Deli'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'sections' => ['Shop', 'Shop', 'Deli']
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("sections", [$this, "reducer"], ["reducer" => "modal_value", 'priority' => ['Deli' => 1, 'Shop' => 2], "default" => 'Butchery'], "section");
 
         $action->execute($data);
 

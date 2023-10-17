@@ -4,6 +4,7 @@ namespace PhelixJuma\DataTransformer\Actions;
 
 use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
 use PhelixJuma\DataTransformer\Utils\DataJoiner;
+use PhelixJuma\DataTransformer\Utils\DataReducer;
 use PhelixJuma\DataTransformer\Utils\Filter;
 use PhelixJuma\DataTransformer\Utils\ModelMapper;
 use PhelixJuma\DataTransformer\Utils\UnitConverter;
@@ -87,6 +88,8 @@ class FunctionAction implements ActionInterface
             $newValue = Filter::splitByPath(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'join') {
             $newValue = (new DataJoiner(...$paramValues))->mergeData();
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'reducer') {
+            $newValue = (new DataReducer(...$paramValues))->reduce();
         } elseif (isset($this->function[1]) && $this->function['1'] == 'sort_multi_by_key') {
             $newValue = Utils::sortMultiAssocArrayByKey(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'format_date') {

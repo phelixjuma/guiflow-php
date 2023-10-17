@@ -85,9 +85,19 @@ class SimpleCondition implements ConditionInterface
             case '<=':
                 return $pathValue <= $value;
             case 'contains':
-                return str_contains($pathValue, $value);
+                return !empty($pathValue) && !empty($value) && str_contains($pathValue, $value);
             case 'not contains':
-                return strpos($pathValue, $value) == false;
+                return empty($pathValue) || empty($value) || strpos($pathValue, $value) == false;
+            case 'list contains':
+                if (is_array($value)) {
+                    return !empty(array_intersect($pathValue, $value));
+                }
+                return in_array($value, $pathValue);
+            case 'list not contains':
+                if (is_array($value)) {
+                    return empty(array_intersect($pathValue, $value));
+                }
+                return !in_array($value, $pathValue);
             case 'exists':
                 return $pathValue == 0 || !empty($pathValue);
             case 'not exists':
