@@ -888,7 +888,16 @@ class FunctionActionTest extends TestCase
                     'description' => [
                         'meta_data' => [
                             'other_details' => [
-                                'Shipping_Address' => 'NAIVAS JUJA SHOP-JUJA SHOP'
+                                'Shipping_Address' => 'NAIVAS JUJA Shop-JUJA Shop'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'description' => [
+                        'meta_data' => [
+                            'other_details' => [
+                                'Shipping_Address' => 'NAIVAS JUJA Shop-JUJA Shop'
                             ]
                         ]
                     ]

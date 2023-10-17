@@ -190,10 +190,10 @@ class Utils
         $extracted = [];
 
         if (!empty($query)) {
-            foreach ($query as $search) {
+            foreach ($query as $key => $search) {
 
                 // set default
-                $extracted[$search] = $defaultChoice;
+                $extracted["$key-$search"] = $defaultChoice;
 
                 $result = $fuzzProcess->extractOne($search, $choices, null, [$fuzz, $fuzzyMethod]);
 
@@ -202,7 +202,7 @@ class Utils
                     $score = $result[1];
 
                     if ($score >= $minScore) {
-                        $extracted[$search] = $choice;
+                        $extracted["$key-$search"] = $choice;
                     }
                 }
             }
