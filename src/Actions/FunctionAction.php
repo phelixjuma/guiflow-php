@@ -6,6 +6,7 @@ use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
 use PhelixJuma\DataTransformer\Utils\DataJoiner;
 use PhelixJuma\DataTransformer\Utils\DataReducer;
 use PhelixJuma\DataTransformer\Utils\Filter;
+use PhelixJuma\DataTransformer\Utils\FuzzySearch;
 use PhelixJuma\DataTransformer\Utils\ModelMapper;
 use PhelixJuma\DataTransformer\Utils\UnitConverter;
 use PhelixJuma\DataTransformer\Utils\Utils;
@@ -114,6 +115,10 @@ class FunctionAction implements ActionInterface
             $newValue = UnitConverter::convert_multiple(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'model_mapping') {
             $newValue = ModelMapper::transform(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_search') {
+            $newValue = (new FuzzySearch())->fuzzySearch(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_match') {
+            $newValue = (new FuzzySearch())->fuzzyMatch(...$paramValues);
         } elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
             if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {
                 $newValue = $this->function['1'](...$paramValues);

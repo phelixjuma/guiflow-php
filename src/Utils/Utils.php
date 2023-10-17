@@ -295,4 +295,9 @@ class Utils
         return $data;
     }
 
+    public static function removeKeysFromAssocArray($data, $keysToRemove): array
+    {
+        return array_diff_key($data, array_flip($keysToRemove));
+    }
+
 }

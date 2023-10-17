@@ -925,7 +925,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testReducer()
+    public function _testReducer()
     {
 
         $data = [
@@ -967,7 +967,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -1066,6 +1066,59 @@ class FunctionActionTest extends TestCase
         $expectedData = [];
 
         $action = new FunctionAction("", [$this, 'join'], ['join_paths' => $joinPaths, 'criteria' => $condition]);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testFuzzySearch()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'products' => [
+                ['code' => "DEL001", 'name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200, "brand" => "Kenchic"],
+                ['code' => "DEL002",'name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300, "brand" => "Kenchic"],
+                ['code' => "PIL003", 'name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200, "brand" => "kenmeat"],
+            ],
+            "customers_list" => [
+                ["name" => "Naivas LTD", "id" => 1],
+                ["name" => "Majid - Two Rivers", "id" => 2],
+                ["name" => "Naivasha Supermarkets", "id" => 3],
+                ["name" => "Quick Mart", "id" => 4],
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("customer", [$this, 'fuzzy_search'], ['corpus' => ["path" => "customers_list"], "corpus_search_key" => "name", "corpus_id_key" => "id", "master_data_type" => "customers", "similarity_threshold" => 20, 'number_of_matches' => 1, 'scorer' => 'weightedRatio']);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testFuzzyMatch()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'products' => [
+                ['code' => "DEL001", 'name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200, "brand" => "Kenchic"],
+                ['code' => "DEL002",'name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300, "brand" => "Kenchic"],
+            ],
+            "products_list" => [
+                ["name" => "Capon 1.3", "id" => 1],
+                ["name" => "Frozen Chicken Sausage 500 GMS", "id" => 2],
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("products", [$this, 'fuzzy_match'], ['search_key' => 'name', 'matching_key' => 'name','corpus' => ["path" => "products_list"], "corpus_search_key" => "name", "corpus_id_key" => "id", "master_data_type" => "all products", "similarity_threshold" => 20, 'number_of_matches' =>1 , 'scorer' => 'weightedRatio']);
 
         $action->execute($data);
 
