@@ -219,6 +219,14 @@ class Utils
         return html_entity_decode(htmlspecialchars_decode($string, ENT_QUOTES), ENT_QUOTES);
     }
 
+    /**
+     * @param string $text
+     * @return string
+     */
+    public static function removeExtraSpaces(string $text): string {
+        return preg_replace('/\s+/', ' ', $text);
+    }
+
     private static function  custom_preg_escape($input) {
 
         // Define characters to escape
@@ -239,16 +247,16 @@ class Utils
 
         $specialFunctions = [
             'str_replace' => function($subject, $search, $replace) {
-                if (str_contains($subject, $replace)) {
-                    return $subject;
+                if (!empty($replace) && str_contains($subject, $replace)) {
+                    return self::removeExtraSpaces($subject);
                 }
-                return str_replace($search, $replace, $subject);
+                return self::removeExtraSpaces(str_replace($search, $replace, $subject));
             },
             'preg_replace' => function($subject, $pattern, $replacement) {
-                if (str_contains($subject, $replacement)) {
+                if (!empty($replace) && str_contains($subject, $replacement)) {
                     return $subject;
                 }
-                return preg_replace($pattern, $replacement, $subject);
+                return self::removeExtraSpaces(preg_replace($pattern, $replacement, $subject));
             },
             'dictionary_mapper' => function($value, $mappings) {
                 // Set keys to lower case

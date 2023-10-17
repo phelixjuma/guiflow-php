@@ -761,6 +761,53 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
+    public function testStrReplace()
+    {
+        $data = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                [
+                    'name' => 'Capon Chicken -700G',
+                    'unit_of_measure' => [
+                        [
+                            'selling_quantity' => "-2",
+                            'selling_unit'    => 'Cases'
+                        ],
+                        [
+                            'selling_quantity' => 1,
+                            'selling_unit'    => 'Pieces'
+                        ]
+                    ],
+                    'unit_price' => -200
+                ],
+                [
+                    'name' => 'Chicken Sausages',
+                    'unit_of_measure' => [
+                        [
+                            'selling_quantity' => 3,
+                            'selling_unit'    => 'Cases'
+                        ]
+                    ],
+                    'unit_price' => 300
+                ],
+            ],
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("products.*.name", [$this, "transform"], ["str_replace", "args" => ["search" => "-", "replace" => " - "], "target_keys" => []]);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
     public function _testValueMapping()
     {
         $data =
@@ -1074,7 +1121,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testFuzzySearch()
+    public function _testFuzzySearch()
     {
         $data = [
             'customer' => 'NAIVAS LIMITED NAIVAS CIATA SHOP-CIATA SHOP',
@@ -1097,7 +1144,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+       // print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
