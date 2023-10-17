@@ -863,9 +863,9 @@ class FunctionActionTest extends TestCase
         ];
 
         $mapping = [
-            "\b(?:s|sh|sho|shop)\b" => "Shops",
-            "\b(?:d|de|del|deli)\b" => "Delis",
-            "\b(?:b|bu|but|butc|butch|butche|butcher|butchery)\b" => "Butchery"
+            "(?:s|sh|sho|shop)" => "Shops",
+            "(?:d|de|del|deli)" => "Delis",
+            "(?:b|bu|but|butc|butch|butche|butcher|butchery)" => "Butchery"
         ];
 
         $expectedData = [];
