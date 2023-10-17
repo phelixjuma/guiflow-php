@@ -241,13 +241,8 @@ class Utils
 
                     if (!str_contains($value, $replace)) {
 
-                        print "\n Before value: $value\n";
-
                         $pattern = '/\b' . self::full_unescape($search) . '\b/'.$modifier;
                         $value = preg_replace($pattern, $replace, $value);
-
-                        print "\n Pattern: $pattern\n";
-                        print "\n After value: $value\n";
                     }
                 }
                 return preg_replace('/\s+/', ' ', $value);
