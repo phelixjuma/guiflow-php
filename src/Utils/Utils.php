@@ -232,11 +232,22 @@ class Utils
             },
             'regex_mapper' => function($value, $mappings, $isCaseSensitive = false) {
                 $modifier = !$isCaseSensitive ? 'i' : '';
+
+                print_r($mappings);
                 foreach ($mappings as $search => $replace) {
+
+                    print  "search: ".$search;
+                    print  "replace: ".$replace;
 
                     if (!str_contains($value, $replace)) {
                         $pattern = '/' . self::custom_preg_escape($search, '/') . '/';
                         $value = preg_replace($pattern . $modifier, $replace, $value);
+
+                        print "pattern: $pattern";
+                        print "value: $value";
+
+                    } else {
+                        print "Skipped; replacement already exists";
                     }
                 }
                 return preg_replace('/\s+/', ' ', $value);
