@@ -268,13 +268,13 @@ class Utils
 
                 foreach ($mappings as $search => $replace) {
 
-                    if (!str_contains($value, $replace)) {
+                    if (empty($replace) || !str_contains($value, $replace)) {
 
                         $pattern = '/\b' . self::full_unescape($search) . '\b/'.$modifier;
                         $value = preg_replace($pattern, $replace, $value);
                     }
                 }
-                return preg_replace('/\s+/', ' ', $value);
+                return self::removeExtraSpaces($value);
             }
         ];
 
