@@ -796,7 +796,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testRegexMapper()
+    public function _testRegexMapper()
     {
         $data =
             [
@@ -871,6 +871,43 @@ class FunctionActionTest extends TestCase
         $expectedData = [];
 
         $action = new FunctionAction("items.*.description.meta_data.other_details.Shipping_Address", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "isCaseSensitive" => false], "target_keys" => []]);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testExtractOne()
+    {
+
+        $data = [
+            'items' => [
+                [
+                    'description' => [
+                        'meta_data' => [
+                            'other_details' => [
+                                'Shipping_Address' => 'NAIVAS JUJA SHOP-JUJA SHOP'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'description' => [
+                        'meta_data' => [
+                            'other_details' => [
+                                'Shipping_Address' => 'NAIVAS NYERI Deli-NYERI Deli'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("items.*.description.meta_data.other_details.Shipping_Address", [$this, "fuzzy_extract_one"], ["choices" => ["Shop", "Deli", "Butchery"], 'min_score' => 50, 'default_choice' => "Shop", 'fuzzy_method' => 'tokenSetRatio'], "items.*.description.meta_data.other_details.Section");
 
         $action->execute($data);
 

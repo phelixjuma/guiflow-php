@@ -181,17 +181,38 @@ class Utils
         $fuzz = new Fuzz();
         $fuzzProcess = new Process();
 
-        $result = $fuzzProcess->extractOne($query, $choices, null, [$fuzz, $fuzzyMethod]);
+        $isList = is_array($query);
 
-        if (!empty($result)) {
-            $choice = $result[0];
-            $score = $result[1];
-
-            if ($score >= $minScore) {
-                return $choice;
-            }
+        if (!$isList) {
+            $query = [$query];
         }
-        return $defaultChoice;
+
+        $extracted = [];
+
+        if (!empty($query)) {
+            foreach ($query as $search) {
+
+                // set default
+                $extracted[$search] = $defaultChoice;
+
+                $result = $fuzzProcess->extractOne($search, $choices, null, [$fuzz, $fuzzyMethod]);
+
+                if (!empty($result)) {
+                    $choice = $result[0];
+                    $score = $result[1];
+
+                    if ($score >= $minScore) {
+                        $extracted[$search] = $choice;
+                    }
+                }
+            }
+
+            // We get the responses.
+            $response = array_values($extracted);
+
+            return !$isList ? $response[0] : $response;
+        }
+        return null;
     }
 
     public static function full_unescape($string) {
