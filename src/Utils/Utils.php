@@ -243,8 +243,8 @@ class Utils
 
                         print "\n Before value: $value\n";
 
-                        $pattern = '/' . self::custom_preg_escape(self::full_unescape($search), '/') . '/';
-                        $value = preg_replace($pattern . $modifier, $replace, $value);
+                        $pattern = '/' . self::custom_preg_escape(self::full_unescape($search), '/') . '/'.$modifier;
+                        $value = preg_replace($pattern, $replace, $value);
 
                         print "\n Pattern: $pattern\n";
                         print "\n After value: $value\n";
