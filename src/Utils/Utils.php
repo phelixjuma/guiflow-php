@@ -247,9 +247,12 @@ class Utils
 
         $specialFunctions = [
             'str_replace' => function($subject, $search, $replace) {
+                print "\n subject: $subject; search: $search; replacement: $replace \n";
                 if (!empty($replace) && str_contains($subject, $replace)) {
+                    print "\n replacement already exists; skipping \n";
                     return self::removeExtraSpaces($subject);
                 }
+                print "\n no replacement, we replace \n";
                 return self::removeExtraSpaces(str_replace($search, $replace, $subject));
             },
             'preg_replace' => function($subject, $pattern, $replacement) {
