@@ -761,7 +761,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testStrReplace()
+    public function testPregReplace()
     {
         $data = [
             'customer' => 'Naivas',
@@ -799,7 +799,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("products.*.name", [$this, "transform"], ["str_replace", "args" => ["search" => "-", "replace" => " - "], "target_keys" => []]);
+        $action = new FunctionAction("products.*.name", [$this, "transform"], ["preg_replace", "args" => ["pattern" => "/-(?=\S)/", "replacement" => "- "], "target_keys" => []]);
 
         $action->execute($data);
 

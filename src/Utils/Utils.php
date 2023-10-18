@@ -246,19 +246,19 @@ class Utils
         }
 
         $specialFunctions = [
-            'str_replace' => function($subject, $search, $replace) {
-                print "\n subject: $subject; search: $search; replacement: $replace \n";
-                if (!empty($replace) && str_contains($subject, $replace)) {
-                    print "\n replacement already exists; skipping \n";
+            'str_replace' => function($subject, $search, $replacement) {
+                if (!empty($replacement) && str_contains($subject, $replacement)) {
                     return self::removeExtraSpaces($subject);
                 }
-                print "\n no replacement, we replace \n";
-                return self::removeExtraSpaces(str_replace($search, $replace, $subject));
+                return self::removeExtraSpaces(str_replace($search, $replacement, $subject));
             },
             'preg_replace' => function($subject, $pattern, $replacement) {
-                if (!empty($replace) && str_contains($subject, $replacement)) {
+                print "\n subject: $subject; pattern: $pattern; replacement: $replacement \n";
+                if (!empty($replace) && preg_match($pattern, $subject)) {
+                    print "\n replacement already exists or pattern not matched; skipping \n";
                     return $subject;
                 }
+                print "\n no replacement and matched, we replace \n";
                 return self::removeExtraSpaces(preg_replace($pattern, $replacement, $subject));
             },
             'dictionary_mapper' => function($value, $mappings) {
