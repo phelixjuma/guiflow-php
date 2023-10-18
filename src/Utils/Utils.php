@@ -252,13 +252,19 @@ class Utils
                 }
                 return self::removeExtraSpaces(str_replace($search, $replacement, $subject));
             },
-            'preg_replace' => function($subject, $pattern, $replacement) {
+            'preg_replace' => function($subject, $pattern, $replacement, $isCaseSensitive=false) {
                 print "\n subject: $subject; pattern: $pattern; replacement: $replacement \n";
                 if (!empty($replace) && preg_match($pattern, $subject)) {
                     print "\n replacement already exists or pattern not matched; skipping \n";
                     return $subject;
                 }
                 print "\n no replacement and matched, we replace \n";
+
+                $pattern = "/$pattern/";
+                if (!$isCaseSensitive) {
+                    $pattern .= "i";
+                }
+
                 return self::removeExtraSpaces(preg_replace($pattern, $replacement, $subject));
             },
             'dictionary_mapper' => function($value, $mappings) {
