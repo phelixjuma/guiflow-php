@@ -253,15 +253,17 @@ class Utils
                 return self::removeExtraSpaces(str_replace($search, $replacement, $subject));
             },
             'preg_replace' => function($subject, $pattern, $replacement, $isCaseSensitive=false) {
-                print "\n subject: $subject; pattern: $pattern; replacement: $replacement \n";
-                if (!empty($replace) && preg_match($pattern, $subject)) {
-                    print "\n replacement already exists or pattern not matched; skipping \n";
-                    return $subject;
-                }
 
                 $pattern = "/$pattern/";
                 if (!$isCaseSensitive) {
                     $pattern .= "i";
+                }
+
+                print "\n subject: $subject; pattern: $pattern; replacement: $replacement \n";
+
+                if (!preg_match($pattern, $subject)) {
+                    print "\n pattern not matched; skipping \n";
+                    return $subject;
                 }
 
                 $replacement = self::removeExtraSpaces(preg_replace($pattern, $replacement, $subject));
