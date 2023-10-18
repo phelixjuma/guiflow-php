@@ -259,10 +259,7 @@ class Utils
                     $pattern .= "i";
                 }
 
-                print "\n subject: $subject; pattern: $pattern; replacement: $replacement \n";
-
                 if (!preg_match($pattern, $subject)) {
-                    print "\n pattern not matched; skipping \n";
                     return $subject;
                 }
 
@@ -271,11 +268,7 @@ class Utils
                     $replacement = " $replacement ";
                 }
 
-                $replaced = self::removeExtraSpaces(preg_replace($pattern, $replacement, $subject));
-
-                print "\n Replaced $subject with $replaced \n";
-
-                return $replaced;
+                return self::removeExtraSpaces(preg_replace($pattern, $replacement, $subject));
             },
             'dictionary_mapper' => function($value, $mappings) {
                 // Set keys to lower case
