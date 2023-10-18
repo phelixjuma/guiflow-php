@@ -258,14 +258,17 @@ class Utils
                     print "\n replacement already exists or pattern not matched; skipping \n";
                     return $subject;
                 }
-                print "\n no replacement and matched, we replace \n";
 
                 $pattern = "/$pattern/";
                 if (!$isCaseSensitive) {
                     $pattern .= "i";
                 }
 
-                return self::removeExtraSpaces(preg_replace($pattern, $replacement, $subject));
+                $replacement = self::removeExtraSpaces(preg_replace($pattern, $replacement, $subject));
+
+                print "\n Replaced $subject with $replacement \n";
+
+                return $replacement;
             },
             'dictionary_mapper' => function($value, $mappings) {
                 // Set keys to lower case

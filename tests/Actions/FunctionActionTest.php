@@ -799,7 +799,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("products.*.name", [$this, "transform"], ["preg_replace", "args" => ["pattern" => "-(?=\S)", "replacement" => "- "], "target_keys" => []]);
+        $action = new FunctionAction("products.*.name", [$this, "transform"], ["preg_replace", "args" => ["pattern" => "-(?=\S)", "replacement" => "- ", "isCaseSensitive" => false], "target_keys" => []]);
 
         $action->execute($data);
 
