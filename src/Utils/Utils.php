@@ -252,7 +252,7 @@ class Utils
                 }
                 return self::removeExtraSpaces(str_replace($search, $replacement, $subject));
             },
-            'preg_replace' => function($subject, $pattern, $replacement, $isCaseSensitive=false) {
+            'preg_replace' => function($subject, $pattern, $replacement, $addSpacer=true, $isCaseSensitive=false) {
 
                 $pattern = "/$pattern/";
                 if (!$isCaseSensitive) {
@@ -266,11 +266,16 @@ class Utils
                     return $subject;
                 }
 
-                $replacement = self::removeExtraSpaces(preg_replace($pattern, $replacement, $subject));
+                // Add a spacer to replacement
+                if ($addSpacer) {
+                    $replacement = " $replacement ";
+                }
 
-                print "\n Replaced $subject with $replacement \n";
+                $replaced = self::removeExtraSpaces(preg_replace($pattern, $replacement, $subject));
 
-                return $replacement;
+                print "\n Replaced $subject with $replaced \n";
+
+                return $replaced;
             },
             'dictionary_mapper' => function($value, $mappings) {
                 // Set keys to lower case

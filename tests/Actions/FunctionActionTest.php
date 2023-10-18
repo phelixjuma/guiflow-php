@@ -785,7 +785,7 @@ class FunctionActionTest extends TestCase
                     'unit_price' => -200
                 ],
                 [
-                    'name' => 'Chicken Sausages',
+                    'name' => 'CHICKEN DRUMSTICKS 6PC -700 GM',
                     'unit_of_measure' => [
                         [
                             'selling_quantity' => 3,
@@ -799,7 +799,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("products.*.name", [$this, "transform"], ["preg_replace", "args" => ["pattern" => "-(?=\S)", "replacement" => "- ", "isCaseSensitive" => false], "target_keys" => []]);
+        $action = new FunctionAction("products.*.name", [$this, "transform"], ["preg_replace", "args" => ["pattern" => "-(?=\S)", "replacement" => "-", "addSpacer" => true, "isCaseSensitive" => false], "target_keys" => []]);
 
         $action->execute($data);
 
