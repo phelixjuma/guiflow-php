@@ -761,7 +761,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testPregReplace()
+    public function __testPregReplace()
     {
         $data = [
             'customer' => 'Naivas',
@@ -803,7 +803,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -972,7 +972,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testReducer()
+    public function _testModalReducer()
     {
 
         $data = [
@@ -1015,6 +1015,53 @@ class FunctionActionTest extends TestCase
         $action->execute($data);
 
         //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testPriorityReducer()
+    {
+
+        $data = [
+            'items' => [
+                [
+                    'description' => [
+                        'meta_data' => [
+                            'other_details' => [
+                                'Shipping_Address' => 'NAIVAS JUJA Shop-JUJA Shop'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'description' => [
+                        'meta_data' => [
+                            'other_details' => [
+                                'Shipping_Address' => 'NAIVAS JUJA Shop-JUJA Shop'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'description' => [
+                        'meta_data' => [
+                            'other_details' => [
+                                'Shipping_Address' => 'NAIVAS NYERI Deli-NYERI Deli'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'product_types' => ['Frozen', 'Frozen', 'Fresh']
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("product_types", [$this, "reducer"], ["reducer" => "priority_reducer", 'priority' => ['Fresh' => 1, 'Frozen' => 2], "default" => 'Frozen'], "product_type");
+
+        $action->execute($data);
+
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

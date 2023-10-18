@@ -74,4 +74,25 @@ class DataReducer
         // If default is set, we return it
         return $default;
     }
+
+    /**
+     * @param $priorityList
+     * @param $default
+     * @return int|mixed|string
+     */
+    private function priority_reducer($priorityList, $default = "") {
+
+        // Flip the priority list to map priorities to kinds
+        $flippedPriorityList = array_flip($priorityList);
+
+        // Sort the flipped list so lower priorities come first
+        ksort($flippedPriorityList);
+
+        foreach ($flippedPriorityList as $kind) {
+            if (in_array($kind, $this->data)) {
+                return $kind;  // Return the first (highest priority) kind found
+            }
+        }
+        return $default;  // or some default value, if necessary
+    }
 }

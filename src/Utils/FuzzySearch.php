@@ -55,9 +55,6 @@ class FuzzySearch
         // Remove URLs
         $text = preg_replace('/https?:\/\/\S+/', '', $text);
 
-        // Remove or replace special characters (excluding spaces)
-        //$text = preg_replace('/[^a-z0-9\s]/', '', $text);
-
         // Remove stop words
         $stopWords = array("and", "the", "is", "in", "to", "for", "on", "of", "with", "at", "by", "an", "be", "this", "that", "it", "from", "as", "are"); // You can expand this list
 
