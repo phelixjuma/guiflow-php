@@ -45,7 +45,8 @@ class Utils
      */
     public static function concat(array $strings, $separator = " "): string
     {
-        return implode($separator, $strings);
+        $separator = " $separator "; // add spaces to the separator
+        return self::removeExtraSpaces(implode($separator, $strings));
     }
 
     /**
@@ -56,6 +57,8 @@ class Utils
      */
     public static function concat_multi_array_assoc(array $data, array $fields, $newField, $separator = " "): array
     {
+
+        $separator = " $separator "; // add spaces to the separator
 
         array_walk($data, function (&$value, $key) use($fields, $newField, $separator) {
             $dataToConcat = array_flip($fields);
