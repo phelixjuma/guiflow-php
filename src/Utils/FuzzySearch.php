@@ -123,7 +123,7 @@ class FuzzySearch
         });
 
         if (str_contains(strtolower($query), "katani")) {
-            print "Fuzzy Search for $query. Response: ".json_encode($tempCorpus);
+            print "Fuzzy Search by $scoringMethod for $query Response: ".json_encode($tempCorpus);
         }
 
         // We sort the data by similarity
