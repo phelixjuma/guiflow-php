@@ -44,9 +44,10 @@ class FuzzySearch
 
     /**
      * @param $text
+     * @param $stopWords
      * @return string
      */
-    private static function cleanText($text): string
+    private static function cleanText($text, $stopWords=[]): string
     {
 
         // Convert text to lowercase
@@ -56,7 +57,17 @@ class FuzzySearch
         $text = preg_replace('/https?:\/\/\S+/', '', $text);
 
         // Remove stop words
-        $stopWords = array("and", "the", "is", "in", "to", "for", "on", "of", "with", "at", "by", "an", "be", "this", "that", "it", "from", "as", "are"); // You can expand this list
+        $moreStopWords = array("and", "the", "is", "in", "to", "for", "on", "of", "with", "at", "by", "an", "be", "this", "that", "it", "from", "as", "are"); // You can expand this list
+
+        if (is_array($stopWords) && sizeof($stopWords) > 0) {
+            array_walk($stopWords, function (&$v, $k) {
+                $v = strtolower($v);
+            });
+        } else {
+            $stopWords = [];
+        }
+
+        $stopWords = array_unique(array_merge($stopWords, $moreStopWords));
 
         foreach ($stopWords as $word) {
             $text = preg_replace('/\b' . $word . '\b/', '', $text);
@@ -73,12 +84,12 @@ class FuzzySearch
      * @param $method
      * @return int|mixed
      */
-    private function getSimilarity($query, $target, $method="tokenSetRatio"): mixed
+    private function getSimilarity($query, $target, $method="tokenSetRatio", $stopWords=[]): mixed
     {
 
         // clean before search
-        $query = self::cleanText($query);
-        $target = self::cleanText($target);
+        $query = self::cleanText($query, $stopWords);
+        $target = self::cleanText($target, $stopWords);
 
         return match ($method) {
             'ratio' => $this->fuzz->ratio($query, $target),
@@ -96,16 +107,17 @@ class FuzzySearch
      * @param $similarityThreshold
      * @param int $topN
      * @param $scoringMethod
+     * @param $stopWords
      * @return array
      */
-    private function search($query, $similarityThreshold, int $topN = 1, $scoringMethod="tokenSetRatio"): array
+    private function search($query, $similarityThreshold, int $topN = 1, $scoringMethod="tokenSetRatio", $stopWords = []): array
     {
 
         // We get cosine similarity of embeddings for every item
         $tempCorpus = $this->corpus;
 
-        array_walk($tempCorpus, function (&$value, $key) use($query, $scoringMethod) {
-            $value['similarity'] = $this->getSimilarity($value[$this->corpusSearchKey], $query, $scoringMethod);
+        array_walk($tempCorpus, function (&$value, $key) use($query, $scoringMethod, $stopWords) {
+            $value['similarity'] = $this->getSimilarity($value[$this->corpusSearchKey], $query, $scoringMethod, $stopWords);
         });
 
         // We sort the data by similarity
@@ -153,10 +165,12 @@ class FuzzySearch
      * @param $corpusIdKey
      * @param $masterDataType
      * @param $similarityThreshold
+     * @param $topN
      * @param $scoringMethod
+     * @param $stopWords
      * @return array
      */
-    public function fuzzyMatch($dataToMatch, $searchKey, $matchKey, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio"): array
+    public function fuzzyMatch($dataToMatch, $searchKey, $matchKey, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio", $stopWords=[]): array
     {
         // We set the corpus
         $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType);
@@ -180,7 +194,7 @@ class FuzzySearch
             if (isset($searchDatum[$searchKey])) {
 
                 //We perform search
-                $searchResponse = $this->search($searchDatum[$searchKey], $similarityThreshold, $topN, $scoringMethod);
+                $searchResponse = $this->search($searchDatum[$searchKey], $similarityThreshold, $topN, $scoringMethod, $stopWords);
 
                 if (!empty($searchResponse)) {
 
@@ -208,10 +222,12 @@ class FuzzySearch
      * @param $corpusIdKey
      * @param $masterDataType
      * @param $similarityThreshold
+     * @param $topN
      * @param $scoringMethod
+     * @param $stopWords
      * @return mixed
      */
-    public function fuzzySearch($searchPhrase, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio"): mixed
+    public function fuzzySearch($searchPhrase, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio", $stopWords=[]): mixed
     {
 
         // We set the corpus
@@ -226,7 +242,7 @@ class FuzzySearch
         ];
 
         // We perform search
-        $searchResponse = $this->search($searchPhrase, $similarityThreshold, $topN, $scoringMethod);
+        $searchResponse = $this->search($searchPhrase, $similarityThreshold, $topN, $scoringMethod, $stopWords);
 
         if (!empty($searchResponse)) {
 
