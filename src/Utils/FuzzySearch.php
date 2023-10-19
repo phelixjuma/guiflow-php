@@ -11,6 +11,7 @@ class FuzzySearch
     private $corpus;
     private $corpusSearchKey;
     private $corpusIdKey;
+    private $stopWords;
 
     protected $fuzz;
 
@@ -28,15 +29,17 @@ class FuzzySearch
      * @param $corpusSearchKey
      * @param $corpusIdKey
      * @param $masterDataType
+     * @param $stopWords
      * @return $this
      */
-    public function setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType): FuzzySearch
+    public function setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $stopWords=[]): FuzzySearch
     {
 
         $this->corpusSearchKey = $corpusSearchKey;
         $this->corpusIdKey = $corpusIdKey;
         $this->masterDataType = $masterDataType;
         $this->corpus = $corpus;
+        $this->stopWords = $stopWords;
 
 
         return $this;
@@ -82,14 +85,14 @@ class FuzzySearch
      * @param $query
      * @param $target
      * @param $method
-     * @return int|mixed
+     * @return mixed
      */
-    private function getSimilarity($query, $target, $method="tokenSetRatio", $stopWords=[]): mixed
+    private function getSimilarity($query, $target, $method="tokenSetRatio"): mixed
     {
 
         // clean before search
-        $query = self::cleanText($query, $stopWords);
-        $target = self::cleanText($target, $stopWords);
+        $query = self::cleanText($query, $this->stopWords);
+        $target = self::cleanText($target, $this->stopWords);
 
         return match ($method) {
             'ratio' => $this->fuzz->ratio($query, $target),
@@ -107,17 +110,16 @@ class FuzzySearch
      * @param $similarityThreshold
      * @param int $topN
      * @param $scoringMethod
-     * @param $stopWords
      * @return array
      */
-    private function search($query, $similarityThreshold, int $topN = 1, $scoringMethod="tokenSetRatio", $stopWords = []): array
+    private function search($query, $similarityThreshold, int $topN = 1, $scoringMethod="tokenSetRatio"): array
     {
 
         // We get cosine similarity of embeddings for every item
         $tempCorpus = $this->corpus;
 
-        array_walk($tempCorpus, function (&$value, $key) use($query, $scoringMethod, $stopWords) {
-            $value['similarity'] = $this->getSimilarity($value[$this->corpusSearchKey], $query, $scoringMethod, $stopWords);
+        array_walk($tempCorpus, function (&$value, $key) use($query, $scoringMethod) {
+            $value['similarity'] = $this->getSimilarity($value[$this->corpusSearchKey], $query, $scoringMethod);
         });
 
         // We sort the data by similarity
@@ -173,7 +175,7 @@ class FuzzySearch
     public function fuzzyMatch($dataToMatch, $searchKey, $matchKey, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio", $stopWords=[]): array
     {
         // We set the corpus
-        $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType);
+        $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $stopWords);
 
         // We set the match key to search key, if not set
         $matchKey = empty($matchKey) ? $searchKey : $matchKey;
@@ -194,7 +196,7 @@ class FuzzySearch
             if (isset($searchDatum[$searchKey])) {
 
                 //We perform search
-                $searchResponse = $this->search($searchDatum[$searchKey], $similarityThreshold, $topN, $scoringMethod, $stopWords);
+                $searchResponse = $this->search($searchDatum[$searchKey], $similarityThreshold, $topN, $scoringMethod);
 
                 if (!empty($searchResponse)) {
 
@@ -231,7 +233,7 @@ class FuzzySearch
     {
 
         // We set the corpus
-        $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType);
+        $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $stopWords);
 
         // matched value defaults to corpus structure with empty values
         $response =  [
@@ -242,7 +244,7 @@ class FuzzySearch
         ];
 
         // We perform search
-        $searchResponse = $this->search($searchPhrase, $similarityThreshold, $topN, $scoringMethod, $stopWords);
+        $searchResponse = $this->search($searchPhrase, $similarityThreshold, $topN, $scoringMethod);
 
         if (!empty($searchResponse)) {
 
