@@ -115,11 +115,13 @@ class FunctionAction implements ActionInterface
             $newValue = UnitConverter::convert_multiple(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'model_mapping') {
             $newValue = ModelMapper::transform(...$paramValues);
-        } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_search') {
-            $newValue = (new FuzzySearch())->fuzzySearch(...$paramValues);
-        } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_match') {
-            $newValue = (new FuzzySearch())->fuzzyMatch(...$paramValues);
-        } elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
+        }
+//        elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_search') {
+//            $newValue = (new FuzzySearch())->fuzzySearch(...$paramValues);
+//        } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_match') {
+//            $newValue = (new FuzzySearch())->fuzzyMatch(...$paramValues);
+//        }
+        elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
             if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {
                 $newValue = $this->function['1'](...$paramValues);
             } else {

@@ -1160,20 +1160,18 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testFuzzySearch()
+    public function testFuzzySearch()
     {
         $data = [
-            'customer' => 'NAIVAS LIMITED NAIVAS CIATA SHOP-CIATA SHOP',
+            'customer' => 'NAIVAS LIMITED NAIVAS KATANI SHOP KATANI SH',
             'products' => [
                 ['code' => "DEL001", 'name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200, "brand" => "Kenchic"],
                 ['code' => "DEL002",'name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300, "brand" => "Kenchic"],
                 ['code' => "PIL003", 'name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200, "brand" => "kenmeat"],
             ],
             "customers_list" => [
-                ["name" => "NAIVAS CIATA- HENRY KIARIE", "id" => 1],
-                ["name" => "NAIVAS DEVELOPMENT - JACOB SEKO LONZIE", "id" => 2],
-                ["name" => "NAIVAS DIGO- DAVID MWAURA", "id" => 3],
-                ["name" => "Quick Mart", "id" => 4],
+                ["name" => "NAIVAS LIMURU -", "id" => 1],
+                ["name" => "NAIVAS KATANI- CHARLES MATHEKA", "id" => 2]
             ]
         ];
 
@@ -1183,7 +1181,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-       // print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
