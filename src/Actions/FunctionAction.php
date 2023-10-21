@@ -6,7 +6,6 @@ use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
 use PhelixJuma\DataTransformer\Utils\DataJoiner;
 use PhelixJuma\DataTransformer\Utils\DataReducer;
 use PhelixJuma\DataTransformer\Utils\Filter;
-use PhelixJuma\DataTransformer\Utils\FuzzySearch;
 use PhelixJuma\DataTransformer\Utils\ModelMapper;
 use PhelixJuma\DataTransformer\Utils\UnitConverter;
 use PhelixJuma\DataTransformer\Utils\Utils;
@@ -25,7 +24,7 @@ class FunctionAction implements ActionInterface
         'intval', 'floatval',
         'preg_match', 'preg_replace',
         // custom functions
-        'dictionary_mapper', 'regex_mapper'
+        'dictionary_mapper', 'regex_mapper', 'string_to_date_time'
     ];
 
     private $path;

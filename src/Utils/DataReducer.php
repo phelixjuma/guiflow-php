@@ -27,6 +27,14 @@ class DataReducer
         return call_user_func([$this, $this->reducer], ...$this->reducerArgs);
     }
 
+    private function min() {
+        return min($this->data);
+    }
+
+    private function max() {
+        return max($this->data);
+    }
+
     /**
      * @param $priority
      * @param $default

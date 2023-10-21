@@ -286,6 +286,22 @@ class Utils
 
                 return self::removeExtraSpaces(preg_replace($pattern, $replacement, $subject));
             },
+            'explode' => function($string, $separator,) {
+                return explode($separator, $string);
+            },
+            'string_to_date_time' => function($data, $pre_modifier="", $post_modifier="") {
+                $date = null;
+                if (is_array($data)) {
+                    foreach ($data as $datum) {
+                        $dateString = self::removeExtraSpaces("$pre_modifier $datum $post_modifier");
+                        $date[] = date("Y-m-d H:i:s", strtotime($dateString));
+                    }
+                } else {
+                    $dateString = self::removeExtraSpaces("$pre_modifier $data $post_modifier");
+                    $date = date("Y-m-d H:i:s", strtotime($dateString));
+                }
+                return $date;
+            },
             'dictionary_mapper' => function($value, $mappings) {
                 // Set keys to lower case
                 $mappings = array_change_key_case($mappings, CASE_LOWER);

@@ -343,7 +343,8 @@ class FunctionActionTest extends TestCase
                 ['name' => 'Capon Chicken', 'description' => 'Capon 1.2', 'quantity' => 2, 'unit_price' => 200],
                 ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
                 ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200],
-            ]
+            ],
+            'days' => ['Monday', 'Tuesday']
         ];
 
         $expectedData = [];
@@ -805,6 +806,40 @@ class FunctionActionTest extends TestCase
         $action->execute($data);
 
         //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testExplodeString()
+    {
+        $data = [
+            'days' => "Monday/Tuesday"
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("days", [$this, "transform"], ["explode", "args" => ["separator" => "/"], "target_keys" => []]);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function testDateFromString()
+    {
+        $data = [
+            'days' => ["Monday", "Tuesday"]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("days", [$this, "transform"], ["string_to_date_time", "args" => ["pre_modifier" => "Next", "post_modifier" => ""], "target_keys" => []]);
+
+        $action->execute($data);
+
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
