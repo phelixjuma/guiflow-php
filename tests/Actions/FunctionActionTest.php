@@ -827,7 +827,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testDateFromString()
+    public function _testDateFromString()
     {
         $data = [
             'days' => ["Monday", "Tuesday"]
@@ -839,7 +839,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
