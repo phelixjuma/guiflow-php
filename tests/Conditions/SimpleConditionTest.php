@@ -140,4 +140,33 @@ class SimpleConditionTest extends TestCase
 
         $this->assertTrue($simpleCondition->evaluate($evaluation));
     }
+
+    public function _testNotContains()
+    {
+        $data = [
+            'delivery_schedule_details' => [
+                "REGION"=> "EASTERN",
+                "ROUTE"=> "KITENGELA",
+                "NAIVAS"=> "Monday/Thursday",
+                "QUICKMART"=> "Monday/Thursday",
+                "MAJID"=> "",
+                "OTHERS"=> "Monday/Thursday"
+            ]
+        ];
+
+        $condition = [
+            'path' => 'delivery_schedule_details',
+            'operator' => 'not exists'
+        ];
+
+        $pathResolver = new PathResolver();
+
+        $simpleCondition = new SimpleCondition($condition, $pathResolver);
+
+        $evaluation = $simpleCondition->evaluate($data);
+
+        //print "Evaluation: ".($evaluation);
+
+        $this->assertTrue($simpleCondition->evaluate($evaluation));
+    }
 }

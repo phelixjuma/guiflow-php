@@ -60,9 +60,7 @@ class FuzzySearch
         $text = preg_replace('/https?:\/\/\S+/', '', $text);
 
         // Remove stop words
-        //$moreStopWords = array("and", "the", "is", "in", "to", "for", "on", "of", "with", "at", "by", "an", "be", "this", "that", "it", "from", "as", "are"); // You can expand this list
-
-        $moreStopWords = [];
+        $moreStopWords = array("and", "the", "is", "in", "to", "for", "on", "of", "with", "at", "by", "an", "be", "this", "that", "it", "from", "as", "are"); // You can expand this list
 
         if (is_array($stopWords) && sizeof($stopWords) > 0) {
             array_walk($stopWords, function (&$v, $k) {

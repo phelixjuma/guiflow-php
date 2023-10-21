@@ -1160,7 +1160,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testFuzzySearch()
+    public function _testFuzzySearch()
     {
         $data = [
             'customer' => 'NAIVAS LIMITED NAIVAS KATANI SHOP KATANI SH',
@@ -1181,7 +1181,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

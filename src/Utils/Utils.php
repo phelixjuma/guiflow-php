@@ -323,4 +323,13 @@ class Utils
         return array_diff_key($data, array_flip($keysToRemove));
     }
 
+    /**
+     * An associative array in php - akin to objects in other lands
+     * @param $value
+     * @return bool
+     */
+    public static function isObject($value) {
+        return (is_array($value) && array_keys($value) !== range(0, count($value) - 1));
+    }
+
 }

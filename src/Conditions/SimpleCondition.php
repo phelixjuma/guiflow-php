@@ -43,7 +43,7 @@ class SimpleCondition implements ConditionInterface
         $similarityThreshold = $this->condition['similarity_threshold'] ?? null;
 
         // Handle wildcard paths
-        if (is_array($pathValues)) {
+        if (is_array($pathValues) && !Utils::isObject($pathValues)) {
             foreach ($pathValues as $pathValue) {
                 if (self::compare($pathValue, $operator, $value, $similarityThreshold)) {
                     return true; // Return true as soon as one match is found
