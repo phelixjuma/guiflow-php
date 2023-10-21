@@ -155,6 +155,19 @@ class Utils
     }
 
     /**
+     * @param $data
+     * @param $key
+     * @return mixed|string
+     */
+    public static function get_from_object($data, $key) {
+
+        if (array_key_exists($key, $data)) {
+            return $data[$key];
+        }
+        return "";
+    }
+
+    /**
      * @param $text
      * @return string
      */

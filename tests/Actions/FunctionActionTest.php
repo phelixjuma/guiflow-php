@@ -560,7 +560,8 @@ class FunctionActionTest extends TestCase
                     ]
                 ],
             ],
-            'total_unit_price' => 500
+            'total_unit_price' => 500,
+
         ];
 
         $action = new FunctionAction("products.*.original_value.unit_of_measure", [$this, 'assoc_array_find'], ['condition_field' => "selling_unit", "condition_operator" => "similar_to", "condition_value" => "Pieces - PCS", "condition_threshold" => 80, "condition_tokenize" => false, "return_key" => "selling_quantity"], 'products.*.original_value.number_of_pieces');

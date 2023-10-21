@@ -109,6 +109,8 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::assoc_array_sum_if(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'assoc_array_find') {
             $newValue = Utils::assoc_array_find(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'get_from_object') {
+            $newValue = Utils::get_from_object(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit') {
             $newValue = UnitConverter::convert(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit_multi') {
@@ -116,11 +118,6 @@ class FunctionAction implements ActionInterface
         } elseif (isset($this->function[1]) && $this->function['1'] == 'model_mapping') {
             $newValue = ModelMapper::transform(...$paramValues);
         }
-//        elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_search') {
-//            $newValue = (new FuzzySearch())->fuzzySearch(...$paramValues);
-//        } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_match') {
-//            $newValue = (new FuzzySearch())->fuzzyMatch(...$paramValues);
-//        }
         elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
             if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {
                 $newValue = $this->function['1'](...$paramValues);
