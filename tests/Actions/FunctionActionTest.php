@@ -827,7 +827,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testDateFromString()
+    public function testDateFromString()
     {
         $data = [
             'days' => ["Monday", "Tuesday"]
@@ -835,11 +835,11 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("days", [$this, "transform"], ["string_to_date_time", "args" => ["pre_modifier" => "Next", "post_modifier" => ""], "target_keys" => []]);
+        $action = new FunctionAction("days", [$this, "transform"], ["string_to_date_time", "args" => ["format" => "Y-m-d H:i:s","pre_modifier" => "Next", "post_modifier" => ""], "target_keys" => []]);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

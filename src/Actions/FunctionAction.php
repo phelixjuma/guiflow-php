@@ -110,6 +110,10 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::assoc_array_find(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'get_from_object') {
             $newValue = Utils::get_from_object(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'date_add_substract_days') {
+            $newValue = Utils::date_add_substract_days(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'date_format') {
+            $newValue = Utils::date_format(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit') {
             $newValue = UnitConverter::convert(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit_multi') {

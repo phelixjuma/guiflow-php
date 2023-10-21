@@ -156,6 +156,56 @@ class Utils
 
     /**
      * @param $data
+     * @param $days
+     * @param $operator
+     * @param $format
+     * @return array
+     */
+    public static function date_add_substract_days($data, $days, $operator, $format="Y-m-d") {
+
+        $method = $operator == 'add' ? 'add' : 'sub';
+
+        $response = null;
+
+        try {
+
+            if (is_array($data)) {
+                foreach ($data as $datum) {
+                    $response[] = (new \DateTime($datum))->$method(new \DateInterval("P{$days}D"))->format($format);
+                }
+            } else {
+                $response = (new \DateTime($data))->$method(new \DateInterval("P{$days}D"))->format($format);
+            }
+
+        } catch (\Exception $e) {
+        }
+        return $response;
+    }
+
+    /**
+     * @param $data
+     * @param $format
+     * @return array|string
+     */
+    public static function date_format($data, $format="Y-m-d") {
+
+        $response = null;
+        try {
+            if (is_array($data)) {
+                foreach ($data as $datum) {
+                    $response[] = (new \DateTime($datum))->format($format);
+                }
+            } else {
+                $response = (new \DateTime($data))->format($format);
+            }
+        } catch (\Exception $e) {
+
+        }
+        return $response;
+    }
+
+    /**
+     * @param $data
      * @param $key
      * @return mixed|string
      */
@@ -289,16 +339,16 @@ class Utils
             'explode' => function($string, $separator,) {
                 return explode($separator, $string);
             },
-            'string_to_date_time' => function($data, $pre_modifier="", $post_modifier="") {
+            'string_to_date_time' => function($data, $format="Y-m-d", $pre_modifier="", $post_modifier="") {
                 $date = null;
                 if (is_array($data)) {
                     foreach ($data as $datum) {
                         $dateString = self::removeExtraSpaces("$pre_modifier $datum $post_modifier");
-                        $date[] = date("Y-m-d H:i:s", strtotime($dateString));
+                        $date[] = date($format, strtotime($dateString));
                     }
                 } else {
                     $dateString = self::removeExtraSpaces("$pre_modifier $data $post_modifier");
-                    $date = date("Y-m-d H:i:s", strtotime($dateString));
+                    $date = date($format, strtotime($dateString));
                 }
                 return $date;
             },
