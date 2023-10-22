@@ -102,12 +102,16 @@ class SimpleCondition implements ConditionInterface
                 // For arrays, we remove empty values
                 if (is_array($pathValue) && !Utils::isObject($pathValue)) {
                     $pathValue = array_filter($pathValue);
+                } else {
+                    $pathValue = Utils::removeExtraSpaces(trim($pathValue));
                 }
                 return $pathValue == 0 || !empty($pathValue);
             case 'not exists':
                 // For arrays, we remove empty values
                 if (is_array($pathValue) && !Utils::isObject($pathValue)) {
                     $pathValue = array_filter($pathValue);
+                } else {
+                    $pathValue = Utils::removeExtraSpaces(trim($pathValue));
                 }
                 return !($pathValue == 0 || !empty($pathValue));
             case 'regex':
