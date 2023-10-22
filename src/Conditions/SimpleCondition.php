@@ -32,8 +32,6 @@ class SimpleCondition implements ConditionInterface
 
         $pathValues = $this->pathResolver::getValueByPath($data, $this->condition['path']);
 
-        print_r($pathValues);
-
         $operator = $this->condition['operator'];
         $conditionValue = $this->condition['value'] ?? null;
 
