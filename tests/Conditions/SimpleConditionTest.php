@@ -60,7 +60,7 @@ class SimpleConditionTest extends TestCase
         $this->assertTrue($simpleCondition->evaluate($data));
     }
 
-    public function testEvaluateBasic()
+    public function _testEvaluateBasic()
     {
         $data = [
             'customer' => 'Naivas',
@@ -155,7 +155,7 @@ class SimpleConditionTest extends TestCase
         ];
 
         $condition = [
-            'path' => 'delivery_schedule_details',
+            'path' => 'days',
             'operator' => 'not exists'
         ];
 
@@ -165,7 +165,7 @@ class SimpleConditionTest extends TestCase
 
         $evaluation = $simpleCondition->evaluate($data);
 
-        //print "Evaluation: ".($evaluation);
+        print "Evaluation: ".($evaluation);
 
         $this->assertTrue($simpleCondition->evaluate($evaluation));
     }

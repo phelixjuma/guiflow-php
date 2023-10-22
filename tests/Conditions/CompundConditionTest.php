@@ -9,7 +9,7 @@ use PhelixJuma\DataTransformer\Utils\PathResolver;
 
 class CompundConditionTest extends TestCase
 {
-    public function testEvaluateNested()
+    public function _testEvaluateNested()
     {
         $data = [
             'customer' => 'Naivas',

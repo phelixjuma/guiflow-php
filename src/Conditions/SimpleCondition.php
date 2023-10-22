@@ -32,6 +32,8 @@ class SimpleCondition implements ConditionInterface
 
         $pathValues = $this->pathResolver::getValueByPath($data, $this->condition['path']);
 
+        print_r($pathValues);
+
         $operator = $this->condition['operator'];
         $conditionValue = $this->condition['value'] ?? null;
 
@@ -103,13 +105,13 @@ class SimpleCondition implements ConditionInterface
                 if (is_array($pathValue) && !Utils::isObject($pathValue)) {
                     $pathValue = array_filter($pathValue);
                 }
-                return $pathValue == 0 || !empty($pathValue);
+                return $pathValue === 0 || !empty($pathValue);
             case 'not exists':
                 // For arrays, we remove empty values
                 if (is_array($pathValue) && !Utils::isObject($pathValue)) {
                     $pathValue = array_filter($pathValue);
                 }
-                return !($pathValue == 0 || !empty($pathValue));
+                return empty($pathValue) && $pathValue !== 0;
             case 'regex':
                 return preg_match($value, $pathValue) === 1;
             case 'in':
