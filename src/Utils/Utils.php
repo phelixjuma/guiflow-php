@@ -265,7 +265,7 @@ class Utils
         if (is_array($data)) {
             if (self::isObject($data)) {
                 foreach ($keyMap as $oldKey => $newKey) {
-                    if (array_key_exists($oldKey, $data)) {
+                    if ($oldKey != $newKey && array_key_exists($oldKey, $data)) {
                         $data[$newKey] = $data[$oldKey];
                         unset($data[$oldKey]);
                     }
@@ -275,7 +275,7 @@ class Utils
                 $size =  sizeof($data);
                 for($index = 0; $index < $size; $index++) {
                     foreach ($keyMap as $oldKey => $newKey) {
-                        if (array_key_exists($oldKey, $data[$index])) {
+                        if ($oldKey != $newKey && array_key_exists($oldKey, $data[$index])) {
                             $data[$index][$newKey] = $data[$index][$oldKey];
                             unset($data[$index][$oldKey]);
                         }
