@@ -39,6 +39,44 @@ class Utils
     }
 
     /**
+     * @param $data
+     * @param $stringsToAppend
+     * @param $separator
+     * @return array|string
+     */
+    public static function prepend($data, $stringsToAppend, $separator = " ")
+    {
+        $separator = " $separator ";
+        $strings = implode($separator, $stringsToAppend);
+
+        $newData = null;
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $newData[$key] = self::removeExtraSpaces($strings . $separator . $value);
+            }
+        } else {
+            $newData = self::removeExtraSpaces($strings . $separator . $data);
+        }
+        return $newData;
+    }
+
+    public static function append($data, $stringsToAppend, $separator = " ")
+    {
+        $separator = " $separator ";
+        $strings = implode($separator, $stringsToAppend);
+
+        $newData = null;
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $newData[$key] = self::removeExtraSpaces($value. $separator. $strings);
+            }
+        } else {
+            $newData = self::removeExtraSpaces($data. $separator. $strings);
+        }
+        return $newData;
+    }
+
+    /**
      * @param array $strings
      * @param $separator
      * @return string
@@ -409,6 +447,82 @@ class Utils
      */
     public static function isObject($value) {
         return (is_array($value) && array_keys($value) !== range(0, count($value) - 1));
+    }
+
+    /**
+     * @param $obj
+     * @param $prefix
+     * @return array
+     */
+    public static function flattenObject($obj, $prefix = '') {
+
+        $flattened = [];
+
+        foreach ($obj as $key => $value) {
+            $newKey = $prefix . $key;
+            if (is_array($value) && array_values($value) !== $value) { // Associative array (dict in python)
+                $nested = self::flattenObject($value, $newKey . '.');
+                $flattened = array_merge($flattened, $nested);
+            } elseif (is_array($value) && array_values($value) === $value) { // Indexed array (list in python)
+                foreach ($value as $index => $item) {
+                    $value[$index] = is_array($item) && array_values($item) !== $item ? self::flattenObject($item) : $item;
+                }
+                $flattened[$newKey] = $value;
+            } else {
+                $flattened[$newKey] = $value;
+            }
+        }
+
+        return $flattened;
+    }
+
+    /**
+     * @param $data
+     * @param $prefix
+     * @param $siblings
+     * @return array
+     */
+    public static function expandList($data, $prefix = null, $siblings = []) {
+        $expanded = [];
+
+        if (is_array($data) && array_values($data) === $data) { // Indexed array
+            foreach ($data as $item) {
+                $expanded = array_merge($expanded, self::expandList($item, $prefix, $siblings));
+            }
+        } elseif (is_array($data)) { // Associative array
+            $nonListValues = [];
+            $listValues = [];
+            foreach ($data as $key => $value) {
+                $newKey = $prefix ? $prefix . '.' . $key : $key;
+                if (is_array($value) && array_values($value) === $value) {
+                    $listValues[$key] = $value;
+                } else {
+                    $nonListValues[$newKey] = $value;
+                }
+            }
+
+            if (!empty($listValues)) {
+                foreach ($listValues as $key => $value) {
+                    $newKey = $prefix ? $prefix . '.' . $key : $key;
+                    $expanded = array_merge($expanded, self::expandList($value, $newKey, array_merge($siblings, $nonListValues)));
+                }
+            } else {
+                $expanded[] = array_merge($siblings, $nonListValues);
+            }
+        } else {
+            $expanded[] = [$prefix => $data];
+        }
+
+        return $expanded;
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    public static function flattenAndExpand($data) {
+        $flattenedData = self::flattenObject($data);
+        return self::expandList($flattenedData);
     }
 
 }

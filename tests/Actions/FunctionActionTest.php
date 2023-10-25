@@ -387,6 +387,28 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
+    public function _testAppendFunction()
+    {
+        $data = [
+            'products' => [
+                ['name' => 'Capon Chicken', 'description' => 'Capon 1.2', 'quantity' => 2, 'unit_price' => 200],
+                ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
+                ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200],
+            ],
+            "name" => "Juma"
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("name", [$this, 'prepend'], ["strings" => ['Phelix', 'Omondi'], "separator" => ""]);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
     public function _testUnitConversion()
     {
         $data = [
@@ -1250,6 +1272,31 @@ class FunctionActionTest extends TestCase
 
     public function summate($data) {
         return array_sum($data);
+    }
+
+    public function _testFlattenObject()
+    {
+        $data = [
+            'products' => [
+                ['name' => 'Capon Chicken', 'description' => 'Capon 1.2', 'quantity' => 2, 'unit_price' => 200],
+                ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
+                ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200],
+            ],
+            "location" => [
+                "country" => "Kenya",
+                "city"  => "Nairobi"
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("", [$this, 'flatten_and_expand'], []);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
     }
 
 }

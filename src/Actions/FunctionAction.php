@@ -98,6 +98,10 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::fuzzy_extract_one(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'transform') {
             $newValue = Utils::transform_data(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'append') {
+            $newValue = Utils::append(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'prepend') {
+            $newValue = Utils::prepend(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'concat') {
             $newValue = Utils::concat($paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'concat_multi_array_assoc') {
@@ -110,6 +114,12 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::assoc_array_find(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'get_from_object') {
             $newValue = Utils::get_from_object(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'flatten_objects') {
+            $newValue = Utils::flattenObject(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'expand_lists') {
+            $newValue = Utils::expandList(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'flatten_and_expand') {
+            $newValue = Utils::flattenAndExpand(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'date_add_substract_days') {
             $newValue = Utils::date_add_substract_days(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'date_format') {
