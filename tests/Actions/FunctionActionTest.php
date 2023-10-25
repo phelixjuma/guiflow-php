@@ -1299,4 +1299,23 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
+    public function testRenameObjectKeys()
+    {
+        $data = [
+            ['name' => 'Capon Chicken', 'description' => 'Capon 1.2', 'quantity' => 2, 'unit_price' => 200],
+            ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
+            ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("", [$this, 'rename_object_keys'], ["key_map"=> ["name" => "product_name", "quantity" => "qty"]]);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
 }

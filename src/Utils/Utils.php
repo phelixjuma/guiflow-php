@@ -256,6 +256,38 @@ class Utils
     }
 
     /**
+     * @param $data
+     * @param $keyMap
+     * @return mixed
+     */
+    public static function rename_object_keys(&$data, $keyMap) {
+
+        if (is_array($data)) {
+            if (self::isObject($data)) {
+                foreach ($keyMap as $oldKey => $newKey) {
+                    if (array_key_exists($oldKey, $data)) {
+                        $data[$newKey] = $data[$oldKey];
+                        unset($data[$oldKey]);
+                    }
+                }
+            } else {
+
+                $size =  sizeof($data);
+                for($index = 0; $index < $size; $index++) {
+                    foreach ($keyMap as $oldKey => $newKey) {
+                        if (array_key_exists($oldKey, $data[$index])) {
+                            $data[$index][$newKey] = $data[$index][$oldKey];
+                            unset($data[$index][$oldKey]);
+                        }
+                    }
+                }
+
+            }
+        }
+        return $data;
+    }
+
+    /**
      * @param $text
      * @return string
      */
