@@ -30,7 +30,11 @@ class SimpleCondition implements ConditionInterface
             return true;
         }
 
-        $pathValues = $this->pathResolver::getValueByPath($data, $this->condition['path']);
+        if (isset($this->condition['path_value'])) {
+            $pathValues = $this->condition['path_value'];
+        } else {
+            $pathValues = $this->pathResolver::getValueByPath($data, $this->condition['path']);
+        }
 
         $operator = $this->condition['operator'];
         $conditionValue = $this->condition['value'] ?? null;

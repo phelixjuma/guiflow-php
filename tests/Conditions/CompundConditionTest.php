@@ -4,7 +4,6 @@ namespace PhelixJuma\DataTransformer\Tests\Conditions;
 
 use PhelixJuma\DataTransformer\Conditions\CompositeCondition;
 use PHPUnit\Framework\TestCase;
-use PhelixJuma\DataTransformer\Conditions\SimpleCondition;
 use PhelixJuma\DataTransformer\Utils\PathResolver;
 
 class CompundConditionTest extends TestCase

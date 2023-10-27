@@ -169,4 +169,5 @@ class SimpleConditionTest extends TestCase
 
         $this->assertTrue($simpleCondition->evaluate($evaluation));
     }
+
 }

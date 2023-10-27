@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\DataTransformer\Actions;
 
+use PhelixJuma\DataTransformer\DataTransformer;
 use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
 use PhelixJuma\DataTransformer\Utils\DataJoiner;
 use PhelixJuma\DataTransformer\Utils\DataReducer;
@@ -33,20 +34,24 @@ class FunctionAction implements ActionInterface
     private $newField;
     private $strict;
     private $targetPath;
+    private $condition;
 
     /**
      * @param string $path
      * @param $function
      * @param array $args
-     *
+     * @param $newField
+     * @param $strict
+     * @param $condition
      */
-    public function __construct(string $path, $function, array $args, $newField = null, $strict = 0)
+    public function __construct(string $path, $function, array $args, $newField = null, $strict = 0, $condition=null)
     {
         $this->path = $path;
         $this->function = $function;
         $this->args = $args;
         $this->newField = $newField;
         $this->strict = $strict != 0;
+        $this->condition = $condition;
         $this->targetPath = !empty($this->newField) ? $this->newField : $this->path;
     }
 
@@ -80,6 +85,10 @@ class FunctionAction implements ActionInterface
             } else {
                 $paramValues[] = $param;
             }
+        }
+
+        if (!empty($this->condition)) {
+            $paramValues[] = $this->condition;
         }
 
         if (isset($this->function[1]) && $this->function['1'] == 'filter') {

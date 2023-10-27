@@ -1317,4 +1317,31 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function testConditionalFunction()
+    {
+        $data = [
+            'products' => [
+                ['name' => 'Capon Chicken p/kg', 'description' => 'Capon 1.2', 'quantity' => 2, 'unit_price' => 200],
+                ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
+                ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200],
+            ],
+            "name" => "Juma"
+        ];
+
+        $expectedData = [];
+
+        $condition = [
+            "operator" => "contains",
+            "value"    => "p/kg"
+        ];
+
+        $action = new FunctionAction("products.*.name", [$this, 'prepend'], ["strings" => ['Fresh'], "separator" => ""], null, null, $condition);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }

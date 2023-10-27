@@ -19,14 +19,14 @@ class DataTransformer
 {
     private array $config;
     private object $functionsClass;
-    private PathResolver $pathResolver;
+    //private PathResolver $pathResolver;
 
 
     public function __construct(array $config, object $functionsClass)
     {
         $this->config = $config;
         $this->functionsClass = $functionsClass;
-        $this->pathResolver = new PathResolver();
+        //$this->pathResolver = new PathResolver();
 
         // Validate the configuration against the schema
         ConfigurationValidator::validate($this->config);
@@ -88,7 +88,7 @@ class DataTransformer
                     $actions = $rule['actions'];
 
                     // Evaluate the condition
-                    if ($this->evaluateCondition($data, $condition)) {
+                    if (self::evaluateCondition($data, $condition)) {
                         // Execute the actions
                         foreach ($actions as $action) {
                             try {
@@ -112,12 +112,47 @@ class DataTransformer
         return  array_keys($data) !== range(0, count($data) - 1);
     }
 
-    private function evaluateCondition($data, $condition)
+    /**
+     * @param $condition
+     * @param $pathValue
+     * @return void
+     */
+    private static function addPathValueToCondition(&$condition, $pathValue) {
+
+        if (!is_array($condition)) {
+            return;
+        }
+
+        if (isset($condition['operator']) && isset($condition['value'])) {
+            // Add 'path_value' field. This can be set to any value as needed.
+            $condition['path_value'] = $pathValue;  // Set this to your desired value
+        }
+
+        if (isset($condition['conditions']) && is_array($condition['conditions'])) {
+            foreach ($condition['conditions'] as &$subCondition) {
+                self::addPathValueToCondition($subCondition, $pathValue);
+            }
+        }
+    }
+
+    /**
+     * @param $data
+     * @param $condition
+     * @param $useDataAsPathValue
+     * @return mixed
+     */
+    public static function evaluateCondition($data, $condition, $useDataAsPathValue = false)
     {
-        $conditionClass = $this->getConditionClass($condition);
-        $conditionInstance = new $conditionClass($condition, $this->pathResolver);
+        // We add path value, if set
+        if ($useDataAsPathValue !== false) {
+            self::addPathValueToCondition($condition, $data);
+        }
+
+        $conditionClass = self::getConditionClass($condition);
+        $conditionInstance = new $conditionClass($condition, (new PathResolver()));
         return $conditionInstance->evaluate($data);
     }
+
 
     /**
      * @param $data
@@ -126,7 +161,7 @@ class DataTransformer
      */
     private function executeAction(&$data, $action)
     {
-        $actionClass = $this->getActionClass($action);
+        $actionClass = self::getActionClass($action);
 
         switch ($action['action']) {
             case 'add':
@@ -152,7 +187,7 @@ class DataTransformer
     }
 
 
-    private function getConditionClass($condition): string
+    private static function getConditionClass($condition): string
     {
         if (isset($condition['operator']) && in_array(strtolower($condition['operator']), ['and', 'or'])) {
             return CompositeCondition::class;
@@ -161,7 +196,7 @@ class DataTransformer
         }
     }
 
-    private function getActionClass($action): string
+    private static function getActionClass($action): string
     {
         switch ($action['action']) {
             case 'add':

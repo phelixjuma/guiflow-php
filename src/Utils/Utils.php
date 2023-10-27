@@ -6,6 +6,7 @@ use FuzzyWuzzy\Fuzz;
 use FuzzyWuzzy\Process;
 use PhelixJuma\DataTransformer\Actions\FunctionAction;
 use PhelixJuma\DataTransformer\Conditions\SimpleCondition;
+use PhelixJuma\DataTransformer\DataTransformer;
 use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
 
 class Utils
@@ -38,42 +39,46 @@ class Utils
         return date($format, $date);
     }
 
-    /**
-     * @param $data
-     * @param $stringsToAppend
-     * @param $separator
-     * @return array|string
-     */
-    public static function prepend($data, $stringsToAppend, $separator = " ")
+    public static function prepend($data, $stringsToAppend, $separator = " ", $condition = null)
     {
-        $separator = " $separator ";
-        $strings = implode($separator, $stringsToAppend);
+        $modifiedSeparator = " $separator ";
+        $strings = implode($modifiedSeparator, $stringsToAppend);
 
-        $newData = null;
+        // If the data is an array, apply prepend recursively to each element
         if (is_array($data)) {
             foreach ($data as $key => $value) {
-                $newData[$key] = self::removeExtraSpaces($strings . $separator . $value);
+                $data[$key] = self::prepend($value, $stringsToAppend, $modifiedSeparator, $condition);
             }
-        } else {
-            $newData = self::removeExtraSpaces($strings . $separator . $data);
+            return $data;
         }
-        return $newData;
+
+        // If it's not an array, apply the prepend logic to the string
+        if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, true)) {
+            return self::removeExtraSpaces($strings . $modifiedSeparator . $data);
+        }
+
+        return $data;
     }
 
-    public static function append($data, $stringsToAppend, $separator = " ")
+    public static function append($data, $stringsToAppend, $separator = " ", $condition = null)
     {
-        $separator = " $separator ";
-        $strings = implode($separator, $stringsToAppend);
+        $modifiedSeparator = " $separator ";
+        $strings = implode($modifiedSeparator, $stringsToAppend);
 
-        $newData = null;
+        // If the data is an array, apply prepend recursively to each element
         if (is_array($data)) {
             foreach ($data as $key => $value) {
-                $newData[$key] = self::removeExtraSpaces($value. $separator. $strings);
+                $data[$key] = self::prepend($value, $stringsToAppend, $modifiedSeparator, $condition);
             }
-        } else {
-            $newData = self::removeExtraSpaces($data. $separator. $strings);
+            return $data;
         }
-        return $newData;
+
+        // If it's not an array, apply the prepend logic to the string
+        if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, true)) {
+            return self::removeExtraSpaces($data . $modifiedSeparator . $strings);
+        }
+
+        return $data;
     }
 
     /**
@@ -83,6 +88,7 @@ class Utils
      */
     public static function concat(array $strings, $separator = " "): string
     {
+
         $separator = " $separator "; // add spaces to the separator
         return self::removeExtraSpaces(implode($separator, $strings));
     }
@@ -375,7 +381,17 @@ class Utils
 
         return $input;
     }
-    public static function transform_data($data, $transformFunction, $args = [], $targetKeys=[]) {
+
+    /**
+     * @param $data
+     * @param $transformFunction
+     * @param $args
+     * @param $targetKeys
+     * @param $condition
+     * @return mixed
+     * @throws UnknownOperatorException
+     */
+    public static function transform_data($data, $transformFunction, $args = [], $targetKeys=[], $condition=[]) {
 
         if (!in_array($transformFunction, FunctionAction::SUPPORTED_FUNCTIONS)) {
             throw new UnknownOperatorException();
@@ -446,22 +462,29 @@ class Utils
 
         if (is_array($data)) {
             foreach ($data as $key => $value) {
-                if (is_array($value)) {
-                    $data[$key] = self::transform_data($value, $transformFunction, $args, $targetKeys);
-                } else {
-                    if (empty($targetKeys) || in_array($key, $targetKeys)) {
-                        if (isset($specialFunctions[$transformFunction])) {
-                            $data[$key] = $specialFunctions[$transformFunction]($value, ...$args);
-                        } else {
-                            $data[$key] = !empty($args) ? $transformFunction($value, ...$args) : $transformFunction($value);
+
+                if (empty($condition) || DataTransformer::evaluateCondition($value, $condition, true)) {
+
+                    if (is_array($value)) {
+                        $data[$key] = self::transform_data($value, $transformFunction, $args, $targetKeys);
+                    } else {
+                        if (empty($targetKeys) || in_array($key, $targetKeys)) {
+                            if (isset($specialFunctions[$transformFunction])) {
+                                $data[$key] = $specialFunctions[$transformFunction]($value, ...$args);
+                            } else {
+                                $data[$key] = !empty($args) ? $transformFunction($value, ...$args) : $transformFunction($value);
+                            }
                         }
                     }
                 }
             }
         } elseif (empty($targetKeys)) {
-            return isset($specialFunctions[$transformFunction])
-                ? $specialFunctions[$transformFunction]($data, ...$args)
-                : (!empty($args) ? $transformFunction($data, ...$args) : $transformFunction($data));
+
+            if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, true)) {
+                return isset($specialFunctions[$transformFunction])
+                    ? $specialFunctions[$transformFunction]($data, ...$args)
+                    : (!empty($args) ? $transformFunction($data, ...$args) : $transformFunction($data));
+            }
         }
 
         return $data;
