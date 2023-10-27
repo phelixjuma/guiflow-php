@@ -472,18 +472,11 @@ class Utils
 
                         $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
 
-                        print "\nvalue: $value \n";
-                        print "\nsearch: $search \n";
-                        print "\nreplacement: $replace \n";
-                        print "\npattern: $pattern \n";
-
                         $value = preg_replace($pattern, $replace, $value);
 
                         if (preg_last_error() !== PREG_NO_ERROR) {
-                            print "Preg Error: ".self::getPregError(preg_last_error());
+                            throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
                         }
-
-                        print "\nnew value: $value \n";
                     }
                 }
                 return self::removeExtraSpaces($value);
