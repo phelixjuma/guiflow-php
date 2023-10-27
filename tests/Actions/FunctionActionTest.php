@@ -907,6 +907,9 @@ class FunctionActionTest extends TestCase
             'items' => [
                 [
                     'description' => "FR-KENCHIC CHICKEN"
+                ],
+                [
+                    'description' => "FR-KENCHIC CHICKEN BREAST BONELES PER KG"
                 ]
             ]
         ];

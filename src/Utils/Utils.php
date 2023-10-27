@@ -444,7 +444,14 @@ class Utils
                 return $mappings[strtolower($value)] ?? $value;
             },
             'regex_mapper' => function($value, $mappings, $isCaseSensitive = false) {
+
                 $modifier = !$isCaseSensitive ? 'i' : '';
+
+                print "\nRegex Mapper on: \n";
+                print_r($value);
+                print "\n";
+                print_r($mappings);
+                print "\n";
 
                 foreach ($mappings as $search => $replace) {
 
