@@ -425,7 +425,7 @@ class Utils
             },
             'preg_replace' => function($subject, $pattern, $replacement, $addSpacer=true, $isCaseSensitive=false) {
 
-                $pattern = "/$pattern/";
+                $pattern = "/".self::custom_preg_escape($pattern)."/";
                 if (!$isCaseSensitive) {
                     $pattern .= "i";
                 }
@@ -470,7 +470,7 @@ class Utils
 
                     if (empty($replace) || !str_contains($value, $replace)) {
 
-                        $pattern = '/' . self::full_unescape($search) . '/'.$modifier;
+                        $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
 
                         print "\nvalue: $value \n";
                         print "\nsearch: $search \n";

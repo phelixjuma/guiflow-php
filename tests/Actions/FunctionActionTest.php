@@ -901,7 +901,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testRegexMapper()
+    public function testRegexMapper()
     {
         $data = [
             'items' => [
@@ -915,7 +915,7 @@ class FunctionActionTest extends TestCase
         ];
 
         $mapping = [
-            "kenchic" => ""
+            "(PERKG|PER KG|P/KG|PKG|PK|/KG)" => "PER 1 KG"
         ];
 
         $expectedData = [];
@@ -924,7 +924,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
