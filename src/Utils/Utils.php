@@ -457,6 +457,8 @@ class Utils
                         $pattern = '/' . self::full_unescape($search) . '/'.$modifier;
 
                         print "\nvalue: $value \n";
+                        print "\nsearch: $search \n";
+                        print "\nreplacement: $replace \n";
                         print "\npattern: $pattern \n";
 
                         $value = preg_replace($pattern, $replace, $value);
