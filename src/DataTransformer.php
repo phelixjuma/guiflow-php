@@ -32,6 +32,10 @@ class DataTransformer
         ConfigurationValidator::validate($this->config);
     }
 
+    /**
+     * @param $data
+     * @return void
+     */
     public function transform(&$data) {
 
         $dataCopy = $data;
@@ -99,13 +103,20 @@ class DataTransformer
                                         $this->executeAction($value, $action);
                                     });
                                 }
-                            } catch (\Exception|\Throwable $e ) {}
+                            } catch (\Exception|\Throwable $e ) {
+                                print "Transformer error: ".$e->getMessage();
+                                print_r($action);
+                            }
                         }
                     }
-                } catch (\Exception|\Throwable $e ) {}
+                } catch (\Exception|\Throwable $e ) {
+                    print "Transformer error: ".$e->getMessage();
+                }
             }
 
-        } catch (\Exception|\Throwable $e ) {}
+        } catch (\Exception|\Throwable $e ) {
+            print "Transformer error: ".$e->getMessage();
+        }
     }
 
     private static function isObject($data) {
