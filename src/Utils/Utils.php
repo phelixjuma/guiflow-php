@@ -386,6 +386,22 @@ class Utils
     }
 
     /**
+     * @param $error
+     * @return string
+     */
+    private static function getPregError($error) {
+        return match ($error) {
+            PREG_INTERNAL_ERROR => 'There was an internal error!',
+            PREG_BACKTRACK_LIMIT_ERROR => 'Backtrack limit was exhausted!',
+            PREG_RECURSION_LIMIT_ERROR => 'Recursion limit was exhausted!',
+            PREG_BAD_UTF8_ERROR => 'Bad UTF-8 error!',
+            PREG_BAD_UTF8_OFFSET_ERROR => 'Bad UTF-8 offset error!',
+            PREG_JIT_STACKLIMIT_ERROR => 'JIT stack limit error!',
+            default => $error. 'Unknown error!',
+        };
+    }
+
+    /**
      * @param $data
      * @param $transformFunction
      * @param $args
@@ -462,6 +478,10 @@ class Utils
                         print "\npattern: $pattern \n";
 
                         $value = preg_replace($pattern, $replace, $value);
+
+                        if (preg_last_error() !== PREG_NO_ERROR) {
+                            print "Preg Error: ".self::getPregError(preg_last_error());
+                        }
 
                         print "\nnew value: $value \n";
                     }
