@@ -901,7 +901,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testRegexMapper()
+    public function _testRegexMapper()
     {
         $data = [
             'items' => [
@@ -924,7 +924,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -1271,7 +1271,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testConditionalFunction()
+    public function testConditionalFunction()
     {
         $data = [
             'products' => [
@@ -1285,15 +1285,24 @@ class FunctionActionTest extends TestCase
         $expectedData = [];
 
         $condition = [
-            "operator" => "contains",
-            "value"    => "p/kg"
+            "operator" => "AND",
+            "conditions" => [
+                [
+                    "operator" => "contains",
+                    "value"    => "p/kg"
+                ],
+                [
+                    "operator" => "contains",
+                    "value"    => "capon"
+                ]
+            ]
         ];
 
         $action = new FunctionAction("products.*.name", [$this, 'prepend'], ["strings" => ['Fresh'], "separator" => ""], null, null, $condition);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

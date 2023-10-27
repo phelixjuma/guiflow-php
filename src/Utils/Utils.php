@@ -455,7 +455,13 @@ class Utils
                     if (empty($replace) || !str_contains($value, $replace)) {
 
                         $pattern = '/' . self::full_unescape($search) . '/'.$modifier;
+
+                        print "\nvalue: $value \n";
+                        print "\npattern: $pattern \n";
+
                         $value = preg_replace($pattern, $replace, $value);
+
+                        print "\nnew value: $value \n";
                     }
                 }
                 return self::removeExtraSpaces($value);
