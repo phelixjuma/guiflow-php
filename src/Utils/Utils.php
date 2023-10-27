@@ -362,11 +362,14 @@ class Utils
     }
 
     /**
-     * @param string $text
-     * @return string
+     * @param $text
+     * @return array|string|string[]|null
      */
-    public static function removeExtraSpaces(string $text): string {
-        return preg_replace('/\s+/', ' ', $text);
+    public static function removeExtraSpaces($text) {
+        if (!is_null($text)) {
+            return preg_replace('/\s+/', ' ', $text);
+        }
+        return $text;
     }
 
     private static function  custom_preg_escape($input) {
@@ -446,12 +449,6 @@ class Utils
             'regex_mapper' => function($value, $mappings, $isCaseSensitive = false) {
 
                 $modifier = !$isCaseSensitive ? 'i' : '';
-
-                print "\nRegex Mapper on: \n";
-                print_r($value);
-                print "\n";
-                print_r($mappings);
-                print "\n";
 
                 foreach ($mappings as $search => $replace) {
 
