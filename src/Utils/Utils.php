@@ -450,7 +450,7 @@ class Utils
 
                     if (empty($replace) || !str_contains($value, $replace)) {
 
-                        $pattern = '/\b' . self::full_unescape($search) . '\b/'.$modifier;
+                        $pattern = '/' . self::full_unescape($search) . '/'.$modifier;
                         $value = preg_replace($pattern, $replace, $value);
                     }
                 }

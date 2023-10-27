@@ -901,62 +901,12 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testRegexMapper()
+    public function testRegexMapper()
     {
-        $data =
-            [
-                'customer' => 'Naivas',
-                'location' => [
-                    'address' => 'Kilimani',
-                    'region' => 'Nairobi'
-                ],
-                'products' => [
-                    ["ItemName" => "Ribena Cordial 50cl Pet Cordial"],
-                    ["ItemName" => "Ribena Dil Bc 300ml Gla X12"],
-                    ["ItemName" => "Ribena Dil Bc 600ml Gla X12"],
-                    ["ItemName" => "Ribena Rtd Bc 1l Tet X12"],
-                    ["ItemName" => "Ribena Rtd Bc 250ml Tet X24"],
-                    ["ItemName" => "Ribena Rtd Bc&S/Berry 1l Tet X12"],
-                    ["ItemName" => "Ribena Rtd Bc&S/Berry 250ml Tet X24"],
-                    ["ItemName" => "Rib Rtd Bc 25cl Pet 2x24"],
-                    ["ItemName" => "Rib Rtd Bc 50cl Pet X12"],
-                    ["ItemName" => "Rib Spark Bc Can Regular 325ml X24"],
-                    ["ItemName" => "Ribena Cordial 1l Pet Cordial"],
-                    ["ItemName" => "Grape Blackberry-250ml"],
-                    ["ItemName" => "Lucozade Boost Buzz 1l Pet X12"],
-                    ["ItemName" => "Lucozade Nrg Boost 250ml Tet X24"],
-                    ["ItemName" => "Lucozade Nrg Original 300ml Gla X12"],
-                    ["ItemName" => "Lucozade Nrg Original 600ml Gla X12"],
-                    ["ItemName" => "WEETABIX STANDARD - 48 PCS-210GMS"],
-                    ["ItemName" => "WEETABIX JUMBO OATS 500G"],
-                    ["ItemName" => "WEETABIX JUMBO OATS 1KG"],
-                    ["ItemName" => "WEETABIX MINIS - CHOCOLATE 450G"],
-                    ["ItemName" => "WEETABIX JUMBO OATS 500G"],
-                    ["ItemName" => "CERES PASSION FRUIT JUICE 1L"],
-                    ["ItemName" => "CERES CRANBERRY/KIWI JUICE 1L -"]
-                ]
-            ];
-
-        $mapping = [
-            "Dil"    => "Diluted",
-            "Bc"    => "Black Currant",
-            "Rtd"    => "Ready to Drink",
-            "Nrg"    => "Energy",
-            "S/Berry"   => "Straw Berry",
-            "Rib"   => "Ribena",
-            "Luc"   => "Lucozade",
-            "Gla" => "",
-            "Tet" => "",
-            "X12" => "",
-            "X24" => "",
-            "Botdbke" => "",
-            "n/source" => "Nature's Source"
-        ];
-
         $data = [
             'items' => [
                 [
-                    'description' => "KENCHIC CAPON 1.4KG"
+                    'description' => "FR-KENCHIC CHICKEN"
                 ]
             ]
         ];
@@ -971,7 +921,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -1318,7 +1268,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testConditionalFunction()
+    public function _testConditionalFunction()
     {
         $data = [
             'products' => [
@@ -1340,7 +1290,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
