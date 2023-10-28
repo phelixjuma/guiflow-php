@@ -104,16 +104,17 @@ class Utils
 
         $separator = " $separator "; // add spaces to the separator
 
-        array_walk($data, function (&$value, $key) use($fields, $newField, $separator) {
-            $dataToConcat = array_flip($fields);
-            foreach ($value as $key => $v) {
-                if (in_array($key, $fields)) {
-                    $dataToConcat[$key] = $v;
+        if (is_array($data)) {
+            array_walk($data, function (&$value, $key) use($fields, $newField, $separator) {
+                $dataToConcat = array_flip($fields);
+                foreach ($value as $key => $v) {
+                    if (in_array($key, $fields)) {
+                        $dataToConcat[$key] = $v;
+                    }
                 }
-            }
-            $value[$newField] = self::concat(array_values($dataToConcat), $separator);
-        });
-
+                $value[$newField] = self::concat(array_values($dataToConcat), $separator);
+            });
+        }
         return $data;
     }
 
