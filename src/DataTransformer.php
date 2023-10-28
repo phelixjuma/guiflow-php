@@ -101,7 +101,8 @@ class DataTransformer
                                 $skipAction = $action['skip'] ?? 0;
 
                                 // We execute the action, if it is not set to be skipped.
-                                //if ($skipAction != 1) {
+                                if ($skipAction != 1) {
+
                                     if (self::isObject($data)) {
                                         $this->executeAction($data, $action);
                                     } else {
@@ -109,7 +110,7 @@ class DataTransformer
                                             $this->executeAction($value, $action);
                                         });
                                     }
-                                //}
+                                }
 
                             } catch (\Exception|\Throwable $e ) {
                                 print "Transformer error: ".$e->getMessage(). "action is: ";
