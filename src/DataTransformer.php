@@ -93,7 +93,7 @@ class DataTransformer
                     $actions = $rule['actions'];
 
                     // We execute this rule if it is not skipped and the conditions are true
-                    if ($skip != 1 && self::evaluateCondition($data, $condition)) {
+                    if (self::evaluateCondition($data, $condition)) {
                         // Execute the actions
                         foreach ($actions as $action) {
                             try {
@@ -101,7 +101,7 @@ class DataTransformer
                                 $skipAction = $action['skip'] ?? 0;
 
                                 // We execute the action, if it is not set to be skipped.
-                                if ($skipAction != 1) {
+                                //if ($skipAction != 1) {
                                     if (self::isObject($data)) {
                                         $this->executeAction($data, $action);
                                     } else {
@@ -109,7 +109,7 @@ class DataTransformer
                                             $this->executeAction($value, $action);
                                         });
                                     }
-                                }
+                                //}
 
                             } catch (\Exception|\Throwable $e ) {
                                 print "Transformer error: ".$e->getMessage(). "action is: ";
