@@ -34,7 +34,7 @@ class Utils
      * @param $format
      * @return string
      */
-    public static function format_date($date, $format): string
+    public static function format_date($date, $format)
     {
         return date($format, $date);
     }
@@ -86,7 +86,7 @@ class Utils
      * @param $separator
      * @return string
      */
-    public static function concat(array $strings, $separator = " "): string
+    public static function concat($strings, $separator = " ")
     {
 
         $separator = " $separator "; // add spaces to the separator
@@ -99,7 +99,7 @@ class Utils
      * @param $newField
      * @return array
      */
-    public static function concat_multi_array_assoc(array $data, array $fields, $newField, $separator = " "): array
+    public static function concat_multi_array_assoc($data, $fields, $newField, $separator = " "): array
     {
 
         $separator = " $separator "; // add spaces to the separator
@@ -123,7 +123,7 @@ class Utils
      * @param $replacement
      * @return array|string|string[]|null
      */
-    public static function custom_preg_replace($data, $pattern, $replacement): array|string|null
+    public static function custom_preg_replace($data, $pattern, $replacement)
     {
         $newData = null;
         if (is_array($data)) {
@@ -297,7 +297,7 @@ class Utils
      * @param $text
      * @return string
      */
-    public static function cleanText($text): string
+    public static function cleanText($text)
     {
         // Convert text to lowercase
         $text = strtolower($text);
