@@ -6,37 +6,83 @@
     "properties": {
       "rule": {
         "type": "string",
-        "description": "A string that represents the name or description of the rule."
+        "description": "A string that represents the name of the rule."
+      },
+      "description": {
+        "type": "string",
+        "description": "A string that represents the description of the rule."
+      },
+      "skip": {
+        "type": "boolean",
+        "description": "Defines whether this rule should be skipped or not"
       },
       "condition": {
         "oneOf": [
           {
             "type": "object",
             "properties": {
-              "path": {"type": "string"},
-              "operator": {"type": "string", "enum": ["exists", "not exists"]}
-            },
-            "required": ["path", "operator"]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "path": {"type": "string"},
-              "operator": {"type": "string"},
-              "value": {"type": ["string", "integer", "boolean", "array", "object"]}
-            },
-            "required": ["path", "operator", "value"]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "operator": {"type": "string", "enum": ["AND", "OR"]},
-              "conditions": {
-                "type": "array",
-                "items": {"$ref": "#/items/properties/condition"}
+              "path": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string",
+                "enum": [
+                  "exists",
+                  "not exists"
+                ]
               }
             },
-            "required": ["operator", "conditions"]
+            "required": [
+              "path",
+              "operator"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "integer",
+                  "boolean",
+                  "array",
+                  "object"
+                ]
+              }
+            },
+            "required": [
+              "path",
+              "operator",
+              "value"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "operator": {
+                "type": "string",
+                "enum": [
+                  "AND",
+                  "OR"
+                ]
+              },
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/items/properties/condition"
+                }
+              }
+            },
+            "required": [
+              "operator",
+              "conditions"
+            ]
           },
           {
             "type": "string"
@@ -50,15 +96,38 @@
           "properties": {
             "action": {
               "type": "string",
-              "enum": ["add", "subtract", "multiply", "divide", "set", "delete", "remove_path", "function"],
+              "enum": [
+                "add",
+                "subtract",
+                "multiply",
+                "divide",
+                "set",
+                "delete",
+                "remove_path",
+                "function"
+              ],
               "description": "The operation to be performed."
+            },
+            "description": {
+              "type": "string",
+              "description": "The description of what the action does"
+            },
+            "skip": {
+              "type": "boolean",
+              "description": "Defines whether this action should be skipped or not"
             },
             "path": {
               "type": "string",
               "description": "The field to be used as the argument for the operation."
             },
             "value": {
-              "type": ["string", "integer", "boolean", "array", "object"],
+              "type": [
+                "string",
+                "integer",
+                "boolean",
+                "array",
+                "object"
+              ],
               "description": "The value to be used as the argument for the operation. This is optional and is only used for 'set', 'add', 'subtract', 'multiply', 'divide' actions."
             },
             "valueFromField": {
@@ -82,19 +151,38 @@
               "description": "The name of the function to be executed. This is optional and is only used for 'function' and 'customFunction' actions."
             }
           },
-          "required": ["action", "path"],
+          "required": [
+            "action",
+            "path"
+          ],
           "dependencies": {
-            "value": ["path"],
-            "valueFromField": ["path"],
-            "valueMapping": ["valueFromField"],
-            "args": ["function"],
-            "newField": ["path"],
-            "function": ["args"]
+            "value": [
+              "path"
+            ],
+            "valueFromField": [
+              "path"
+            ],
+            "valueMapping": [
+              "valueFromField"
+            ],
+            "args": [
+              "function"
+            ],
+            "newField": [
+              "path"
+            ],
+            "function": [
+              "args"
+            ]
           }
         },
         "description": "An array of actions to be executed in order."
       }
     },
-    "required": ["rule", "condition", "actions"]
+    "required": [
+      "rule",
+      "condition",
+      "actions"
+    ]
   }
 }
