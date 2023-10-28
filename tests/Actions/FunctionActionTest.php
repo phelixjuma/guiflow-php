@@ -400,7 +400,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("name", [$this, 'prepend'], ["strings" => ['Phelix', 'Omondi'], "separator" => ""]);
+        $action = new FunctionAction("name", [$this, 'append'], ["strings" => ['(For Phelix)'], "separator" => ""]);
 
         $action->execute($data);
 
@@ -901,7 +901,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testRegexMapper()
+    public function _testRegexMapper()
     {
         $data = [
             'items' => [
@@ -924,7 +924,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

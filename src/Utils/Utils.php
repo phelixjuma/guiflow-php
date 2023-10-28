@@ -39,15 +39,15 @@ class Utils
         return date($format, $date);
     }
 
-    public static function prepend($data, $stringsToAppend, $separator = " ", $condition = null)
+    public static function prepend($data, $stringsToPrepend, $separator = " ", $condition = null)
     {
         $modifiedSeparator = " $separator ";
-        $strings = implode($modifiedSeparator, $stringsToAppend);
+        $strings = implode($modifiedSeparator, $stringsToPrepend);
 
         // If the data is an array, apply prepend recursively to each element
         if (is_array($data)) {
             foreach ($data as $key => $value) {
-                $data[$key] = self::prepend($value, $stringsToAppend, $modifiedSeparator, $condition);
+                $data[$key] = self::prepend($value, $stringsToPrepend, $modifiedSeparator, $condition);
             }
             return $data;
         }
@@ -68,7 +68,7 @@ class Utils
         // If the data is an array, apply prepend recursively to each element
         if (is_array($data)) {
             foreach ($data as $key => $value) {
-                $data[$key] = self::prepend($value, $stringsToAppend, $modifiedSeparator, $condition);
+                $data[$key] = self::append($value, $stringsToAppend, $modifiedSeparator, $condition);
             }
             return $data;
         }
