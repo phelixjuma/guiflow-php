@@ -13,7 +13,7 @@
         "description": "A string that represents the description of the rule."
       },
       "skip": {
-        "type": "boolean",
+        "type": "string",
         "description": "Defines whether this rule should be skipped or not"
       },
       "condition": {
@@ -113,7 +113,7 @@
               "description": "The description of what the action does"
             },
             "skip": {
-              "type": "boolean",
+              "type": "string",
               "description": "Defines whether this action should be skipped or not"
             },
             "path": {

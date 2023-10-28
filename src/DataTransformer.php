@@ -88,7 +88,7 @@ class DataTransformer
 
                 try {
 
-                    $skip = isset($rule['skip']) && $rule['skip'] == true;
+                    $skip = isset($rule['skip']) && $rule['skip'] == 1;
                     $condition = $rule['condition'];
                     $actions = $rule['actions'];
 
@@ -98,7 +98,7 @@ class DataTransformer
                         foreach ($actions as $action) {
                             try {
 
-                                $skipAction = isset($action['skip']) && $action['skip'] == true;
+                                $skipAction = isset($action['skip']) && $action['skip'] == 1;
 
                                 // We execute the action, if it is not set to be skipped.
                                 if (!$skipAction) {
