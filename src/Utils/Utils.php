@@ -17,7 +17,7 @@ class Utils
      * @param $key
      * @return mixed
      */
-    public static function sortMultiAssocArrayByKey($array, $key, $order='asc'): mixed
+    public static function sortMultiAssocArrayByKey($array, $key, $order='asc')
     {
         usort($array, function($a, $b) use ($key, $order) {
             if (isset($a[$key]) && isset($b[$key])) {
@@ -99,7 +99,7 @@ class Utils
      * @param $newField
      * @return array
      */
-    public static function concat_multi_array_assoc($data, $fields, $newField, $separator = " "): array
+    public static function concat_multi_array_assoc($data, $fields, $newField, $separator = " ")
     {
 
         $separator = " $separator "; // add spaces to the separator
@@ -147,7 +147,7 @@ class Utils
      * @return mixed
      * @throws UnknownOperatorException
      */
-    public static function assoc_array_sum_if($data, $conditionField, $conditionOperator, $conditionValue, $conditionSimilarityThreshold = 80, $sumField = null): mixed
+    public static function assoc_array_sum_if($data, $conditionField, $conditionOperator, $conditionValue, $conditionSimilarityThreshold = 80, $sumField = null)
     {
 
         $sum = 0;
@@ -173,7 +173,7 @@ class Utils
      * @return mixed
      * @throws UnknownOperatorException
      */
-    public static function assoc_array_find($data, $conditionField, $conditionOperator, $conditionValue, $conditionSimilarityThreshold = 80, $conditionSimilarityTokenize= false, $returnKey = null): mixed
+    public static function assoc_array_find($data, $conditionField, $conditionOperator, $conditionValue, $conditionSimilarityThreshold = 80, $conditionSimilarityTokenize= false, $returnKey = null)
     {
 
         $response = null;
@@ -516,7 +516,7 @@ class Utils
         return $data;
     }
 
-    public static function removeKeysFromAssocArray($data, $keysToRemove): array
+    public static function removeKeysFromAssocArray($data, $keysToRemove)
     {
         return array_diff_key($data, array_flip($keysToRemove));
     }
