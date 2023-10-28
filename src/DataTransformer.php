@@ -88,20 +88,20 @@ class DataTransformer
 
                 try {
 
-                    $skip = isset($rule['skip']) && $rule['skip'] == 1;
+                    $skip = $rule['skip'] ?? 0;
                     $condition = $rule['condition'];
                     $actions = $rule['actions'];
 
                     // We execute this rule if it is not skipped and the conditions are true
-                    if (!$skip && self::evaluateCondition($data, $condition)) {
+                    if ($skip != 1 && self::evaluateCondition($data, $condition)) {
                         // Execute the actions
                         foreach ($actions as $action) {
                             try {
 
-                                $skipAction = isset($action['skip']) && $action['skip'] == 1;
+                                $skipAction = $action['skip'] ?? 0;
 
                                 // We execute the action, if it is not set to be skipped.
-                                if (!$skipAction) {
+                                if ($skipAction != 1) {
                                     if (self::isObject($data)) {
                                         $this->executeAction($data, $action);
                                     } else {
