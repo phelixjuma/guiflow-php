@@ -93,7 +93,7 @@ class DataTransformer
                     $actions = $rule['actions'];
 
                     // We execute this rule if it is not skipped and the conditions are true
-                    if (self::evaluateCondition($data, $condition)) {
+                    if ($skip != 1 && self::evaluateCondition($data, $condition)) {
                         // Execute the actions
                         foreach ($actions as $action) {
                             try {
