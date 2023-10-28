@@ -113,7 +113,7 @@ class DataTransformer
                                 }
 
                             } catch (\Exception|\Throwable $e ) {
-                                print "Transformer error: ".$e->getMessage(). "action is: ";
+                                print "Transformer error: ".$e->getMessage(). " on {$e->getLine()} of {$e->getFile()} \n". "action is: ";
                                 print_r($action);
                             }
                         }
