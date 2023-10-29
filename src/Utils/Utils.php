@@ -368,9 +368,26 @@ class Utils
      */
     public static function removeExtraSpaces($text) {
         if (!is_null($text)) {
-            return preg_replace('/\s+/', ' ', $text);
+            return preg_replace('/\s+/', ' ', trim($text));
         }
         return $text;
+    }
+
+    public static function remove_repeated_words($string) {
+
+        $words = explode(' ', $string); // Split the string into words
+        $seen = array();                // Array to track seen words in lowercase
+        $result = array();              // Array to hold the final words
+
+        foreach ($words as $word) {
+            $lowercaseWord = strtolower($word); // Convert the word to lowercase for comparison
+            if (!isset($seen[$lowercaseWord])) {
+                $seen[$lowercaseWord] = true;    // Mark the lowercase word as seen
+                $result[] = $word;               // Add the original word to the result
+            }
+        }
+
+        return self::removeExtraSpaces(implode(' ', $result));   // Join the words back into a string
     }
 
     private static function  custom_preg_escape($input) {
@@ -476,7 +493,7 @@ class Utils
                         $value = preg_replace($pattern, $replace, $value);
 
                         if (preg_last_error() !== PREG_NO_ERROR) {
-                            throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
+                            //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
                         }
                     }
                 }
