@@ -373,21 +373,28 @@ class Utils
         return $text;
     }
 
-    public static function remove_repeated_words($string) {
+    public static function remove_repeated_words($data) {
 
-        $words = explode(' ', $string); // Split the string into words
-        $seen = array();                // Array to track seen words in lowercase
-        $result = array();              // Array to hold the final words
-
-        foreach ($words as $word) {
-            $lowercaseWord = strtolower($word); // Convert the word to lowercase for comparison
-            if (!isset($seen[$lowercaseWord])) {
-                $seen[$lowercaseWord] = true;    // Mark the lowercase word as seen
-                $result[] = $word;               // Add the original word to the result
+        if (is_array($data)) {
+            foreach ($data as &$value) {
+                $value = self::remove_repeated_words($value);
             }
-        }
+        } else {
+            $words = explode(' ', $data); // Split the string into words
+            $seen = array();                // Array to track seen words in lowercase
+            $result = array();              // Array to hold the final words
 
-        return self::removeExtraSpaces(implode(' ', $result));   // Join the words back into a string
+            foreach ($words as $word) {
+                $lowercaseWord = strtolower($word); // Convert the word to lowercase for comparison
+                if (!isset($seen[$lowercaseWord])) {
+                    $seen[$lowercaseWord] = true;    // Mark the lowercase word as seen
+                    $result[] = $word;               // Add the original word to the result
+                }
+            }
+
+            return self::removeExtraSpaces(implode(' ', $result));   // Join the words back into a string
+        }
+        return $data;
     }
 
     private static function  custom_preg_escape($input) {

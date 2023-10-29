@@ -1306,4 +1306,25 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function testRemoveRepeatedWords()
+    {
+        $data = [
+            'items' => [
+                ['name' => 'Fresh QUICKMART BREAST BONELESS 1KG FRESH', 'description' => 'Capon 1.2', 'quantity' => 2, 'unit_price' => 200],
+                ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
+                ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("items.*.name", [$this, 'remove_repeated_words'], []);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }
