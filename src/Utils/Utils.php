@@ -82,15 +82,48 @@ class Utils
     }
 
     /**
-     * @param array $strings
-     * @param $separator
+     * @param $string
+     * @param $enclosure
      * @return string
      */
-    public static function concat($strings, $separator = " ")
+    private static function enclose($string, $enclosure) {
+        return match ($enclosure) {
+            'brackets' => "($string)",
+            'square brackets' => "[$string]",
+            'curly brackets' => '{'.$string.'}',
+            'forward strokes' => "/$string/",
+            'backward strokes' => "\\$string\\",
+            'double quotes' => '"'.$string.'"',
+            'single quotes' => "'".$string."'",
+            default => $string,
+        };
+    }
+
+    /**
+     * @param $strings
+     * @param $separator
+     * @param $enclosure
+     * @return array|string|string[]|null
+     */
+    public static function concat($strings, $separator = " ", $enclosure="")
     {
 
         $separator = " $separator "; // add spaces to the separator
-        return self::removeExtraSpaces(implode($separator, $strings));
+        if (empty($enclosure)) {
+            return self::removeExtraSpaces(implode($separator, $strings));
+        } else {
+            $response = "";
+            $numberOfItems = sizeof($strings);
+
+            for ($i = 0; $i < $numberOfItems; $i++) {
+                if ($i == 0) {
+                    $response .= $separator.$strings[$i];
+                } else {
+                    $response .= $separator.self::enclose($strings[$i], $enclosure);
+                }
+            }
+            return self::removeExtraSpaces($response);
+        }
     }
 
     /**
@@ -99,20 +132,20 @@ class Utils
      * @param $newField
      * @return array
      */
-    public static function concat_multi_array_assoc($data, $fields, $newField, $separator = " ")
+    public static function concat_multi_array_assoc($data, $fields, $newField, $separator = " ", $enclosure="")
     {
 
         $separator = " $separator "; // add spaces to the separator
 
         if (is_array($data)) {
-            array_walk($data, function (&$value, $key) use($fields, $newField, $separator) {
+            array_walk($data, function (&$value, $key) use($fields, $newField, $separator, $enclosure) {
                 $dataToConcat = array_flip($fields);
                 foreach ($value as $key => $v) {
                     if (in_array($key, $fields)) {
                         $dataToConcat[$key] = $v;
                     }
                 }
-                $value[$newField] = self::concat(array_values($dataToConcat), $separator);
+                $value[$newField] = self::concat(array_values($dataToConcat), $separator, $enclosure);
             });
         }
         return $data;

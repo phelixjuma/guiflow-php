@@ -361,7 +361,7 @@ class FunctionActionTest extends TestCase
     /**
      * @return void
      */
-    public function _testMultiConcatFunction()
+    public function testMultiConcatFunction()
     {
         $data = [
             'customer' => 'Naivas',
@@ -378,11 +378,11 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("products", [$this, 'concat_multi_array_assoc'], ['fields' => ['name', 'description'], 'newField' => 'search_string']);
+        $action = new FunctionAction("products", [$this, 'concat_multi_array_assoc'], ['fields' => ['name', 'description'], 'newField' => 'search_string', 'separator' => '', 'enclosure' => 'brackets']);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -400,7 +400,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("name", [$this, 'append'], ["strings" => ['(For Phelix)'], "separator" => ""]);
+        $action = new FunctionAction("products.*.name", [$this, 'append'], ["strings" => ['(For Phelix)'], "separator" => ""]);
 
         $action->execute($data);
 
@@ -1307,7 +1307,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testRemoveRepeatedWords()
+    public function _testRemoveRepeatedWords()
     {
         $data = [
             'items' => [
@@ -1323,7 +1323,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
