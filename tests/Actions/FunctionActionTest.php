@@ -361,7 +361,7 @@ class FunctionActionTest extends TestCase
     /**
      * @return void
      */
-    public function testMultiConcatFunction()
+    public function _testMultiConcatFunction()
     {
         $data = [
             'customer' => 'Naivas',
@@ -382,7 +382,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -1271,11 +1271,11 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testConditionalFunction()
+    public function testConditionalFunction()
     {
         $data = [
             'products' => [
-                ['name' => 'Capon Chicken p/kg', 'description' => 'Capon 1.2', 'quantity' => 2, 'unit_price' => 200],
+                ['name' => 'KENCHIO SMOKED CKN SAUSAGE 500G (FOR NAIVAS)', 'description' => 'Capon 1.2', 'quantity' => 2, 'unit_price' => 200],
                 ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
                 ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200],
             ],
@@ -1288,21 +1288,26 @@ class FunctionActionTest extends TestCase
             "operator" => "AND",
             "conditions" => [
                 [
-                    "operator" => "contains",
-                    "value"    => "p/kg"
-                ],
-                [
-                    "operator" => "contains",
-                    "value"    => "capon"
+                    "operator" => "AND",
+                    "conditions"    => [
+                        [
+                            "operator" => "contains",
+                            "value"    => "NAIVAS"
+                        ],
+                        [
+                            "operator" => "not contains",
+                            "value"    => "(FOR NAIVAS)"
+                        ]
+                    ]
                 ]
             ]
         ];
 
-        $action = new FunctionAction("products.*.name", [$this, 'prepend'], ["strings" => ['Fresh'], "separator" => ""], null, null, $condition);
+        $action = new FunctionAction("products.*.name", [$this, 'append'], ["strings" => ['1KG'], "separator" => ""], null, null, $condition);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

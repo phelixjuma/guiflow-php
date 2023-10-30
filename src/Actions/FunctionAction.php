@@ -89,6 +89,7 @@ class FunctionAction implements ActionInterface
 
         if (!empty($this->condition)) {
             $paramValues[] = $this->condition;
+            print_r($paramValues);
         }
 
         if (isset($this->function[1]) && $this->function['1'] == 'filter') {
