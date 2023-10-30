@@ -193,7 +193,7 @@ class DataTransformer
                 $actionInstance = new $actionClass($action['path']);
                 break;
             case 'function':
-                $actionInstance = new $actionClass($action['path'], [$this->functionsClass, $action['function']], $action['args'] ?? [], $action['newField'] ?? null, $action['strict'] ?? null);
+                $actionInstance = new $actionClass($action['path'], [$this->functionsClass, $action['function']], $action['args'] ?? [], $action['newField'] ?? null, $action['strict'] ?? null, $action['condition'] ?? null);
                 break;
             default:
                 throw new \InvalidArgumentException('Unknown action type: ' . $action['action']);
