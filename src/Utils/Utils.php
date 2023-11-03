@@ -34,9 +34,23 @@ class Utils
      * @param $format
      * @return string
      */
-    public static function format_date($date, $format)
+    public static function format_date($input, $format)
     {
-        return date($format, $date);
+        //return date($format, $date);
+        if (is_numeric($input)) {
+            $date = new \DateTime("@$input");
+        } else {
+            // Otherwise, try to parse the string directly
+            try {
+                $date = new \DateTime($input);
+            } catch (\Exception $e) {
+                // If an exception is caught, the date format is not recognized
+                return "Invalid date format: " . $e->getMessage();
+            }
+        }
+
+        // Format the date
+        return $date->format($format);
     }
 
     public static function prepend($data, $stringsToPrepend, $separator = " ", $condition = null)

@@ -317,12 +317,13 @@ class FunctionActionTest extends TestCase
             'sorted_delivery_dates' => [
                 ['planned_delivery' => 'next monday', 'planned_delivery_date' => 1694995200],
                 ['planned_delivery' => 'next thursday', 'planned_delivery_date' => 1695254400],
-            ]
+            ],
+            "delivery_date" => "2023-11-03 11:00:09"
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("sorted_delivery_dates.0.planned_delivery_date", [$this, 'format_date'], ['format' => 'Y-m-d'], "promised_delivery_date");
+        $action = new FunctionAction("delivery_date", [$this, 'format_date'], ['format' => 'Y-m-d'], "delivery_date");
 
         $action->execute($data);
 
