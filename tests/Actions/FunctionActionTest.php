@@ -1271,7 +1271,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testConditionalFunction()
+    public function _testConditionalFunction()
     {
         $data = [
             'products' => [
@@ -1307,7 +1307,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

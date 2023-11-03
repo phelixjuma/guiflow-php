@@ -502,16 +502,30 @@ class Utils
             'explode' => function($string, $separator,) {
                 return explode($separator, $string);
             },
-            'string_to_date_time' => function($data, $format="Y-m-d", $pre_modifier="", $post_modifier="") {
+            'string_to_date_time' => function($data, $format="Y-m-d H:i:s", $pre_modifier="", $post_modifier="") {
+
+                $getCurrentTime = function() {
+                    return date('H:i:s'); // Returns the current time
+                };
+
+                $convertToDate = function($dateString, $format, $getCurrentTime) {
+                    // Check if time part is present by looking for a colon, which appears in time strings
+                    if (!str_contains($dateString, ':')) {
+                        // If no time part is present, append the current time
+                        $dateString .= ' ' . $getCurrentTime();
+                    }
+                    return date($format, strtotime($dateString));
+                };
+
                 $date = null;
                 if (is_array($data)) {
                     foreach ($data as $datum) {
                         $dateString = self::removeExtraSpaces("$pre_modifier $datum $post_modifier");
-                        $date[] = date($format, strtotime($dateString));
+                        $date[] = $convertToDate($dateString, $format, $getCurrentTime);
                     }
                 } else {
                     $dateString = self::removeExtraSpaces("$pre_modifier $data $post_modifier");
-                    $date = date($format, strtotime($dateString));
+                    $date = $convertToDate($dateString, $format, $getCurrentTime);
                 }
                 return $date;
             },
