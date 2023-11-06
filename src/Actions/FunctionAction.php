@@ -185,8 +185,8 @@ class FunctionAction implements ActionInterface
             return $criteria;
         }
         if (!empty($criteria['conditions'])) {
-            foreach ($criteria['conditions'] as $condition) {
-                return self::getFilterCriteria($data, $condition);
+            foreach ($criteria['conditions'] as &$condition) {
+                $condition = self::getFilterCriteria($data, $condition);
             }
         }
         return $criteria;

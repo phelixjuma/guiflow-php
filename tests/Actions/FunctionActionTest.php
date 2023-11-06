@@ -84,43 +84,26 @@ class FunctionActionTest extends TestCase
     public function _testFilterFunction()
     {
         $data = [
-            'customer' => 'Naivas',
-            'location' => [
-                'address' => 'Kilimani',
-                'region' => 'Nairobi'
-            ],
             'products' => [
-                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200],
-                ['name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300],
-                ['name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200],
+                ["Sell_to_Customer_No" => "PC00072","No" => "PC03267", 'name' => 'CAPON FRESH BUTCHERY.', 'quantity' => 2, 'unit_price' => 200],
+                ["Sell_to_Customer_No" => "PC00072","No" => "1300120", 'name' => 'CAPON FRESH BUTCHERY', 'quantity' => 3, 'unit_price' => 300],
+                ["Sell_to_Customer_No" => "PC00072","No" => "PC00987", 'name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200],
             ],
-        ];
-        $criteria = [
-            "operator"      => "OR",
-            "conditions"    => [
-                ['term' => ['path' => 'products.0.name'], 'mode' => Filter::EQUAL, 'key' => 'name'],
-                [
-                    "operator" => "AND",
-                    "conditions"    => [
-                        ['term' => ['path' => 'products.0.name'], 'mode' => Filter::CONTAINS, 'key' => 'name'],
-                        ['term' => 200, 'mode' => Filter::GREATER, 'key' => 'unit_price'],
-                    ]
+            'customer_name' => [
+                'meta_data' => [
+                    'id' => 'PC00072'
                 ]
             ]
         ];
-
-        $expectedData = [
-            'customer' => 'Naivas',
-            'location' => [
-                'address' => 'Kilimani',
-                'region' => 'Nairobi'
-            ],
-            'products' => [
-                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200],
-                ['name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300],
-            ],
-            'total_unit_price' => 500
+        $criteria = [
+            "operator"      => "AND",
+            "conditions"    => [
+                ['term' => ['path' => 'customer_name.meta_data.id'], 'mode' => '==', 'key' => 'Sell_to_Customer_No'],
+                ['term' => 'PC', 'mode' => 'contains', 'key' => 'No'],
+            ]
         ];
+
+        $expectedData = [];
 
         $action = new FunctionAction("products", [$this, 'filter'], ['filter_criteria' => $criteria], 'filtered_products');
 
