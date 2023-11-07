@@ -114,27 +114,55 @@ class Utils
     }
 
     /**
+     * @param $masterData
+     * @param $definitions
+     * @return array|mixed|null
+     */
+    private static function getValues($masterData, $definitions): mixed
+    {
+
+        if (!is_array($definitions)) {
+            return $definitions;
+        }
+
+        if (isset($definitions['path'])) {
+
+            return PathResolver::getValueByPath($masterData, $definitions['path']);
+        }
+
+        foreach ($definitions as &$definition) {
+            $definition = self::getValues($masterData, $definition);
+        }
+        return $definitions;
+    }
+
+    /**
      * @param $strings
      * @param $separator
      * @param $enclosure
      * @return array|string|string[]|null
      */
-    public static function concat($strings, $separator = " ", $enclosure="")
+    public static function concat($data, $dataToAdd, $separator = " ", $enclosure="")
     {
+
+        $stringsToAdd = self::getValues($data, $dataToAdd);
 
         $separator = " $separator "; // add spaces to the separator
         if (empty($enclosure)) {
-            return self::removeExtraSpaces(implode($separator, $strings));
+            return self::removeExtraSpaces(implode($separator, $stringsToAdd));
         } else {
             $response = "";
-            $numberOfItems = sizeof($strings);
+            $numberOfItems = sizeof($stringsToAdd);
 
             for ($i = 0; $i < $numberOfItems; $i++) {
-                if (!empty($strings[$i])) {
+
+                $data = trim($stringsToAdd[$i]);
+
+                if (!empty($data)) {
                     if ($i == 0) {
-                        $response .= $separator.$strings[$i];
+                        $response .= $separator.$data;
                     } else {
-                        $response .= $separator.self::enclose($strings[$i], $enclosure);
+                        $response .= $separator.self::enclose($data, $enclosure);
                     }
                 }
             }
@@ -161,7 +189,7 @@ class Utils
                         $dataToConcat[$key] = $v;
                     }
                 }
-                $value[$newField] = self::concat(array_values($dataToConcat), $separator, $enclosure);
+                $value[$newField] = self::concat([], array_values($dataToConcat), $separator, $enclosure);
             });
         }
         return $data;

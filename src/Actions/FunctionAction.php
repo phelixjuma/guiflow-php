@@ -112,7 +112,7 @@ class FunctionAction implements ActionInterface
         } elseif (isset($this->function[1]) && $this->function['1'] == 'prepend') {
             $newValue = Utils::prepend(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'concat') {
-            $newValue = Utils::concat($paramValues);
+            $newValue = Utils::concat(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'concat_multi_array_assoc') {
             $newValue = Utils::concat_multi_array_assoc(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'custom_preg_replace') {
