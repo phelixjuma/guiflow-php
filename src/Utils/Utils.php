@@ -130,10 +130,12 @@ class Utils
             $numberOfItems = sizeof($strings);
 
             for ($i = 0; $i < $numberOfItems; $i++) {
-                if ($i == 0) {
-                    $response .= $separator.$strings[$i];
-                } else {
-                    $response .= $separator.self::enclose($strings[$i], $enclosure);
+                if (!empty($strings[$i])) {
+                    if ($i == 0) {
+                        $response .= $separator.$strings[$i];
+                    } else {
+                        $response .= $separator.self::enclose($strings[$i], $enclosure);
+                    }
                 }
             }
             return self::removeExtraSpaces($response);

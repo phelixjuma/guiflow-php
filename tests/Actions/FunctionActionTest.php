@@ -333,7 +333,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("location.address", [$this, 'concat'], ["string1" => " - New"], 'location.full_address');
+        $action = new FunctionAction("customer", [$this, 'concat'], ["string1" => ["path" => "location.address"], "string2" => ["path" => "location.region"]], 'full_address');
 
         $action->execute($data);
 
@@ -371,7 +371,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testAppendFunction()
+    public function testAppendFunction()
     {
         $data = [
             'products' => [
@@ -379,16 +379,17 @@ class FunctionActionTest extends TestCase
                 ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
                 ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200],
             ],
-            "name" => "Juma"
+            "name" => "Juma",
+            "surname" => "Phelix"
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("products.*.name", [$this, 'append'], ["strings" => ['(For Phelix)'], "separator" => ""]);
+        $action = new FunctionAction("name", [$this, 'append'], ["strings" => ['(For Phelix)'], "separator" => ""]);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
