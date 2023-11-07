@@ -65,7 +65,7 @@ class Filter
             self::NOT_EMPTY => !empty($value),
             self::STARTS_WITH => str_starts_with($value, $term),
             self::ENDS_WITH => str_ends_with($value, $term),
-            self::SIMILAR_TO => $fuzz->ratio($value, $term) >= $similarityThreshold,
+            self::SIMILAR_TO => $fuzz->tokenSetRatio($value, $term) >= $similarityThreshold,
             default => str_contains($value, $term),
         };
     }
