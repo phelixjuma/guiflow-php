@@ -41,31 +41,33 @@ class DataTransformer
         $dataCopy = $data;
         $data = [];
 
-        if (self::isObject($dataCopy)) {
-
-            // For an object, we transform it
-            $this->transformObject($dataCopy);
-
-            // Set the response into data: checking if the response has been split or not.
+        if (is_array($dataCopy)) {
             if (self::isObject($dataCopy)) {
-                $data[] = $dataCopy;
-            } else {
-                $data = $dataCopy;
-            }
 
-        } else {
-            // it's an array, we loop
-            foreach ($dataCopy as $item) {
-
-                $this->transformObject($item);
+                // For an object, we transform it
+                $this->transformObject($dataCopy);
 
                 // Set the response into data: checking if the response has been split or not.
-                if (self::isObject($item)) {
-                    $data[] = $item;
+                if (self::isObject($dataCopy)) {
+                    $data[] = $dataCopy;
                 } else {
-                    // For a split response, we flatten by adding each item to data
-                    foreach ($item as $it) {
-                        $data[] = $it;
+                    $data = $dataCopy;
+                }
+
+            } else {
+                // it's an array, we loop
+                foreach ($dataCopy as $item) {
+
+                    $this->transformObject($item);
+
+                    // Set the response into data: checking if the response has been split or not.
+                    if (self::isObject($item)) {
+                        $data[] = $item;
+                    } else {
+                        // For a split response, we flatten by adding each item to data
+                        foreach ($item as $it) {
+                            $data[] = $it;
+                        }
                     }
                 }
             }
