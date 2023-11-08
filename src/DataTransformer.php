@@ -48,7 +48,7 @@ class DataTransformer
                 $this->transformObject($dataCopy);
 
                 // Set the response into data: checking if the response has been split or not.
-                if (self::isObject($dataCopy)) {
+                if (!is_array($dataCopy) || self::isObject($dataCopy)) {
                     $data[] = $dataCopy;
                 } else {
                     $data = $dataCopy;
@@ -61,7 +61,7 @@ class DataTransformer
                     $this->transformObject($item);
 
                     // Set the response into data: checking if the response has been split or not.
-                    if (self::isObject($item)) {
+                    if (!is_array($item) || self::isObject($item)) {
                         $data[] = $item;
                     } else {
                         // For a split response, we flatten by adding each item to data
