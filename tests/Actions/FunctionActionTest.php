@@ -242,31 +242,14 @@ class FunctionActionTest extends TestCase
     public function _testSortDeliveryDatesFunction()
     {
         $data = [
-            'customer' => 'Naivas',
-            'location' => [
-                'address' => 'Kilimani',
-                'region' => 'Nairobi'
-            ],
-            'products' => [
-                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200],
-                ['name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300],
-                ['name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200],
-            ],
-            'customer_delivery_schedule'    => [
-                [
-                    'region'    => 'Nairobi',
-                    'schedule'  => [
-                        ['planned_delivery' => 'next thursday', 'planned_delivery_date' => 1695254400],
-                        ['planned_delivery' => 'next monday', 'planned_delivery_date' => 1694995200],
-                    ]
-                ]
-            ],
-            "current_date" => strtotime("today")
+            ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 200],
+            ['name' => 'Chicken Sausages', 'quantity' => 3, 'unit_price' => 300],
+            ['name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200]
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("customer_delivery_schedule.0.schedule", [$this, 'sort_multi_by_key'], ['key' => 'planned_delivery_date', 'order' => 'asc'], "sorted_delivery_dates");
+        $action = new FunctionAction("", [$this, 'sort_multi_by_key'], ['key' => 'name', 'order' => 'desc']);
 
         $action->execute($data);
 
@@ -333,7 +316,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("", [$this, 'concat'], ["strings" => [["path" => "customer"],["path" => "location.address"], ["path" => "location.region"]], "separator" => "", "enclosure" => "brackets"], 'full_address');
+        $action = new FunctionAction("", [$this, 'concat'], ["strings" => ["Phelix", ["path" => "customer"],["path" => "location.address"], ["path" => "location.region"]], "separator" => "", "enclosure" => "brackets"], 'full_address');
 
         $action->execute($data);
 

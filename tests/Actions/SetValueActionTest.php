@@ -56,21 +56,13 @@ class SetValueActionTest extends TestCase
                 ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 100]
             ],
         ];
-        $expectedData = [
-            'customer' => 'Naivas',
-            'location' => [
-                'address' => 'Kilimani',
-                'region' => 'Nairobi'
-            ],
-            'products' => [
-                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 100]
-            ],
-            'delivery_date' => '2023-09-18'
-        ];
+        $expectedData = [];
 
-        $action = new SetValueAction("delivery_date", '2023-09-18');
+        $action = new SetValueAction("order", null, "", '');
 
         $action->execute($data);
+
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

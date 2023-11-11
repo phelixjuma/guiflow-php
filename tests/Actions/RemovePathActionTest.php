@@ -11,7 +11,7 @@ class RemovePathActionTest extends TestCase
     public function _testRemovePathSimple()
     {
         $data = [
-            'customer' => null,
+            'customer' => "Naivas",
             'location' => [
                 'address' => 'Kilimani',
                 'region' => 'Nairobi'
@@ -23,7 +23,7 @@ class RemovePathActionTest extends TestCase
         ];
         $expectedData = [];
 
-        $action = new RemovePathAction("customer");
+        $action = new RemovePathAction("products.*.unit_price");
 
         $action->execute($data);
 

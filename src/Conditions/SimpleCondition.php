@@ -91,7 +91,7 @@ class SimpleCondition implements ConditionInterface
             case 'contains':
                 return !empty($pathValue) && !empty($value) && str_contains($pathValue, $value);
             case 'not contains':
-                return empty($pathValue) || empty($value) || strpos($pathValue, $value) == false;
+                return empty($pathValue) || empty($value) || !str_contains($pathValue, $value);
             case 'list contains':
                 if (is_array($value)) {
                     return !empty(array_intersect($pathValue, $value));
