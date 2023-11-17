@@ -258,6 +258,24 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
+    public function testDateDiff()
+    {
+        $data = [
+            "delivery_date" => "2023-11-18T13:44:00Z",
+            "now"           => "2023-11-17T12:44:00Z",
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("now", [$this, 'date_diff'], ['target' => ['path' => "delivery_date"], 'period' => 'h'], 'days_to_delivery');
+
+        $action->execute($data);
+
+        print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
     public function _testGetNextDeliveryDateFromSortedDeliveryDatesFunction()
     {
         $data = [

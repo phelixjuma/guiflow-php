@@ -137,6 +137,8 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::date_add_substract_days(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'date_format') {
             $newValue = Utils::date_format(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'date_diff') {
+            $newValue = Utils::date_diff(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit') {
             $newValue = UnitConverter::convert(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit_multi') {

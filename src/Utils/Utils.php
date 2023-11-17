@@ -311,6 +311,52 @@ class Utils
     }
 
     /**
+     * @param $startDateString
+     * @param $endDateString
+     * @param $period
+     * @return null
+     */
+    public static function date_diff($startDateString, $endDateString, $period="d") {
+
+        $response = null;
+
+        try {
+
+            // Set the timezone of the object to UTC
+            $timezone  = new \DateTimeZone('UTC');
+
+            $startDate = new \DateTime($startDateString, $timezone);
+            $endDate = new \DateTime($endDateString, $timezone);
+
+            $diff = $startDate->diff($endDate);
+
+            switch ($period) {
+                case  'y':
+                    $response = $diff->y;
+                    break;
+                case 'm':
+                    $response = ($diff->y*12) + $diff->m;
+                    break;
+                case 'd':
+                    $response = (365 * $diff->y) + (30 * $diff->m) + $diff->d;
+                    break;
+                case 'h':
+                    $response = (24 * 365 * $diff->y) + (24 * 30 * $diff->m) + (24 * $diff->d) + $diff->h;
+                    break;
+                case 'i':
+                    $response = (60 * 24 * 365 * $diff->y) + (60 * 24 * 30 * $diff->m) + (60 * 24 * $diff->d)  + (60 * $diff->h) + $diff->i;
+                    break;
+                case 's':
+                    $response = (60 * 60 * 24 * 365 * $diff->y) + (60 * 60 * 24 * 30 * $diff->m) + (60 * 60 * 24 * $diff->d)  + (60 * 60 * $diff->h) + $diff->s;
+                    break;
+            }
+
+        } catch (\Exception $e) {
+        }
+        return $response;
+    }
+
+    /**
      * @param $data
      * @param $format
      * @return array|string
