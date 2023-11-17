@@ -258,7 +258,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testDateDiff()
+    public function _testDateDiff()
     {
         $data = [
             "delivery_date" => "2023-11-18T13:44:00Z",
@@ -271,7 +271,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

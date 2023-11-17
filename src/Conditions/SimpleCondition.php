@@ -80,13 +80,13 @@ class SimpleCondition implements ConditionInterface
                 return $pathValue == $value;
             case '!=':
                 return $pathValue != $value;
-            case '>':
+            case 'gt':
                 return $pathValue > $value;
-            case '>=':
+            case 'gte':
                 return $pathValue >= $value;
-            case '<':
+            case 'lt':
                 return $pathValue < $value;
-            case '<=':
+            case 'lte':
                 return $pathValue <= $value;
             case 'contains':
                 return !empty($pathValue) && !empty($value) && str_contains($pathValue, $value);

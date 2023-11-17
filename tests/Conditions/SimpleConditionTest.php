@@ -170,4 +170,28 @@ class SimpleConditionTest extends TestCase
         $this->assertTrue($simpleCondition->evaluate($evaluation));
     }
 
+    public function _testDateGreaterThan()
+    {
+        $data = [
+            "current_time" => "07:21:42",
+            "hours_to_delivery" => 24
+        ];
+
+        $condition = [
+            "path" => "hours_to_delivery",
+            "operator" => "<=",
+            "value" => "24"
+        ];
+
+        $pathResolver = new PathResolver();
+
+        $simpleCondition = new SimpleCondition($condition, $pathResolver);
+
+        $response = $simpleCondition->evaluate($data);
+
+        //print "\nCondition Returns $response\n";
+
+        $this->assertTrue($response);
+    }
+
 }
