@@ -36,13 +36,16 @@ class Utils
      */
     public static function format_date($input, $format)
     {
+        // Set the timezone of the object to UTC
+        $timezone  = new \DateTimeZone('UTC');
+
         //return date($format, $date);
         if (is_numeric($input)) {
-            $date = new \DateTime("@$input");
+            $date = new \DateTime("@$input", $timezone);
         } else {
             // Otherwise, try to parse the string directly
             try {
-                $date = new \DateTime($input);
+                $date = new \DateTime($input, $timezone);
             } catch (\Exception $e) {
                 // If an exception is caught, the date format is not recognized
                 return "Invalid date format: " . $e->getMessage();
@@ -291,12 +294,15 @@ class Utils
 
         try {
 
+            // Set the timezone of the object to UTC
+            $timezone  = new \DateTimeZone('UTC');
+
             if (is_array($data)) {
                 foreach ($data as $datum) {
-                    $response[] = (new \DateTime($datum))->$method(new \DateInterval("P{$days}D"))->format($format);
+                    $response[] = (new \DateTime($datum, $timezone))->$method(new \DateInterval("P{$days}D"))->format($format);
                 }
             } else {
-                $response = (new \DateTime($data))->$method(new \DateInterval("P{$days}D"))->format($format);
+                $response = (new \DateTime($data, $timezone))->$method(new \DateInterval("P{$days}D"))->format($format);
             }
 
         } catch (\Exception $e) {
@@ -313,12 +319,16 @@ class Utils
 
         $response = null;
         try {
+
+            // Set the timezone of the object to UTC
+            $timezone  = new \DateTimeZone('UTC');
+
             if (is_array($data)) {
                 foreach ($data as $datum) {
-                    $response[] = (new \DateTime($datum))->format($format);
+                    $response[] = (new \DateTime($datum, $timezone))->format($format);
                 }
             } else {
-                $response = (new \DateTime($data))->format($format);
+                $response = (new \DateTime($data, $timezone))->format($format);
             }
         } catch (\Exception $e) {
 
@@ -548,28 +558,30 @@ class Utils
             },
             'string_to_date_time' => function($data, $format="Y-m-d H:i:s", $pre_modifier="", $post_modifier="") {
 
-                $getCurrentTime = function() {
-                    return date('H:i:s'); // Returns the current time
+                $timezone  = new \DateTimeZone('UTC');
+
+                $getCurrentTime = function($timezone) {
+                    return (new \DateTime("now", $timezone))->format("H:i:s"); // Returns the current time
                 };
 
-                $convertToDate = function($dateString, $format, $getCurrentTime) {
+                $convertToDate = function($dateString, $format, $getCurrentTime, $timezone) {
                     // Check if time part is present by looking for a colon, which appears in time strings
                     if (!str_contains($dateString, ':')) {
                         // If no time part is present, append the current time
-                        $dateString .= ' ' . $getCurrentTime();
+                        $dateString .= ' ' . $getCurrentTime($timezone);
                     }
-                    return date($format, strtotime($dateString));
+                    return (new \DateTime($dateString, $timezone))->format($format);
                 };
 
                 $date = null;
                 if (is_array($data)) {
                     foreach ($data as $datum) {
                         $dateString = self::removeExtraSpaces("$pre_modifier $datum $post_modifier");
-                        $date[] = $convertToDate($dateString, $format, $getCurrentTime);
+                        $date[] = $convertToDate($dateString, $format, $getCurrentTime, $timezone);
                     }
                 } else {
                     $dateString = self::removeExtraSpaces("$pre_modifier $data $post_modifier");
-                    $date = $convertToDate($dateString, $format, $getCurrentTime);
+                    $date = $convertToDate($dateString, $format, $getCurrentTime, $timezone);
                 }
                 return $date;
             },
