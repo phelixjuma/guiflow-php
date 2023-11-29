@@ -615,16 +615,14 @@ class FunctionActionTest extends TestCase
                 'operation_value' => 'Shop',
                 'condition_field' => "Description",
                 "condition_operator" => "==",
-                "condition_value" => "HUNGARIAN CHOMA SAUSAGES 500GMS",
-                "condition_similarity_threshold" => 80
+                "condition_value" => "HUNGARIAN CHOMA SAUSAGES 500GMS"
             ],
             [
                 'operation_field' => 'Section',
                 'operation_value' => 'Butchery',
                 'condition_field' => "Description",
                 "condition_operator" => "==",
-                "condition_value" => "HUNGARIAN CHOMA SAUSAGES 1 KG",
-                "condition_similarity_threshold" => 80
+                "condition_value" => "HUNGARIAN CHOMA SAUSAGES 1 KG"
             ]
         ];
 
