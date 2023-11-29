@@ -244,6 +244,46 @@ class Utils
 
     /**
      * @param $data
+     * @param $setField
+     * @param $setValue
+     * @param $conditionField
+     * @param $conditionOperator
+     * @param $conditionValue
+     * @param $conditionSimilarityThreshold
+     * @return mixed
+     * @throws UnknownOperatorException
+     */
+    public static function assoc_array_set_if($data, $operations = [])
+    {
+
+        if (!empty($operations)) {
+            foreach ($operations as $operation) {
+//                $setField = $operation['setField'];
+//                $setValue,
+//                $conditionField,
+//                $conditionOperator,
+//                $conditionValue,
+//                $conditionSimilarityThreshold
+                extract($operation);
+
+                $operation_value = isset($operation_value['path']) ? PathResolver::getValueByPath($data, $operation_value['path']) : $operation_value;
+
+                if (!empty($data) && is_array($data)) {
+                    foreach ($data as &$d) {
+                        if (SimpleCondition::compare($d[$condition_field], $condition_operator, $condition_value, $condition_similarity_threshold ?? null)) {
+                            $d[$operation_field] = $operation_value;
+                        }
+                    }
+                }
+
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param $data
      * @param $conditionField
      * @param $conditionOperator
      * @param $conditionValue

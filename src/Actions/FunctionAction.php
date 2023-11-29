@@ -121,6 +121,8 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::remove_repeated_words(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'assoc_array_sum_if') {
             $newValue = Utils::assoc_array_sum_if(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'assoc_array_set_if') {
+            $newValue = Utils::assoc_array_set_if(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'assoc_array_find') {
             $newValue = Utils::assoc_array_find(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'get_from_object') {

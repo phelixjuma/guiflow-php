@@ -179,7 +179,7 @@ class SimpleConditionTest extends TestCase
 
         $condition = [
             "path" => "hours_to_delivery",
-            "operator" => "<=",
+            "operator" => "lte",
             "value" => "24"
         ];
 

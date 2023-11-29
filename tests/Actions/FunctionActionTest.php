@@ -582,6 +582,61 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
+    public function _testArraySetIf()
+    {
+        $data = [
+            'products' => [
+                [
+                    "meta_data" => [
+                        "Description" => "CHICKEN DRUMSTICKS 6PC - 700 GM",
+                        "Section" => "Shop"
+                    ]
+                ],
+                [
+                    "meta_data" => [
+                        "Description" => "HUNGARIAN CHOMA SAUSAGES 1 KG",
+                        "Section" => "Shop"
+                    ]
+                ],
+                [
+                    "meta_data" => [
+                        "Description" => "HUNGARIAN CHOMA SAUSAGES 500GMS",
+                        "Section" => "Deli"
+                    ]
+                ],
+            ],
+        ];
+
+        $expectedData = [];
+
+        $operations = [
+            [
+                'operation_field' => 'Section',
+                'operation_value' => 'Shop',
+                'condition_field' => "Description",
+                "condition_operator" => "==",
+                "condition_value" => "HUNGARIAN CHOMA SAUSAGES 500GMS",
+                "condition_similarity_threshold" => 80
+            ],
+            [
+                'operation_field' => 'Section',
+                'operation_value' => 'Butchery',
+                'condition_field' => "Description",
+                "condition_operator" => "==",
+                "condition_value" => "HUNGARIAN CHOMA SAUSAGES 1 KG",
+                "condition_similarity_threshold" => 80
+            ]
+        ];
+
+        $action = new FunctionAction("products.*.meta_data", [$this, 'assoc_array_set_if'], ["operations" => $operations], '');
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
     public function _testArrayFindValueFromPath()
     {
         $data = [
