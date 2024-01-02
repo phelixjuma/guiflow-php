@@ -1358,6 +1358,7 @@ class FunctionActionTest extends TestCase
                 ['name' => 'QUICKMART WINGS 1KG  FRESH', 'uom' => 'KGS'],
                 ['name' => 'CHICKEN WINGS  - 650GM PACK', 'uom' => 'PACK'],
                 ['name' => 'WINGS', 'uom' => 'KGS'],
+                ['name' => 'Fresh (HANDWRAP) CAPON (QUICKMART) 1.0 - 1.3 (CHICKEN)', 'uom' => 'KGS'],
             ]
         ];
 
@@ -1367,14 +1368,24 @@ class FunctionActionTest extends TestCase
             "operator" => "AND",
             "conditions"    => [
                 [
-                    "operator" => "contains",
+                    "operator" => "==",
                     "path" => "uom",
                     "value"    => "KGS"
+                ],
+                [
+                    "operator" => "not contains",
+                    "path" => "name",
+                    "value"    => "1kg"
+                ],
+                [
+                    "operator" => "not contains",
+                    "path" => "name",
+                    "value"    => "500"
                 ]
             ]
         ];
 
-        $action = new FunctionAction("products", [$this, 'append'], ["strings" => ['(PER KG)'], "separator" => "", "useDataAsPathValue" => false, "valueKey" => "name"], null, null, $condition);
+        $action = new FunctionAction("products", [$this, 'append'], ["strings" => ['(PER KG)'], "separator" => "", "useDataAsPathValue" => "", "valueKey" => "name"], null, null, $condition);
 
         $action->execute($data);
 

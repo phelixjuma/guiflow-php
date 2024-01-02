@@ -161,7 +161,7 @@ class DataTransformer
     public static function evaluateCondition($data, $condition, $useDataAsPathValue = false)
     {
         // We add path value, if set
-        if ($useDataAsPathValue !== false) {
+        if ($useDataAsPathValue) {
             self::addPathValueToCondition($condition, $data);
         }
 
