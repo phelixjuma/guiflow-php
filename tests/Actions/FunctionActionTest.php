@@ -1315,7 +1315,7 @@ class FunctionActionTest extends TestCase
         $data = [
             'products' => [
                 ['name' => 'KENCHIO SMOKED CKN SAUSAGE 500G (FOR NAIVAS)', 'description' => 'Capon 1.2', 'quantity' => 2, 'unit_price' => 200],
-                ['name' => 'Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
+                ['name' => 'Naivas Chicken Sausages', 'description' => 'frozen', 'quantity' => 3, 'unit_price' => 300],
                 ['name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces', 'quantity' => 5, 'unit_price' => 200],
             ],
             "name" => "Juma"
@@ -1342,7 +1342,39 @@ class FunctionActionTest extends TestCase
             ]
         ];
 
-        $action = new FunctionAction("products.*.name", [$this, 'append'], ["strings" => ['1KG'], "separator" => ""], null, null, $condition);
+        $action = new FunctionAction("products.*.name", [$this, 'append'], ["strings" => ['1KG'], "separator" => "", "useDataAsPathValue" => true, "valueKey" => ""], null, null, $condition);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testAppendAssoc()
+    {
+        $data = [
+            'products' => [
+                ['name' => 'QUICKMART WINGS 1KG  FRESH', 'uom' => 'KGS'],
+                ['name' => 'CHICKEN WINGS  - 650GM PACK', 'uom' => 'PACK'],
+                ['name' => 'WINGS', 'uom' => 'KGS'],
+            ]
+        ];
+
+        $expectedData = [];
+
+        $condition = [
+            "operator" => "AND",
+            "conditions"    => [
+                [
+                    "operator" => "contains",
+                    "path" => "uom",
+                    "value"    => "KGS"
+                ]
+            ]
+        ];
+
+        $action = new FunctionAction("products", [$this, 'append'], ["strings" => ['(PER KG)'], "separator" => "", "useDataAsPathValue" => false, "valueKey" => "name"], null, null, $condition);
 
         $action->execute($data);
 

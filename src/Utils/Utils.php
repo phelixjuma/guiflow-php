@@ -77,21 +77,30 @@ class Utils
         return $data;
     }
 
-    public static function append($data, $stringsToAppend, $separator = " ", $condition = null)
+    public static function append($data, $stringsToAppend, $separator = " ", $useDataAsPathValue = true, $valueKey=null, $condition = null)
     {
+
         $modifiedSeparator = " $separator ";
         $strings = implode($modifiedSeparator, $stringsToAppend);
 
         // If the data is an array, apply prepend recursively to each element
-        if (is_array($data)) {
+        if (is_array($data) && !self::isObject($data)) {
             foreach ($data as $key => $value) {
-                $data[$key] = self::append($value, $stringsToAppend, $modifiedSeparator, $condition);
+                $data[$key] = self::append($value, $stringsToAppend, $modifiedSeparator, $useDataAsPathValue, $valueKey, $condition);
             }
+
             return $data;
         }
 
         // If it's not an array, apply the prepend logic to the string
-        if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, true)) {
+        if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, $useDataAsPathValue)) {
+
+            if (self::isObject($data) && !empty($valueKey)) {
+
+                $data[$valueKey] = self::removeExtraSpaces($data[$valueKey] . $modifiedSeparator . $strings);
+
+                return $data;
+            }
             return self::removeExtraSpaces($data . $modifiedSeparator . $strings);
         }
 
@@ -244,12 +253,7 @@ class Utils
 
     /**
      * @param $data
-     * @param $setField
-     * @param $setValue
-     * @param $conditionField
-     * @param $conditionOperator
-     * @param $conditionValue
-     * @param $conditionSimilarityThreshold
+     * @param $operations
      * @return mixed
      * @throws UnknownOperatorException
      */
