@@ -945,16 +945,13 @@ class FunctionActionTest extends TestCase
         $data = [
             'items' => [
                 [
-                    'description' => "FR-KENCHIC CHICKEN"
-                ],
-                [
-                    'description' => "FR-KENCHIC CHICKEN BREAST BONELES PER KG"
+                    'description' => "KISUMU MEGA CITY BUTCHERY"
                 ]
             ]
         ];
 
         $mapping = [
-            "(PERKG|PER KG|P/KG|PKG|PK|/KG)" => "PER 1 KG"
+            "KISUMU\s+MEGA\s+CITY" => "MEGA CITY"
         ];
 
         $expectedData = [];

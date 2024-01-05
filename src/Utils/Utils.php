@@ -686,15 +686,12 @@ class Utils
 
                 foreach ($mappings as $search => $replace) {
 
-                    if (empty($replace) || !str_contains($value, $replace)) {
+                    $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
 
-                        $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
+                    $value = preg_replace($pattern, $replace, $value);
 
-                        $value = preg_replace($pattern, $replace, $value);
-
-                        if (preg_last_error() !== PREG_NO_ERROR) {
-                            //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
-                        }
+                    if (preg_last_error() !== PREG_NO_ERROR) {
+                        //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
                     }
                 }
                 return self::removeExtraSpaces($value);
