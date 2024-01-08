@@ -135,7 +135,10 @@
               "description": "The field to be used as the argument for the operation. This is optional and is only used for 'set' action."
             },
             "valueMapping": {
-              "type": "object",
+              "type": [
+                "object",
+                "null"
+              ],
               "description": "An object that maps values of the valueFromField to values of the field. This is optional and is only used for 'set' action with valueFromField."
             },
             "conditionalValue": {
