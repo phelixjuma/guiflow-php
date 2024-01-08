@@ -92,16 +92,6 @@ class SimpleCondition implements ConditionInterface
                 return !empty($pathValue) && !empty($value) && str_contains($pathValue, $value);
             case 'not contains':
                 return empty($pathValue) || empty($value) || !str_contains($pathValue, $value);
-            case 'list contains':
-                if (is_array($value)) {
-                    return !empty(array_intersect($pathValue, $value));
-                }
-                return in_array($value, $pathValue);
-            case 'list not contains':
-                if (is_array($value)) {
-                    return empty(array_intersect($pathValue, $value));
-                }
-                return !in_array($value, $pathValue);
             case 'exists':
                 // For arrays, we remove empty values
                 if (is_array($pathValue) && !Utils::isObject($pathValue)) {
@@ -120,6 +110,50 @@ class SimpleCondition implements ConditionInterface
                 return in_array($pathValue, (array)$value);
             case 'not in':
                 return !in_array($pathValue, (array)$value);
+            case 'in list all':
+                if (is_array($value)) {
+                    foreach ($value as $v) {
+                        $pattern = '/' . Utils::custom_preg_escape(Utils::full_unescape($v)) . '/i';
+                        if (!preg_match($pattern, $pathValue)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return str_contains(strtolower($pathValue), strtolower($value));
+            case 'not in list all':
+                if (is_array($value)) {
+                    foreach ($value as $v) {
+                        $pattern = '/' . Utils::custom_preg_escape(Utils::full_unescape($v)) . '/i';
+                        if (preg_match($pattern, $pathValue)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return !str_contains(strtolower($pathValue), strtolower($value));
+            case 'in list any':
+                if (is_array($value)) {
+                    foreach ($value as $v) {
+                        $pattern = '/' . Utils::custom_preg_escape(Utils::full_unescape($v)) . '/i';
+                        if (preg_match($pattern, $pathValue)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                return str_contains(strtolower($pathValue), strtolower($value));
+            case 'not in list any':
+                if (is_array($value)) {
+                    foreach ($value as $v) {
+                        $pattern = '/' . Utils::custom_preg_escape(Utils::full_unescape($v)) . '/i';
+                        if (!preg_match($pattern, $pathValue)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                return !str_contains(strtolower($pathValue), strtolower($value));
             case 'true':
                 return $pathValue === true;
             case 'false':

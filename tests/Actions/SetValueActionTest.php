@@ -84,23 +84,92 @@ class SetValueActionTest extends TestCase
                     ["ItemName" => "CERES SEASON'S TREASURES JUICE 1L-"],
                 ]
             ];
-        $expectedData = [
-            'customer' => 'Naivas',
-            'location' => [
-                'address' => 'Kilimani',
-                'region' => 'Nairobi'
-            ],
-            'products' => [
-                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 100]
-            ],
-            'delivery_date' => '2023-09-04'
-        ];
+        $expectedData = [];
 
         $valueMapping = [
             'Luc Boost Buzz 1l Tet X12' => 'Lucozade Boost Buzz 1l Pet'
         ];
 
         $action = new SetValueAction("products.*.ItemName", null, "products.*.ItemName", $valueMapping);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testSetConditionalValueFromMapping()
+    {
+        $data =
+            [
+                'customer' => 'Naivas',
+                'location' => [
+                    'address' => 'Kilimani',
+                    'region' => 'Nairobi'
+                ],
+                'products' => [
+                    ["description" => "NAIVAS GIZZARDS"],
+                    ["description" => "NAIVAS LIVER"],
+                    ["description" => "NAIVAS DELI SAUSAGES"],
+                    ["description" => "KENCHIC CAT.LIVER"],
+                    ["description" => "HUNGARIAN CHOMA SAUSAGES 1KG"],
+                    ["description" => "HUNGARIAN CHOMA SAUSAGES 500G"],
+                    ["description" => "CHICKEN SAUSAGES 250G"],
+                    ["description" => "CHICKEN FRESH LIVER PKG"],
+                    ["description" => "CHICKEN FRESH GIZZARDS P/KG"],
+                ]
+            ];
+        $expectedData = [];
+
+        $conditionalValue = [
+            [
+                "condition" => [
+                    "operator" => "AND",
+                    "conditions" => [
+                        [
+                            "operator" => "in list any",
+                            "value" => ["(\d+)\s*(G|GM|GMS|KG|KGS|PC|PCS)"]
+                        ]
+                    ]
+                ],
+                "value"     => "Shop",
+                "valueFromField"    => ""
+            ],
+            [
+                "condition" => [
+                    "operator" => "AND",
+                    "conditions" => [
+                        [
+                            "operator" => "contains",
+                            "value" => 'NAIVAS'
+                        ],
+                        [
+                            "operator" => "not in list all",
+                            "value" => ["NAIVAS DELI"]
+                        ]
+                    ]
+                ],
+                "value"     => "Butchery",
+                "valueFromField"    => ""
+            ],
+            [
+                "condition" => [
+                    "operator" => "OR",
+                    "conditions" => [
+                        [
+                            "operator" => "in list any",
+                            "value" => ['NAIVAS DELI', "KENCHIC CAT", "HUNGARIAN CHOMA SAUSAGES 1KG",
+                                "\b(PERKG|PER KG|P/KG|PKG|PK|/KG)\b"]
+                        ]
+                    ]
+                ],
+                "value"     => "Deli",
+                "valueFromField"    => ""
+            ]
+        ];
+
+        $action = new SetValueAction("products.*.description", null, null, null, $conditionalValue, "products.*.section");
 
         $action->execute($data);
 

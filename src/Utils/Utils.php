@@ -574,7 +574,7 @@ class Utils
         return $data;
     }
 
-    private static function  custom_preg_escape($input) {
+    public static function  custom_preg_escape($input) {
 
         // Define characters to escape
         $charsToEscape = ['/',"'", '"'];  // Add any other characters you'd like to escape

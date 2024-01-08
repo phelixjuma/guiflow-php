@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\DataTransformer\Actions;
 
+use PhelixJuma\DataTransformer\DataTransformer;
 use PhelixJuma\DataTransformer\Utils\PathResolver;
 
 class SetValueAction implements ActionInterface
@@ -11,36 +12,67 @@ class SetValueAction implements ActionInterface
     private $valueFromField;
     private $valueMapping;
     private $targetPath;
+    private $conditionalValue;
 
-    public function __construct($path, $value = null, $valueFromField = null, $valueMapping = null)
+    /**
+     * @param $path
+     * @param $value
+     * @param $valueFromField
+     * @param $valueMapping
+     * @param $conditionalValue
+     * @param $newField
+     */
+    public function __construct($path, $value = null, $valueFromField = null, $valueMapping = null, $conditionalValue = null, $newField=null)
     {
         $this->path = $path;
         $this->value = $value;
         $this->valueFromField = $valueFromField;
         $this->valueMapping = $valueMapping;
-        $this->targetPath = $this->path;
+        $this->conditionalValue = $conditionalValue;
+        $this->targetPath = !empty($newField) ? $newField : $this->path;
     }
 
     public function execute(&$data)
     {
+
         // Get all values from the path.
         $currentValues = PathResolver::getValueByPath($data, $this->path);
 
         // Determine the value to map with.
-        $valueToMap = $this->value;
+        $valueToSet = $this->value;
         if ($this->valueFromField !== null) {
-            $valueToMap = PathResolver::getValueByPath($data, $this->valueFromField);
+            $valueToSet = PathResolver::getValueByPath($data, $this->valueFromField);
         }
+        $newValue = "";
 
         if (is_array($currentValues)) {
             foreach ($currentValues as $index => $currentValue) {
 
-                $value = is_array($valueToMap) ? $valueToMap[$index] : $valueToMap;
+                $value = is_array($valueToSet) ? $valueToSet[$index] : $valueToSet;
 
-                if (empty($this->valueMapping) || !isset($this->valueMapping[$value])) {
-                    $newValue = $valueToMap;
-                } else {
+                // check if value-mapping
+                if (!empty($this->valueMapping) && isset($this->valueMapping[$value])) {
                     $newValue = $this->valueMapping[$value];
+                }
+                // We set conditional values, if set.
+                elseif(!empty($this->conditionalValue)) {
+                    $newValue = "";
+                    foreach ($this->conditionalValue as $conditionV) {
+                        // We check if the condition is a pass
+                        if (DataTransformer::evaluateCondition($currentValue, $conditionV['condition'], true)) {
+                            // We set the value
+                            if (!empty($conditionV['valueFromField'])) {
+                                $valueFromField = PathResolver::getValueByPath($data, $conditionV['valueFromField']);
+                                $newValue = is_array($valueFromField) ? $valueFromField[$index] : $valueFromField;
+                            } else {
+                                $newValue = $conditionV['value'];
+                            }
+                        }
+                    }
+                }
+                // We set from value or valueFromField
+                else {
+                    $newValue = $valueToSet;
                 }
 
                 $targetPath = str_replace('*', $index, $this->targetPath);
@@ -50,11 +82,29 @@ class SetValueAction implements ActionInterface
         } else {
             // This is for non-wildcard paths.
 
-            if (empty($this->valueMapping) || !isset($this->valueMapping[$valueToMap])) {
-                $newValue = $valueToMap;
-            } else {
-                $newValue = $this->valueMapping[$valueToMap];
+            // check if value-mapping
+            if (!empty($this->valueMapping) && isset($this->valueMapping[$valueToSet])) {
+                $newValue = $this->valueMapping[$valueToSet];
             }
+            // We set conditional values, if set.
+            elseif(!empty($this->conditionalValue)) {
+                foreach ($this->conditionalValue as $conditionV) {
+                    // We check if the condition is a pass
+                    if (DataTransformer::evaluateCondition($valueToSet, $conditionV['condition'], true)) {
+                        // We set the value
+                        if (!empty($conditionV['valueFromField'])) {
+                            $newValue = PathResolver::getValueByPath($data, $conditionV['valueFromField']);
+                        } else {
+                            $newValue = $conditionV['value'];
+                        }
+                    }
+                }
+            }
+            // We set from value or valueFromField
+            else {
+                $newValue = $valueToSet;
+            }
+
             PathResolver::setValueByPath($data, $this->targetPath, $newValue);
         }
     }
