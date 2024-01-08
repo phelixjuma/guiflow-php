@@ -591,7 +591,7 @@ class Utils
      * @param $error
      * @return string
      */
-    private static function getPregError($error) {
+    public static function getPregError($error) {
         return match ($error) {
             PREG_INTERNAL_ERROR => 'There was an internal error!',
             PREG_BACKTRACK_LIMIT_ERROR => 'Backtrack limit was exhausted!',

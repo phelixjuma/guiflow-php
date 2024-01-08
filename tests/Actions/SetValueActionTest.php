@@ -99,7 +99,7 @@ class SetValueActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testSetConditionalValueFromMapping()
+    public function testSetConditionalValueFromMapping()
     {
         $data =
             [
@@ -118,6 +118,8 @@ class SetValueActionTest extends TestCase
                     ["description" => "CHICKEN SAUSAGES 250G"],
                     ["description" => "CHICKEN FRESH LIVER PKG"],
                     ["description" => "CHICKEN FRESH GIZZARDS P/KG"],
+                    ["description" => "KENCHIC CHICKEN SAUSAGE 500G"],
+                    ["description" => "KENCHIC CHICKEN SAUSAGE 26PCS"],
                 ]
             ];
         $expectedData = [];
@@ -145,8 +147,8 @@ class SetValueActionTest extends TestCase
                             "value" => 'NAIVAS'
                         ],
                         [
-                            "operator" => "not in list all",
-                            "value" => ["NAIVAS DELI"]
+                            "operator" => "not contains",
+                            "value" => "NAIVAS DELI"
                         ]
                     ]
                 ],
@@ -159,8 +161,12 @@ class SetValueActionTest extends TestCase
                     "conditions" => [
                         [
                             "operator" => "in list any",
-                            "value" => ['NAIVAS DELI', "KENCHIC CAT", "HUNGARIAN CHOMA SAUSAGES 1KG",
-                                "\\b(PERKG|PER KG|P\/KG|PKG|PK|\/KG|PER 500G)\\b"]
+                            "value" => [
+                                "NAIVAS DELI",
+                                "KENCHIC CAT",
+                                "HUNGARIAN CHOMA SAUSAGES 1KG",
+                                "\b(PERKG|PER KG|P/KG|PKG|PK|/KG|PER 500G)\b"
+                            ]
                         ]
                     ]
                 ],
@@ -173,7 +179,7 @@ class SetValueActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
