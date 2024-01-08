@@ -160,7 +160,7 @@ class SetValueActionTest extends TestCase
                         [
                             "operator" => "in list any",
                             "value" => ['NAIVAS DELI', "KENCHIC CAT", "HUNGARIAN CHOMA SAUSAGES 1KG",
-                                "\b(PERKG|PER KG|P/KG|PKG|PK|/KG)\b"]
+                                "\\b(PERKG|PER KG|P\/KG|PKG|PK|\/KG|PER 500G)\\b"]
                         ]
                     ]
                 ],

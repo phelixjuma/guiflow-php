@@ -138,6 +138,10 @@
               "type": "object",
               "description": "An object that maps values of the valueFromField to values of the field. This is optional and is only used for 'set' action with valueFromField."
             },
+            "conditionalValue": {
+              "type": "array",
+              "description": "Allows us to set a value based on a given condition being passed"
+            },
             "args": {
               "type": "object",
               "description": "An object that specifies the arguments for the operation. This is optional and is only used for 'function' and 'customFunction' actions."
@@ -160,6 +164,9 @@
               "path"
             ],
             "valueFromField": [
+              "path"
+            ],
+            "conditionalValue": [
               "path"
             ],
             "valueMapping": [
