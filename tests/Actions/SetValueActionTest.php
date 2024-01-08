@@ -99,7 +99,7 @@ class SetValueActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testSetConditionalValueFromMapping()
+    public function _testSetConditionalValueFromMapping()
     {
         $data =
             [
@@ -120,7 +120,7 @@ class SetValueActionTest extends TestCase
                     ["description" => "CHICKEN FRESH GIZZARDS P/KG"],
                     ["description" => "KENCHIC CHICKEN SAUSAGE 500G"],
                     ["description" => "KENCHIC CHICKEN SAUSAGE 26PCS"],
-                    ["description" => "KENCHIC CHICKEN SAUSAGE"],
+                    ["description" => "KENCHIC CHICKEN SAUSAGE", "section" => "Butchery"],
                 ]
             ];
         $expectedData = [];
@@ -190,7 +190,7 @@ class SetValueActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

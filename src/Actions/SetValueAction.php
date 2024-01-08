@@ -56,7 +56,7 @@ class SetValueAction implements ActionInterface
                 }
                 // We set conditional values, if set.
                 elseif(!empty($this->conditionalValue)) {
-                    $newValue = "";
+                    $newValue = $currentValue;
                     foreach ($this->conditionalValue as $conditionV) {
                         // We check if the condition is a pass
                         if (DataTransformer::evaluateCondition($currentValue, $conditionV['condition'], true)) {
