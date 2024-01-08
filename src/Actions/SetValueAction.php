@@ -56,7 +56,7 @@ class SetValueAction implements ActionInterface
                 }
                 // We set conditional values, if set.
                 elseif(!empty($this->conditionalValue)) {
-                    $newValue = $currentValue;
+                    $newValue = "";
                     foreach ($this->conditionalValue as $conditionV) {
                         // We check if the condition is a pass
                         if (DataTransformer::evaluateCondition($currentValue, $conditionV['condition'], true)) {
@@ -75,8 +75,10 @@ class SetValueAction implements ActionInterface
                     $newValue = $valueToSet;
                 }
 
-                $targetPath = str_replace('*', $index, $this->targetPath);
-                PathResolver::setValueByPath($data, $targetPath, $newValue);
+                if (!empty($newValue)) {
+                    $targetPath = str_replace('*', $index, $this->targetPath);
+                    PathResolver::setValueByPath($data, $targetPath, $newValue);
+                }
 
             }
         } else {
@@ -88,6 +90,7 @@ class SetValueAction implements ActionInterface
             }
             // We set conditional values, if set.
             elseif(!empty($this->conditionalValue)) {
+                $newValue = "";
                 foreach ($this->conditionalValue as $conditionV) {
                     // We check if the condition is a pass
                     if (DataTransformer::evaluateCondition($valueToSet, $conditionV['condition'], true)) {
@@ -105,7 +108,9 @@ class SetValueAction implements ActionInterface
                 $newValue = $valueToSet;
             }
 
-            PathResolver::setValueByPath($data, $this->targetPath, $newValue);
+            if (!empty($newValue)) {
+                PathResolver::setValueByPath($data, $this->targetPath, $newValue);
+            }
         }
     }
 }
