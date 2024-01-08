@@ -120,7 +120,7 @@ class SimpleCondition implements ConditionInterface
                     }
                     return true;
                 }
-                return str_contains(strtolower($pathValue), strtolower($value));
+                return preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
             case 'not in list all':
                 if (is_array($value)) {
                     foreach ($value as $v) {
@@ -131,7 +131,7 @@ class SimpleCondition implements ConditionInterface
                     }
                     return true;
                 }
-                return !str_contains(strtolower($pathValue), strtolower($value));
+                return !preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
             case 'in list any':
                 if (is_array($value)) {
                     foreach ($value as $v) {
@@ -142,7 +142,7 @@ class SimpleCondition implements ConditionInterface
                     }
                     return false;
                 }
-                return str_contains(strtolower($pathValue), strtolower($value));
+                return preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
             case 'not in list any':
                 if (is_array($value)) {
                     foreach ($value as $v) {
@@ -153,7 +153,7 @@ class SimpleCondition implements ConditionInterface
                     }
                     return false;
                 }
-                return !str_contains(strtolower($pathValue), strtolower($value));
+                return !preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
             case 'true':
                 return $pathValue === true;
             case 'false':
