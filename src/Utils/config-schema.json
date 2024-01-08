@@ -137,7 +137,8 @@
             "valueMapping": {
               "type": [
                 "object",
-                "null"
+                "null",
+                "string"
               ],
               "description": "An object that maps values of the valueFromField to values of the field. This is optional and is only used for 'set' action with valueFromField."
             },
