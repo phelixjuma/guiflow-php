@@ -26,7 +26,6 @@ class DataTransformer
     {
         $this->config = $config;
         $this->functionsClass = $functionsClass;
-        //$this->pathResolver = new PathResolver();
 
         // Validate the configuration against the schema
         ConfigurationValidator::validate($this->config);
@@ -188,7 +187,7 @@ class DataTransformer
                 $actionInstance = new $actionClass($action['path'], $action['value'] ?? null, $action['valueFromField'] ?? null, $action['newField'] ?? null);
                 break;
             case 'set':
-                $actionInstance = new $actionClass($action['path'], $action['value'] ?? null, $action['valueFromField'] ?? null, $action['valueMapping'] ?? null);
+                $actionInstance = new $actionClass($action['path'], $action['value'] ?? null, $action['valueFromField'] ?? null, $action['valueMapping'] ?? null, $action['conditionalValue'] ?? null, $action['newField'] ?? null);
                 break;
             case 'remove_path':
             case 'delete':
