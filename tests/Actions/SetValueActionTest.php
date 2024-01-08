@@ -120,6 +120,7 @@ class SetValueActionTest extends TestCase
                     ["description" => "CHICKEN FRESH GIZZARDS P/KG"],
                     ["description" => "KENCHIC CHICKEN SAUSAGE 500G"],
                     ["description" => "KENCHIC CHICKEN SAUSAGE 26PCS"],
+                    ["description" => "KENCHIC CHICKEN SAUSAGE"],
                 ]
             ];
         $expectedData = [];
@@ -175,7 +176,17 @@ class SetValueActionTest extends TestCase
             ]
         ];
 
-        $action = new SetValueAction("products.*.description", null, null, null, $conditionalValue, "products.*.section");
+        $conditionalValue = [
+            [
+                "condition" => [
+                    "operator" => "not exists"
+                ],
+                "value"     => "Shop",
+                "valueFromField"    => ""
+            ]
+        ];
+
+        $action = new SetValueAction("products.*.section", null, null, null, $conditionalValue);
 
         $action->execute($data);
 

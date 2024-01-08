@@ -140,7 +140,7 @@ class DataTransformer
             return;
         }
 
-        if (isset($condition['operator']) && isset($condition['value'])) {
+        if (isset($condition['operator'])) {
             // Add 'path_value' field. This can be set to any value as needed.
             $condition['path_value'] = $pathValue;  // Set this to your desired value
         }
