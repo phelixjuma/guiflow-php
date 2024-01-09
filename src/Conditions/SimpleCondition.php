@@ -139,6 +139,7 @@ class SimpleCondition implements ConditionInterface
                         $pattern = '/' . Utils::custom_preg_escape(Utils::full_unescape($v)) . '/i';
 
                         if (preg_match($pattern, $pathValue)) {
+                            print "\n$pathValue matched to $pattern preped from $v\n";
                             return true;
                         } else {
                             print "\n$pathValue failed to match $pattern preped from $v\n";
