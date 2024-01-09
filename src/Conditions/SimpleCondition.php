@@ -145,6 +145,7 @@ class SimpleCondition implements ConditionInterface
                             print "\n$pathValue failed to match $pattern preped from $v\n";
                         }
                         if (preg_last_error() !== PREG_NO_ERROR) {
+                            print "Preg Error when matching $pathValue against $pattern : ".Utils::getPregError(preg_last_error());
                             throw new \Exception("Preg Error: ".Utils::getPregError(preg_last_error()));
                         }
                     }
