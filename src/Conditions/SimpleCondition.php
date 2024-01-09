@@ -137,6 +137,7 @@ class SimpleCondition implements ConditionInterface
                 if (is_array($value)) {
                     foreach ($value as $v) {
                         $pattern = '/' . Utils::custom_preg_escape(Utils::full_unescape($v)) . '/i';
+
                         if (preg_match($pattern, $pathValue)) {
                             return true;
                         }

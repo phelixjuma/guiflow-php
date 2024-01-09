@@ -99,7 +99,7 @@ class SetValueActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testSetConditionalValueFromMapping()
+    public function testSetConditionalValueFromMapping()
     {
         $data =
             [
@@ -121,6 +121,7 @@ class SetValueActionTest extends TestCase
                     ["description" => "KENCHIC CHICKEN SAUSAGE 500G"],
                     ["description" => "KENCHIC CHICKEN SAUSAGE 26PCS"],
                     ["description" => "KENCHIC CHICKEN SAUSAGE", "section" => "Butchery"],
+                    ["description" => "CLEANSHELF KENCHIC FRESH CAPON 1.1-1.3KG"],
                 ]
             ];
         $expectedData = [];
@@ -143,14 +144,20 @@ class SetValueActionTest extends TestCase
                 "condition" => [
                     "operator" => "AND",
                     "conditions" => [
+//                        [
+//                            "operator" => "contains",
+//                            "value" => 'NAIVAS'
+//                        ],
+//                        [
+//                            "operator" => "not contains",
+//                            "value" => "NAIVAS DELI"
+//                        ],
                         [
-                            "operator" => "contains",
-                            "value" => 'NAIVAS'
+                            "operator" => "in list any",
+                            "value" => [
+                                "CAPON (\d+)\.(\d+)-(\d+)\.(\d+)KG"
+                            ]
                         ],
-                        [
-                            "operator" => "not contains",
-                            "value" => "NAIVAS DELI"
-                        ]
                     ]
                 ],
                 "value"     => "Butchery",
@@ -176,7 +183,7 @@ class SetValueActionTest extends TestCase
             ]
         ];
 
-        $conditionalValue = [
+        $conditionalValue_ = [
             [
                 "condition" => [
                     "operator" => "not exists"
@@ -186,11 +193,11 @@ class SetValueActionTest extends TestCase
             ]
         ];
 
-        $action = new SetValueAction("products.*.section", null, null, null, $conditionalValue);
+        $action = new SetValueAction("products.*.description", null, null, null, $conditionalValue, "products.*.section");
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

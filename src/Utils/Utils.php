@@ -481,10 +481,9 @@ class Utils
         $text = strtolower($text);
 
         // Remove URLs
-        $text = preg_replace('/https?:\/\/\S+/', '', $text);
-
+        //$text = preg_replace('/https?:\/\/\S+/', '', $text);
         // Remove or replace special characters (excluding spaces)
-        $text = preg_replace('/[^a-z0-9\s]/', '', $text);
+        //$text = preg_replace('/[^a-z0-9\s]/', '', $text);
 
         // Remove extra spaces
         $text = preg_replace('/\s+/', ' ', $text);
