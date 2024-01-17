@@ -45,8 +45,6 @@ class Filter
         $value = strtolower($value);
         $fuzz = new Fuzz();
 
-        print "\nterm: $term; value: $value\n";
-
         return match ($mode) {
             self::EQUAL => $term == $value,
             self::NOT_EQUAL => $term != $value,
