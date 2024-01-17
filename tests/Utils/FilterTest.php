@@ -186,19 +186,18 @@ class FilterTest extends TestCase
         ];
 
         $data = [
-            ['name' => 'Apples'],
-            ['name' => "Oranges"],
-            ['name' => "Lemons"],
-            ['name' => "Pears"],
-            ['name' => "Mangoes"],
+            ['name' => 'Apples', "blocked" => "1"],
+            ['name' => "Oranges", "blocked" => "1"],
+            ['name' => "Lemons", "blocked" => ""],
+            ['name' => "Pears", "blocked" => ""],
+            ['name' => "Mangoes", "blocked" => "1"],
         ];
 
 
         $conditions = [
             "operator"      => "OR",
             "conditions"    => [
-                ['term' => 'Mangoes', 'mode' => Filter::SIMILAR_TO, 'threshold' => 80, 'key' => 'name'],
-                ['term' => 'Pears', 'mode' => Filter::EQUAL, 'key' => 'name']
+                ['term' => '', 'mode' => Filter::FALSE, 'key' => 'blocked']
             ]
         ];
 

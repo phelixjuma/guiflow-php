@@ -41,13 +41,11 @@ class Filter
     private static function matchValueAgainstFilter($value, $term, $mode, int $similarityThreshold=self::DEFAULT_THRESHOLD): bool|int
     {
 
-        if (empty($value)) {
-            return false;
-        }
-
         $term = is_array($term) ? array_map('strtolower', $term) : strtolower($term);
         $value = strtolower($value);
         $fuzz = new Fuzz();
+
+        print "\nterm: $term; value: $value\n";
 
         return match ($mode) {
             self::EQUAL => $term == $value,
@@ -59,8 +57,8 @@ class Filter
             self::IN => in_array($value, $term),
             self::NOT_IN => !in_array($value, $term),
             self::REGEX => preg_match($term, $value),
-            self::TRUE => $value == 1,
-            self::FALSE => $value == 0,
+            self::TRUE => $value == true,
+            self::FALSE => $value == false,
             self::EMPTY => empty($value),
             self::NOT_EMPTY => !empty($value),
             self::STARTS_WITH => str_starts_with($value, $term),
