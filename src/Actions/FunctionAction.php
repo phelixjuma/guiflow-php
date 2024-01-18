@@ -95,6 +95,8 @@ class FunctionAction implements ActionInterface
             $newValue = Filter::filterArray(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'split') {
             $newValue = Filter::splitByPath(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'merge') {
+            $newValue = Utils::join(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'join') {
             $newValue = (new DataJoiner(...$paramValues))->mergeData();
         } elseif (isset($this->function[1]) && $this->function['1'] == 'reducer') {

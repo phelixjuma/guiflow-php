@@ -4,8 +4,57 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "91b0a83edc58c497caa323058d38f405",
+    "content-hash": "e9d9e64e1b500e78543cbd1a03c924eb",
     "packages": [
+        {
+            "name": "erdalceylan/array-join",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/erdalceylan/array-join.git",
+                "reference": "df53e15940c6f8be6a57082aa1eeb0529aa6105e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/erdalceylan/array-join/zipball/df53e15940c6f8be6a57082aa1eeb0529aa6105e",
+                "reference": "df53e15940c6f8be6a57082aa1eeb0529aa6105e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ArrayJoin\\": "src/ArrayJoin"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Erdal CEYLAN",
+                    "email": "erdalceylan25@gmail.com",
+                    "homepage": "https://github.com/erdalceylan"
+                }
+            ],
+            "description": "Array join",
+            "keywords": [
+                "array",
+                "join",
+                "merge",
+                "orm",
+                "sql",
+                "util"
+            ],
+            "support": {
+                "issues": "https://github.com/erdalceylan/array-join/issues",
+                "source": "https://github.com/erdalceylan/array-join/tree/2.1.0"
+            },
+            "time": "2020-01-08T07:13:42+00:00"
+        },
         {
             "name": "justinrainbow/json-schema",
             "version": "5.2.12",

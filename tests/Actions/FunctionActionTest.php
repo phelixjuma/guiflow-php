@@ -1411,4 +1411,29 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function _testDataMerge()
+    {
+        $data = [
+            'all_products' => [
+                ['code' => 'PC0001', 'name' => 'Fresh QUICKMART BREAST BONELESS 1KG FRESH', 'description' => 'Capon 1.2'],
+                ['code' => 'PC0002', 'code', 'name' => 'Chicken Sausages', 'description' => 'frozen'],
+                ['code' => 'PC0003', 'code', 'name' => 'Chicken Sausages 500g', 'description' => ' sold in pieces']
+            ],
+            "historical_products" => [
+                ["code" => "PC0001", 'quantity' => 2, 'unit_price' => 200],
+                ["code" => "PC0002", 'quantity' => 3, 'unit_price' => 300]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("", [$this, 'merge'], ['left' => ['path' => 'historical_products'], 'right' => ['path' => 'all_products'], 'join' => ['type' => "inner", "on" => "left.code = right.code"], 'fields' => ["left.code", "right.name", "right.description"], "group_by" => null]);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }

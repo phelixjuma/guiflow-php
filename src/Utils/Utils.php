@@ -2,6 +2,8 @@
 
 namespace PhelixJuma\DataTransformer\Utils;
 
+use ArrayJoin\Builder;
+use ArrayJoin\On;
 use FuzzyWuzzy\Fuzz;
 use FuzzyWuzzy\Process;
 use PhelixJuma\DataTransformer\Actions\FunctionAction;
@@ -817,6 +819,55 @@ class Utils
     public static function flattenAndExpand($data) {
         $flattenedData = self::flattenObject($data);
         return self::expandList($flattenedData);
+    }
+
+    /**
+     * @param $data
+     * @param $leftData
+     * @param $rightData
+     * @param $join
+     * @param $fields
+     * @param $groupBy
+     * @return array|null
+     */
+    public static function join($data, $leftData, $rightData, $join, $fields, $groupBy = null): ?array
+    {
+
+        if (isset($leftData['path'])) {
+            $leftData = PathResolver::getValueByPath($data, $leftData['path']);
+        }
+        if (isset($rightData['path'])) {
+            $rightData = PathResolver::getValueByPath($data, $rightData['path']);
+        }
+
+        $response = null;
+
+        try {
+            $instance = Builder::newInstance()
+                ->select(...$fields)
+                ->from($leftData, "left");
+
+            if ($join['type'] == 'inner') {
+                $instance->innerJoin($rightData, "right", new On($join['on']));
+            } elseif ($join['type'] == 'left') {
+                $instance->leftJoin($rightData, "right", new On($join['on']));
+            } elseif ($join['type'] == 'right') {
+                $instance->rightJoin($rightData, "right", new On($join['on']));
+            }
+
+            if (!empty($groupBy)) {
+                $instance->groupBy($groupBy);
+            }
+
+            $instance->setFetchType(Builder::FETCH_TYPE_ARRAY);
+
+            $response = $instance->execute();
+
+        } catch (\Exception $e) {
+            print "Exception: ".$e->getMessage();
+        }
+
+        return $response;
     }
 
 }
