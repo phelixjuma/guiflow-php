@@ -8,6 +8,7 @@ use PhelixJuma\DataTransformer\Utils\DataJoiner;
 use PhelixJuma\DataTransformer\Utils\DataReducer;
 use PhelixJuma\DataTransformer\Utils\Filter;
 use PhelixJuma\DataTransformer\Utils\ModelMapper;
+use PhelixJuma\DataTransformer\Utils\Randomiser;
 use PhelixJuma\DataTransformer\Utils\UnitConverter;
 use PhelixJuma\DataTransformer\Utils\Utils;
 use PhelixJuma\DataTransformer\Utils\PathResolver;
@@ -149,6 +150,11 @@ class FunctionAction implements ActionInterface
             $newValue = UnitConverter::convert_multiple(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'model_mapping') {
             $newValue = ModelMapper::transform(...$paramValues);
+        }
+        elseif (isset($this->function[1]) && $this->function['1'] == 'get_random_string') {
+            // removes data from param values
+            array_shift($paramValues);
+            $newValue = Randomiser::getRandomString(...$paramValues);
         }
         elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
             if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {

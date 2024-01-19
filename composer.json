@@ -8,7 +8,8 @@
     "ext-json": "*",
     "justinrainbow/json-schema": "^5.2",
     "wyndow/fuzzywuzzy": "^0.6.0",
-    "erdalceylan/array-join": "^2.1"
+    "erdalceylan/array-join": "^2.1",
+    "ext-openssl": "*"
   },
   "scripts": {
     "test": "vendor/bin/phpunit"
