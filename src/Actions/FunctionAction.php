@@ -2,7 +2,6 @@
 
 namespace PhelixJuma\DataTransformer\Actions;
 
-use PhelixJuma\DataTransformer\DataTransformer;
 use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
 use PhelixJuma\DataTransformer\Utils\DataJoiner;
 use PhelixJuma\DataTransformer\Utils\DataReducer;
@@ -98,6 +97,24 @@ class FunctionAction implements ActionInterface
             $newValue = Filter::splitByPath(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'merge') {
             $newValue = Utils::join(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'map') {
+
+            //print_r($paramValues);
+            list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
+
+            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
+                (new FunctionAction($path, [$this, $function], $args, $newField, $strict, $condition))->execute($value);
+            });
+            $newValue = $currentData;
+
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'set') {
+
+            list($currentData, $path, $value, $valueFromField, $valueMapping, $conditionalValue, $newField) = $paramValues;
+
+            (new SetValueAction($path, $value, $valueFromField, $valueMapping, $conditionalValue, $newField))->execute($currentData);
+
+            $newValue = $currentData;
+
         } elseif (isset($this->function[1]) && $this->function['1'] == 'join') {
             $newValue = (new DataJoiner(...$paramValues))->mergeData();
         } elseif (isset($this->function[1]) && $this->function['1'] == 'reducer') {

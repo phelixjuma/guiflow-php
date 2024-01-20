@@ -1461,4 +1461,133 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function _testUnitConversionNew()
+    {
+        $data = [
+            "items" => [
+                ["code" => "PC0001", 'quantity' => 200, 'uom' => 'PCS',
+                    "conversion_table" => [
+                        ["from" => "Bales", "to" => "PCS", "factor" => 10]
+                    ]
+                ],
+                ["code" => "PC0002", 'quantity' => 300, 'uom' => 'PCS',
+                    "conversion_table" => [
+                        ["from" => "Bales", "to" => "PCS", "factor" => 10]
+                    ]
+                ]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("", [$this, 'convert_unit_multi'], ['items' => ["path" => "items"], 'conversionTable' => ['in_item_path' => 'conversion_table'], 'quantity' => ['in_item_path' => 'quantity'], 'from_unit' => ['in_item_path' => 'uom'], 'to_unit' => 'Bales', 'output_path' => 'converted_units'], "items");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testMap()
+    {
+        $data = [
+            "items" => [
+                ["code" => "PC0001", "name" => "chicken chicken", 'quantity' => 200, 'uom' => 'PCS', 'factor' => 2,
+                    'matched_value' => ['uom_list' => [['uom_code' => '19', 'uom_name' => '24KG BALE']]],
+                    "conversion_table" => [
+                        ["from" => "PCS", "to" => "24KG BALE", "factor" => "0"]
+                    ]],
+
+                ["code" => "PC0002", "name" => "beef", 'quantity' => 30, 'uom' => 'Bales', 'factor' => 3,
+                    'matched_value' => ['uom_list' => [['uom_code' => '19', 'uom_name' => '8KG BALE']]],
+                    "conversion_table" => [
+                        ["from" => "PCS", "to" => "24KG BALE", "factor" => "0"]
+                    ]]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $conditionalValue = [
+            [
+                "condition" => [
+                    "operator" => "AND",
+                    "conditions" => [
+                        [
+                            "path"  => "uom",
+                            "operator" => "in list any",
+                            "value" => ["PCS", "PC", "Piece", "Bag"]
+                        ],
+                        [
+                            "path"  => "matched_value.uom_list.0.uom_name",
+                            "operator" => "not in list all",
+                            "value" => ["PCS","PC", "Piece", "Bag"]
+                        ]
+                    ]
+                ],
+                'useDataAsPathValue' => false,
+                "value"     => "",
+                "valueFromField"    => "factor"
+            ],
+            [
+                "condition" => [
+                    "operator" => "OR",
+                    "conditions" => [
+                        [
+                            "operator" => "AND",
+                            "conditions" => [
+                                [
+                                    "path"  => "uom",
+                                    "operator" => "in list any",
+                                    "value" => ["Bale","Bales", "Carton", "Ctn", "Pack"]
+                                ],
+                                [
+                                    "path"  => "matched_value.uom_list.0.uom_name",
+                                    "operator" => "in list any",
+                                    "value" => ["Bale","Bales", "Carton", "Ctn", "Pack"]
+                                ]
+                            ]
+                        ],
+                        [
+                            "operator" => "AND",
+                            "conditions" => [
+                                [
+                                    "path"  => "uom",
+                                    "operator" => "in list any",
+                                    "value" => ["PCS", "PC", "Piece", "Bag"]
+                                ],
+                                [
+                                    "path"  => "matched_value.uom_list.0.uom_name",
+                                    "operator" => "in list any",
+                                    "value" => ["PCS","PC", "Piece", "Bag"]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'useDataAsPathValue' => false,
+                "value"     => "1",
+                "valueFromField"    => ""
+            ]
+        ];
+
+        $args = [
+            'data_path' => "",
+            'value' => null,
+            'valueFromField' => null,
+            'valueMapping' => null,
+            'conditionalValue' => $conditionalValue,
+            'newField'  => "conversion_table.0.factor"
+        ];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'set', 'args' => $args, 'newField' => null, 'strict' => 0, 'condition' => null], "new_items");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }

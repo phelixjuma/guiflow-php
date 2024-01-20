@@ -32,7 +32,7 @@ class SetValueActionTest extends TestCase
         ];
 
         $valueMapping = [
-            'Nairobi' => '2023-09-04',
+            'Nairobi' => '2023-09-09',
             'Kisumu' => '2023-09-04',
             'Mombasa' => '2023-09-04',
         ];
@@ -40,6 +40,8 @@ class SetValueActionTest extends TestCase
         $action = new SetValueAction("delivery_date", null, "location.region", $valueMapping);
 
         $action->execute($data);
+
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -90,7 +92,7 @@ class SetValueActionTest extends TestCase
             'Luc Boost Buzz 1l Tet X12' => 'Lucozade Boost Buzz 1l Pet'
         ];
 
-        $action = new SetValueAction("products.*.ItemName", null, "products.*.ItemName", $valueMapping);
+        $action = new SetValueAction("products.*.ItemName", null, null, $valueMapping);
 
         $action->execute($data);
 
@@ -109,19 +111,10 @@ class SetValueActionTest extends TestCase
                     'region' => 'Nairobi'
                 ],
                 'products' => [
-//                    ["description" => "NAIVAS GIZZARDS"],
-//                    ["description" => "NAIVAS LIVER"],
-//                    ["description" => "NAIVAS DELI SAUSAGES"],
-//                    ["description" => "KENCHIC CAT.LIVER"],
-//                    ["description" => "HUNGARIAN CHOMA SAUSAGES 1KG"],
-//                    ["description" => "HUNGARIAN CHOMA SAUSAGES 500G"],
-//                    ["description" => "CHICKEN SAUSAGES 250G"],
-//                    ["description" => "CHICKEN FRESH LIVER PKG"],
-//                    ["description" => "CHICKEN FRESH GIZZARDS P/KG"],
-//                    ["description" => "KENCHIC CHICKEN SAUSAGE 500G"],
-//                    ["description" => "KENCHIC CHICKEN SAUSAGE 26PCS"],
-//                    ["description" => "KENCHIC CHICKEN SAUSAGE", "section" => "Butchery"],
-                    ["description" => "CLEANSHELF KENCHIC FRESH CAPON 1.1-1.3KG"],
+                    ["description" => "CLEANSHELF KENCHIC FRESH CAPON 1.1-1.3KG", "category" => "Flour"],
+                    ["description" => "CAPON 1.1", "category" => "Rice"],
+                    ["description" => "Wings", "category" => "Biscuits"],
+                    ["description" => "Ribs", "category" => "Others"],
                 ]
             ];
         $expectedData = [];
@@ -133,67 +126,31 @@ class SetValueActionTest extends TestCase
                     "conditions" => [
                         [
                             "operator" => "in list any",
-                            "value" => ["(\d+)\s*(G|GM|GMS|KG|KGS|PC|PCS)"]
+                            "value" => ["Rice", "Biscuits", "Others"]
                         ]
                     ]
                 ],
-                "value"     => "Shop",
+                "value"     => "Rice",
                 "valueFromField"    => ""
             ],
             [
                 "condition" => [
                     "operator" => "AND",
                     "conditions" => [
-//                        [
-//                            "operator" => "contains",
-//                            "value" => 'NAIVAS'
-//                        ],
-//                        [
-//                            "operator" => "not contains",
-//                            "value" => "NAIVAS DELI"
-//                        ],
                         [
                             "operator" => "in list any",
                             "value" => [
-                                "CAPON (\d+)\.(\d+)-(\d+)\.(\d+)KG"
+                                "Flour"
                             ]
                         ],
                     ]
                 ],
-                "value"     => "Butchery",
-                "valueFromField"    => ""
-            ],
-            [
-                "condition" => [
-                    "operator" => "OR",
-                    "conditions" => [
-                        [
-                            "operator" => "in list any",
-                            "value" => [
-                                "NAIVAS DELI",
-                                "KENCHIC CAT",
-                                "HUNGARIAN CHOMA SAUSAGES 1KG",
-                                "\b(PERKG|PER KG|P/KG|PKG|PK|/KG|PER 500G)\b"
-                            ]
-                        ]
-                    ]
-                ],
-                "value"     => "Deli",
+                "value"     => "Maize",
                 "valueFromField"    => ""
             ]
         ];
 
-        $conditionalValue_ = [
-            [
-                "condition" => [
-                    "operator" => "not exists"
-                ],
-                "value"     => "Shop",
-                "valueFromField"    => ""
-            ]
-        ];
-
-        $action = new SetValueAction("products.*.description", null, null, null, $conditionalValue, "products.*.section");
+        $action = new SetValueAction("products.*.category", null, null, null, $conditionalValue, "products.*.section");
 
         $action->execute($data);
 
