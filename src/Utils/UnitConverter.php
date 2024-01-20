@@ -21,14 +21,14 @@ class UnitConverter
         // Direct conversion
         foreach ($conversionTable as $conversion) {
             if ($conversion['from'] == $from_unit && $conversion['to'] == $to_unit) {
-                return $quantity * $conversion['factor'];
+                return ceil($quantity * $conversion['factor']);
             }
         }
 
         // Inverse conversion
         foreach ($conversionTable as $conversion) {
             if ($conversion['from'] == $to_unit && $conversion['to'] == $from_unit) {
-                return $quantity / $conversion['factor'];
+                return ceil($quantity / $conversion['factor']);
             }
         }
         return $quantity;
