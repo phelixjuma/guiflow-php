@@ -46,15 +46,13 @@ class UnitConverter
      */
     public static function convert_multiple($data, $items, $conversionTable, $quantity, $fromUnit, $toUnit, $outputPath): array
     {
-        $convertedItems = [];
-
         if (isset($conversionTable['path'])) {
             $conversionTable = PathResolver::getValueByPath($data, $conversionTable['path']);
         }
 
         $items = isset($items['path']) ? PathResolver::getValueByPath($data, $items['path']) : $items;
 
-        foreach ($items as $item) {
+        array_walk($items, function (&$item, $key) use($conversionTable, $quantity, $fromUnit, $toUnit, $outputPath) {
 
             $conversionTable = isset($conversionTable['in_item_path']) ? PathResolver::getValueByPath($item, $conversionTable['in_item_path']) : $conversionTable;
             $quantity = isset($quantity['in_item_path']) ? PathResolver::getValueByPath($item, $quantity['in_item_path']) : $quantity;
@@ -68,10 +66,9 @@ class UnitConverter
                 "converted_value" => $convertedQuantity
             ]);
 
-            $convertedItems[] = $item;
-        }
+        });
 
-        return $convertedItems;
+        return $items;
     }
 }
 
