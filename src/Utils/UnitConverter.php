@@ -77,9 +77,6 @@ class UnitConverter
             $fromUnit = isset($fromUnit['in_item_path']) ? PathResolver::getValueByPath($item, $fromUnit['in_item_path']) : $fromUnit;
             $toUnit = isset($toUnit['in_item_path']) ? PathResolver::getValueByPath($item, $toUnit['in_item_path']) : $toUnit;
 
-            print "\nUnit conversion for quantity $quantity, from $fromUnit to $toUnit\n";
-            print_r($conversionTable);
-
             $convertedQuantity = self::convert($conversionTable, $quantity, $fromUnit, $toUnit);
 
             PathResolver::setValueByPath($item,  $outputPath, [
