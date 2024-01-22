@@ -18,17 +18,35 @@ class UnitConverter
      */
     public static function convert($conversionTable, $quantity, $from_unit, $to_unit): mixed
     {
+        if (empty($quantity)) {
+            return $quantity;
+        }
+
         // Direct conversion
         foreach ($conversionTable as $conversion) {
+
             if ($conversion['from'] == $from_unit && $conversion['to'] == $to_unit) {
-                return ceil($quantity * $conversion['factor']);
+
+                $factor = 1;
+                if (!empty($conversion['factor']) && $conversion['factor'] > 1) {
+                    $factor = floatval($conversion['factor']);
+                }
+
+                return ceil($quantity * $factor);
             }
         }
 
         // Inverse conversion
         foreach ($conversionTable as $conversion) {
+
             if ($conversion['from'] == $to_unit && $conversion['to'] == $from_unit) {
-                return ceil($quantity / $conversion['factor']);
+
+                $factor = 1;
+                if (!empty($conversion['factor']) && $conversion['factor'] > 1) {
+                    $factor = floatval($conversion['factor']);
+                }
+
+                return ceil($quantity / $factor);
             }
         }
         return $quantity;
@@ -58,6 +76,9 @@ class UnitConverter
             $quantity = isset($quantity['in_item_path']) ? PathResolver::getValueByPath($item, $quantity['in_item_path']) : $quantity;
             $fromUnit = isset($fromUnit['in_item_path']) ? PathResolver::getValueByPath($item, $fromUnit['in_item_path']) : $fromUnit;
             $toUnit = isset($toUnit['in_item_path']) ? PathResolver::getValueByPath($item, $toUnit['in_item_path']) : $toUnit;
+
+            print "\nUnit conversion for quantity $quantity, from $fromUnit to $toUnit\n";
+            print_r($conversionTable);
 
             $convertedQuantity = self::convert($conversionTable, $quantity, $fromUnit, $toUnit);
 

@@ -1462,18 +1462,18 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testUnitConversionNew()
+    public function testUnitConversionNew()
     {
         $data = [
             "items" => [
-                ["code" => "PC0001", 'quantity' => 200, 'uom' => 'PCS',
+                ["code" => "PC0001", 'quantity' => 200, 'uom' => 'Bundles',
                     "conversion_table" => [
-                        ["from" => "Bales", "to" => "PCS", "factor" => 10]
+                        ["from" => "24KG BALE", "to" => "Bundles", "factor" => "1"]
                     ]
                 ],
-                ["code" => "PC0002", 'quantity' => 300, 'uom' => 'PCS',
+                ["code" => "PC0002", 'quantity' => 300, 'uom' => 'Bundles',
                     "conversion_table" => [
-                        ["from" => "Bales", "to" => "PCS", "factor" => 10]
+                        ["from" => "25KG BALE/BAG", "to" => "Bundles", "factor" => "1"]
                     ]
                 ]
             ]
@@ -1485,7 +1485,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
