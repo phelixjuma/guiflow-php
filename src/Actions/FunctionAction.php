@@ -167,6 +167,8 @@ class FunctionAction implements ActionInterface
             $newValue = UnitConverter::convert_multiple(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'model_mapping') {
             $newValue = ModelMapper::transform(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'make_object_list_unique') {
+            $newValue = Utils::make_object_list_unique(...$paramValues);
         }
         elseif (isset($this->function[1]) && $this->function['1'] == 'get_random_string') {
             // removes data from param values

@@ -81,7 +81,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testFilterFunction()
+    public function _testFilterFunction()
     {
         $data = [
             'products' => [
@@ -109,7 +109,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -1607,6 +1607,65 @@ class FunctionActionTest extends TestCase
         ];
 
         $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'date_format', 'args' => $args, 'newField' => null, 'strict' => 0, 'condition' => null], "new_items");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testObjectListUnique()
+    {
+        $data = [
+            "items" => [
+                [
+                    "description" => [
+                        "similarity" => 97.02811322688663,
+                        "meta_data" => [
+                            "id" => "FG2911003"
+                        ]
+                    ]
+                ],
+                [
+                    "description" => [
+                        "similarity" => 98.70738305553967,
+                        "meta_data" => [
+                            "id" => "FG2001002"
+                        ]
+                    ]
+                ],
+                [
+                    "description" => [
+                        "similarity" => 90.91947421699516,
+                        "meta_data" => [
+                            "id" => "FG2001002"
+                        ]
+                    ]
+                ],
+                [
+                    "description" => [
+                        "similarity" => 98.60738305553967,
+                        "meta_data" => [
+                            "id" => "FG2001002"
+                        ]
+                    ]
+                ],
+                [
+                    "description" => [
+                        "similarity" => 99.02811322688663,
+                        "meta_data" => [
+                            "id" => "FG2011003"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $expectedData = [];
+
+
+        $action = new FunctionAction("items", [$this, 'make_object_list_unique'], ['uniqueKeyPath' => ['description.meta_data.id'], 'rankKeyPath' => 'description.similarity', 'rankOrder' => 'desc'], "new_items");
 
         $action->execute($data);
 

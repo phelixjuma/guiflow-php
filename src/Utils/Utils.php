@@ -211,6 +211,52 @@ class Utils
 
     /**
      * @param $data
+     * @param $uniqueKeyPath
+     * @param $rankKeyPath
+     * @param $rankOrder
+     * @return array|mixed
+     */
+    public static function make_object_list_unique($data, $uniqueKeyPath, $rankKeyPath, $rankOrder='desc') {
+        if (!is_array($data) || sizeof($data) == 1) {
+            return $data;
+        }
+
+        // Create a unique list
+        $uniqueList = [];
+        $seen = [];
+
+        $getUniqueHash =  function($item, $uniqueKeys) {
+            $values = [];
+            foreach ($uniqueKeys as $keys) {
+                $values[] = PathResolver::getValueByPath($item, $keys);
+            }
+            return md5(serialize($values));
+        };
+
+        foreach ($data as $item) {
+            $hash = $getUniqueHash($item, $uniqueKeyPath);
+            $rankValue = PathResolver::getValueByPath($item, $rankKeyPath);
+
+            if (!isset($seen[$hash])) {
+                $seen[$hash] = ['rank' => $rankValue, 'item' => $item];
+            } else {
+                $betterRank = ($rankOrder === 'asc') ? $rankValue < $seen[$hash]['rank'] : $rankValue > $seen[$hash]['rank'];
+                if ($betterRank) {
+                    $seen[$hash] = ['rank' => $rankValue, 'item' => $item];
+                }
+            }
+        }
+
+        // Extract the best ranked items
+        foreach ($seen as $entry) {
+            $uniqueList[] = $entry['item'];
+        }
+
+        return $uniqueList;
+    }
+
+    /**
+     * @param $data
      * @param $pattern
      * @param $replacement
      * @return array|string|string[]|null
