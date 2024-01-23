@@ -48,10 +48,10 @@ class Filter
         return match ($mode) {
             self::EQUAL => $term == $value,
             self::NOT_EQUAL => $term != $value,
-            self::GREATER => is_numeric($value) && $value > $term,
-            self::GREATER_OR_EQUAL => is_numeric($value) && $value >= $term,
-            self::LESS => is_numeric($value) && $value < $term,
-            self::LESS_OR_EQUAL => is_numeric($value) && $value <= $term,
+            self::GREATER => $value > $term,
+            self::GREATER_OR_EQUAL => $value >= $term,
+            self::LESS => $value < $term,
+            self::LESS_OR_EQUAL => $value <= $term,
             self::IN => in_array($value, $term),
             self::NOT_IN => !in_array($value, $term),
             self::REGEX => preg_match($term, $value),
@@ -144,46 +144,6 @@ class Filter
             }
         }
         return array_values($array);  // Resetting the keys
-    }
-
-    public static function _splitByPath(array $data, string $path): array {
-
-        $valuesForPath = PathResolver::getValueByPath($data, $path, true);
-        $uniqueValues = array_unique($valuesForPath);
-
-        if (sizeof($uniqueValues) == 1) {
-            return $data;
-        }
-
-        $pathParts = explode('.', $path);
-
-        // Extract the attribute by which we are grouping
-        $attribute = array_pop($pathParts);
-
-        $result = [];
-
-        foreach ($uniqueValues as $value) {
-
-            $dataCopy = $data;
-
-            $subData = &$dataCopy;
-
-            // Traverse down the data copy structure to get the data we want to modify
-            foreach ($pathParts as $part) {
-                if ($part !== '*') {
-                    $subData = &$subData[$part];
-                }
-            }
-
-            // Apply the filter dynamically
-            $subData = array_values(array_filter($subData, function($item) use ($value, $attribute) {
-                return $item[$attribute] == $value;
-            }));
-
-            $result[] = $dataCopy;
-        }
-
-        return $result;
     }
 
     /**

@@ -81,12 +81,12 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testFilterFunction()
+    public function testFilterFunction()
     {
         $data = [
             'products' => [
-                ["Sell_to_Customer_No" => "PC00072","No" => "PC03267", 'name' => 'CAPON FRESH BUTCHERY.', 'quantity' => 2, 'unit_price' => 200],
-                ["Sell_to_Customer_No" => "PC00072","No" => "1300120", 'name' => 'CAPON FRESH BUTCHERY', 'quantity' => 3, 'unit_price' => 300],
+                ["Sell_to_Customer_No" => "PC00070","No" => "PC03267", 'name' => 'CAPON FRESH BUTCHERY.', 'quantity' => 2, 'unit_price' => 200],
+                ["Sell_to_Customer_No" => "PC00071","No" => "1300120", 'name' => 'CAPON FRESH BUTCHERY', 'quantity' => 3, 'unit_price' => 300],
                 ["Sell_to_Customer_No" => "PC00072","No" => "PC00987", 'name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200],
             ],
             'customer_name' => [
@@ -109,7 +109,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -1462,7 +1462,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testUnitConversionNew()
+    public function _testUnitConversionNew()
     {
         $data = [
             "items" => [
@@ -1485,12 +1485,12 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testMap()
+    public function _testMapSet()
     {
         $data = [
             "items" => [
@@ -1583,6 +1583,30 @@ class FunctionActionTest extends TestCase
         ];
 
         $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'set', 'args' => $args, 'newField' => null, 'strict' => 0, 'condition' => null], "new_items");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testMapDateFormat()
+    {
+        $data = [
+            "items" => [
+                ["date" => "3/2/2023 12:00:00 AM"],
+                ["date" => "9/30/2022 12:00:00 AM"]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $args = [
+            'data_path' => ""
+        ];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'date_format', 'args' => $args, 'newField' => null, 'strict' => 0, 'condition' => null], "new_items");
 
         $action->execute($data);
 

@@ -47,7 +47,7 @@ class Utils
         } else {
             // Otherwise, try to parse the string directly
             try {
-                $date = new \DateTime($input, $timezone);
+                $date = !empty($input) ? new \DateTime($input, $timezone) : "";
             } catch (\Exception $e) {
                 // If an exception is caught, the date format is not recognized
                 return "Invalid date format: " . $e->getMessage();
@@ -417,10 +417,10 @@ class Utils
 
             if (is_array($data)) {
                 foreach ($data as $datum) {
-                    $response[] = (new \DateTime($datum, $timezone))->format($format);
+                    $response[] = !empty($datum) ? (new \DateTime($datum, $timezone))->format($format) : "";
                 }
             } else {
-                $response = (new \DateTime($data, $timezone))->format($format);
+                $response = !empty($data) ? (new \DateTime($data, $timezone))->format($format) : "";
             }
         } catch (\Exception $e) {
 
@@ -661,7 +661,7 @@ class Utils
                         // If no time part is present, append the current time
                         $dateString .= ' ' . $getCurrentTime($timezone);
                     }
-                    return (new \DateTime($dateString, $timezone))->format($format);
+                    return !empty($dateString) ? (new \DateTime($dateString, $timezone))->format($format) : "";
                 };
 
                 $date = null;

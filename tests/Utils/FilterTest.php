@@ -197,7 +197,7 @@ class FilterTest extends TestCase
         $conditions = [
             "operator"      => "OR",
             "conditions"    => [
-                ['term' => '', 'mode' => Filter::FALSE, 'key' => 'blocked']
+                ['term' => '', 'mode' => Filter::GREATER_OR_EQUAL, 'key' => 'blocked']
             ]
         ];
 
