@@ -58,21 +58,38 @@ class Utils
         return $date->format($format);
     }
 
-    public static function prepend($data, $stringsToPrepend, $separator = " ", $condition = null)
+    /**
+     * @param $data
+     * @param $stringsToAppend
+     * @param $separator
+     * @param $useDataAsPathValue
+     * @param $valueKey
+     * @param $condition
+     * @return array|mixed|string|string[]|null
+     */
+    public static function prepend($data, $stringsToAppend, $separator = " ", $useDataAsPathValue = true, $valueKey=null, $condition = null)
     {
+
         $modifiedSeparator = " $separator ";
-        $strings = implode($modifiedSeparator, $stringsToPrepend);
+        $strings = implode($modifiedSeparator, $stringsToAppend);
 
         // If the data is an array, apply prepend recursively to each element
-        if (is_array($data)) {
+        if (is_array($data) && !self::isObject($data)) {
             foreach ($data as $key => $value) {
-                $data[$key] = self::prepend($value, $stringsToPrepend, $modifiedSeparator, $condition);
+                $data[$key] = self::prepend($value, $stringsToAppend, $modifiedSeparator, $useDataAsPathValue, $valueKey, $condition);
             }
             return $data;
         }
 
         // If it's not an array, apply the prepend logic to the string
-        if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, true)) {
+        if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, $useDataAsPathValue)) {
+
+            if (self::isObject($data) && !empty($valueKey)) {
+
+                $data[$valueKey] = self::removeExtraSpaces(  $strings . $modifiedSeparator . $data[$valueKey]);
+
+                return $data;
+            }
             return self::removeExtraSpaces($strings . $modifiedSeparator . $data);
         }
 
