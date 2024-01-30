@@ -493,6 +493,123 @@ class Utils
 
     /**
      * @param $data
+     * @param $pattern
+     * @param $flag
+     * @param $isCaseSensitive
+     * @return string|string[]
+     */
+    public static function regex_extract($data, $pattern, $flag, $isCaseSensitive = false, $returnSubjectOnNull = false)
+    {
+
+        $pattern = "/".self::custom_preg_escape($pattern)."/";
+        if (!$isCaseSensitive) {
+            $pattern .= "i";
+        }
+
+        $response = preg_match_all($pattern, $data, $matches);
+
+        if (!$response) {
+            return $returnSubjectOnNull ? $data : "";
+        }
+
+        if (!is_array($matches[intval($flag)])) {
+            return $returnSubjectOnNull ? $data : "";
+        }
+
+        return is_array($matches[intval($flag)]) ? $matches[intval($flag)][0] : '';
+    }
+
+    /**
+     * @param $data
+     * @param $operator
+     * @param $operands
+     * @param $defaultValue
+     * @param $moduloHandler
+     * @param $decimalPlaces
+     * @param $condition
+     * @return array|float|int|mixed|string|null
+     */
+    public static function basic_arithmetic($data, $operator, $operands, $defaultValue = "", $moduloHandler='round', $decimalPlaces = 2, $condition = null) {
+
+        // Check condition
+        if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, false)) {
+
+            $operandValues = [];
+
+            foreach ($operands as $operand) {
+                $value = !empty($operand['path']) ? PathResolver::getValueByPath($data, $operand['path']) : $operand;
+                if (!empty($value)) {
+                    $operandValues[] = $value;
+                }
+            }
+
+            // multiplication
+            if ($operator == 'multiply') {
+                $product = 1;
+                foreach ($operandValues as $value) {
+                    $product *= $value;
+                }
+                return $product;
+            }
+            // division
+            if ($operator == 'divide') {
+
+                $dividend = floatval(self::recursiveDivide($operandValues));
+
+                if ($moduloHandler == 'ceil') {
+                    return ceil($dividend);
+                } elseif ($moduloHandler == 'floor') {
+                    return floor($dividend);
+                } else {
+                    return round($dividend, $decimalPlaces);
+                }
+            }
+            // addition
+            if ($operator == 'add') {
+                $sum = 0;
+                foreach ($operandValues as $value) {
+                    $sum += floatval($value);
+                }
+                return $sum;
+            }
+            // subtraction
+            if ($operator == 'subtract') {
+
+                $difference = floatval($operandValues[0]);
+
+                array_shift($operandValues);
+
+                foreach ($operandValues as $value) {
+                    $difference -= floatval($value);
+                }
+                return $difference;
+            }
+
+        } else {
+
+            if (!empty($defaultValue)) {
+                return !empty($defaultValue['path']) ? PathResolver::getValueByPath($data, $defaultValue['path']) : $defaultValue;
+            }
+        }
+        return $data;
+    }
+
+    private static function recursiveDivide($numbers) {
+
+        // Check if the array is empty or has only one element
+        if (count($numbers) <= 1) {
+            return count($numbers) === 1 ? $numbers[0] : 1;
+        }
+
+        // Take the first element
+        $firstElement = array_shift($numbers);
+
+        // Recursively call the function with the remaining elements
+        return $firstElement / self::recursiveDivide($numbers);
+    }
+
+    /**
+     * @param $data
      * @param $key
      * @return mixed|string
      */

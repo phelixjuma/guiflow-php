@@ -71,7 +71,7 @@ class FunctionAction implements ActionInterface
 
         foreach ($this->args as $param) {
 
-            if ($this->function['1'] != 'join') {
+            if ($this->function['1'] != 'join' && $this->function['1'] != 'map') {
 
                 if (is_array($param) && isset($param['path'])) {
 
@@ -99,7 +99,6 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::join(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'map') {
 
-            //print_r($paramValues);
             list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
 
             array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
@@ -125,6 +124,8 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::format_date(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_extract_one') {
             $newValue = Utils::fuzzy_extract_one(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'regex_extract') {
+            $newValue = Utils::regex_extract(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'transform') {
             $newValue = Utils::transform_data(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'append') {
@@ -174,6 +175,8 @@ class FunctionAction implements ActionInterface
             // removes data from param values
             array_shift($paramValues);
             $newValue = Randomiser::getRandomString(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'basic_arithmetic') {
+            $newValue = Utils::basic_arithmetic(...$paramValues);
         }
         elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
             if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {

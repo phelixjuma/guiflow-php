@@ -1673,4 +1673,79 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function _testRegexExtract()
+    {
+        $data = [
+            "items" => [
+                ["description" => "450ML x 6"],
+                ["description" => "2.89KG CARTON"],
+                ["description" => "25KG BALE/BAG"],
+                ["description" => "12KG BALE"],
+                ["description" => "5KG BAG/PACK"],
+                ["description" => "6.5KG PACK"],
+                ["description" => "12 X 250ML"],
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'description', 'function' => 'regex_extract', 'args' => ['pattern' => "^(?!.*\bx\b).*?(\d+(\.\d+)?)\s*(KG|G|ML)\b", 'flag' => '1'], 'newField' => 'pack_total_size', 'strict' => 0, 'condition' => null], "");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testRegexExtract2()
+    {
+        $data = [
+            "items" => [
+                ["description" => "450ML x 6"],
+                ["description" => "2.89KG CARTON"],
+                ["description" => "25KG BALE/BAG"],
+                ["description" => "12KG BALE"],
+                ["description" => "5KG BAG/PACK"],
+                ["description" => "6.5KG PACK"],
+                ["description" => "12 X 250ML"],
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'description', 'function' => 'regex_extract', 'args' => ['pattern' => "^(?=.*\bx\b).*?(\d+(\.\d+)?)\s*(KG|G|ML)\b", 'flag' => '1'], 'newField' => 'unit_size', 'strict' => 0, 'condition' => null], "");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testMultiplication()
+    {
+        $data = [
+            "items" => [
+                ["description" => "450ML x 6", "unit_size" => "450", "pack_total_size" => "", "number_pieces_bale" => "6"],
+                ["description" => "2.89KG CARTON", "unit_size" => "", "pack_total_size" => "2.89", "number_pieces_bale" => "36"],
+                ["description" => "25KG BALE/BAG", "unit_size" => "", "pack_total_size" => "25", "number_pieces_bale" => "5"],
+                ["description" => "12KG BALE", "unit_size" => "", "pack_total_size" => "12", "number_pieces_bale" => "24"],
+                ["description" => "5KG BAG/PACK", "unit_size" => "", "pack_total_size" => "5", "number_pieces_bale" => "1"],
+                ["description" => "6.5KG PACK", "unit_size" => "", "pack_total_size" => "6.5", "number_pieces_bale" => "0"],
+                ["description" => "12 X 250ML", "unit_size" => "250", "pack_total_size" => "", "number_pieces_bale" => "12"],
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'basic_arithmetic', 'args' => ['operator' => "divide", 'operands' => [['path' => 'pack_total_size'], ['path' => 'number_pieces_bale']], 'defaultValue' => ['path' => 'unit_size'], 'moduloHandler' => 'round', 'decimalPlaces' => 2], 'newField' => 'unit_size', 'strict' => 0, 'condition' => ["operator" => "not exists", "path" => "unit_size"]], "");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }
