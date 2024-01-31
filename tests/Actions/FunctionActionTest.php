@@ -1724,6 +1724,27 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
+    public function _testRegexExtract3()
+    {
+        $data = [
+            "items" => [
+                ["description" => "450ML x 6", "unit_of_measure" =>[["quantity" => 721]]],
+                ["description" => "2.89KG CARTON", "unit_of_measure" =>[["quantity" => 42]]],
+                ["description" => "25KG BALE/BAG", "unit_of_measure" =>[["quantity" => 20]]]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'unit_of_measure.0.quantity', 'function' => 'regex_extract', 'args' => ['pattern' => "^(\d{1,})(?:1)$", 'flag' => '1', 'isCaseSensitive' => true, 'returnSubjectOnNull' => true], 'newField' => '', 'strict' => 0, 'condition' => null], "");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
     public function _testMultiplication()
     {
         $data = [
@@ -1741,6 +1762,59 @@ class FunctionActionTest extends TestCase
         $expectedData = [];
 
         $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'basic_arithmetic', 'args' => ['operator' => "divide", 'operands' => [['path' => 'pack_total_size'], ['path' => 'number_pieces_bale']], 'defaultValue' => ['path' => 'unit_size'], 'moduloHandler' => 'round', 'decimalPlaces' => 2], 'newField' => 'unit_size', 'strict' => 0, 'condition' => ["operator" => "not exists", "path" => "unit_size"]], "");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testDuplicator()
+    {
+        $data = [
+            "items" => [
+                    [
+                        "item_code" => "FG2001003",
+                        "item_quantity"=> 4,
+                        "uom_code"=> "22",
+                        "warehouse_code"=> "WH16"
+                    ],
+                    [
+                        "item_code"=> "FG4110002",
+                        "item_quantity" => 1,
+                        "uom_code" => "19",
+                        "warehouse_code" => "WH16"
+                    ]
+                ]
+        ];
+
+        $replacement = [
+            [
+                "item_code" => "FG2001003",
+                "replacements"  => [
+                    "item_code" => "FG2001002",
+                    "uom_code"  => "23"
+                ]
+            ],
+            [
+                "item_code" => "FG2001002",
+                "replacements"  => [
+                    "item_code" => "FG2001003",
+                    "uom_code"  => "23"
+                ]
+            ]
+        ];
+
+        $condition = [
+            'path'      => 'item_code',
+            'operator'  => 'in list any',
+            'value'     => ['FG2001003']
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("items", [$this, 'duplicate_list_item'], ['replacementKey' => 'item_code', 'replacement' => $replacement], '' , 0, $condition);
 
         $action->execute($data);
 

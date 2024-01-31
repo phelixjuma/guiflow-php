@@ -170,8 +170,9 @@ class FunctionAction implements ActionInterface
             $newValue = ModelMapper::transform(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'make_object_list_unique') {
             $newValue = Utils::make_object_list_unique(...$paramValues);
-        }
-        elseif (isset($this->function[1]) && $this->function['1'] == 'get_random_string') {
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'duplicate_list_item') {
+            $newValue = Utils::duplicate_list_item(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'get_random_string') {
             // removes data from param values
             array_shift($paramValues);
             $newValue = Randomiser::getRandomString(...$paramValues);

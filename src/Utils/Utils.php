@@ -521,6 +521,50 @@ class Utils
 
     /**
      * @param $data
+     * @param $condition
+     * @param $replacement
+     * @return mixed
+     */
+    public static function duplicate_list_item($data, $replacementKey = null, $replacement = null, $condition = null) {
+
+        $length = count($data);
+
+        for ($i = 0; $i < $length; $i++) {
+
+            if (DataTransformer::evaluateCondition($data[$i], $condition)) {
+
+                $newItem = $data[$i];
+
+                // Optional: Modify certain values in the new item
+                if (!is_null($replacement) && !is_null($replacementKey)) {
+
+                    $replacementMappings = self::searchMultiArrayByKeyReturnKeys($replacement, $replacementKey, $data[$i][$replacementKey]);
+
+                    if (!empty($replacementMappings)) {
+
+                        foreach ($replacementMappings['replacements'] as $replaceKey => $replaceValue) {
+                            $newItem[$replaceKey] = $replaceValue;
+                        }
+                    }
+
+                }
+
+                // Insert new item after current item
+                array_splice($data, $i + 1, 0, array($newItem));
+
+                // Skip the newly added item in the next iteration
+                $i++;
+
+                // Update the length of the array
+                $length = count($data);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param $data
      * @param $operator
      * @param $operands
      * @param $defaultValue
@@ -1048,6 +1092,28 @@ class Utils
         }
 
         return $response;
+    }
+
+    private static function searchMultiArrayByKey($arrayData, $searchKey, $searchValue) {
+        $foundData = array();
+        $size = sizeof($arrayData);
+        for ($i = 0; $i < $size; $i++) {
+            if ($arrayData[$i][$searchKey] == $searchValue) {
+                $foundData[] = $arrayData[$i];
+            }
+        }
+        return $foundData;
+    }
+
+    public static function searchMultiArrayByKeyReturnKeys
+    ($arrayData, $searchKey, $searchValue) {
+        $size = is_array($arrayData) ? sizeof($arrayData) : 0;
+        for ($i = 0; $i < $size; $i++) {
+            if (strtolower($arrayData[$i][$searchKey]) == strtolower($searchValue)) {
+                return $arrayData[$i];
+            }
+        }
+        return false;
     }
 
 }
