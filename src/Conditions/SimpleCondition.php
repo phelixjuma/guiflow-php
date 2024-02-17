@@ -93,6 +93,10 @@ class SimpleCondition implements ConditionInterface
                 return !empty($pathValue) && !empty($value) && str_contains($pathValue, $value);
             case 'not contains':
                 return empty($pathValue) || empty($value) || !str_contains($pathValue, $value);
+            case 'matches':
+                return preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
+            case 'not matches':
+                return !preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
             case 'exists':
                 // For arrays, we remove empty values
                 if (is_array($pathValue) && !Utils::isObject($pathValue)) {
