@@ -1828,7 +1828,9 @@ class FunctionActionTest extends TestCase
         $data = [
             "text" => "Sent By: Irene Wairimu  Email: iwairimu@kenchic.com
 
-Email Subject: TDR Charity - Order for Mama Jay \n Email Body:
+Email Subject: TDR Charity - Order for Mama Jay
+
+Email Body:
 
 Mixed portions 15kgs
 Capon 1.1. 10pcs
@@ -1838,7 +1840,7 @@ Sausages. 1pkt"
 
         $expectedData = [];
 
-        $action = new FunctionAction("text", [$this, 'parse_template'], ['template' => "TDR {{ordered_by_name}} - Order for {{customer_name}}", 'config' => ['non_greedy' => '1']], "template_data");
+        $action = new FunctionAction("text", [$this, 'parse_template'], ['template' => "TDR {{ordered_by_name}} - Order for {{customer_name}}", 'config' => ['1' => ['non_greedy' => '1']]], "template_data");
 
         $action->execute($data);
 
