@@ -1822,4 +1822,28 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function _testTemplateParser()
+    {
+        $data = [
+            "text" => "Sent By: Irene Wairimu  Email: iwairimu@kenchic.com
+
+Email Subject: TDR Charity - Order for Mama Jay \n Email Body:
+
+Mixed portions 15kgs
+Capon 1.1. 10pcs
+Choma sausages 4kg
+Sausages. 1pkt"
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("text", [$this, 'parse_template'], ['template' => "TDR {{ordered_by_name}} - Order for {{customer_name}}", 'config' => ['non_greedy' => '1']], "template_data");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }

@@ -8,6 +8,7 @@ use PhelixJuma\DataTransformer\Utils\DataReducer;
 use PhelixJuma\DataTransformer\Utils\Filter;
 use PhelixJuma\DataTransformer\Utils\ModelMapper;
 use PhelixJuma\DataTransformer\Utils\Randomiser;
+use PhelixJuma\DataTransformer\Utils\TemplateParserService;
 use PhelixJuma\DataTransformer\Utils\UnitConverter;
 use PhelixJuma\DataTransformer\Utils\Utils;
 use PhelixJuma\DataTransformer\Utils\PathResolver;
@@ -178,6 +179,8 @@ class FunctionAction implements ActionInterface
             $newValue = Randomiser::getRandomString(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'basic_arithmetic') {
             $newValue = Utils::basic_arithmetic(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'parse_template') {
+            $newValue = TemplateParserService::parseMessageFromTemplate(...$paramValues);
         }
         elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
             if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {
