@@ -1826,21 +1826,12 @@ class FunctionActionTest extends TestCase
     public function _testTemplateParser()
     {
         $data = [
-            "text" => "Sent By: Irene Wairimu  Email: iwairimu@kenchic.com
-
-Email Subject: TDR Charity - Order for Mama Jay
-
-Email Body:
-
-Mixed portions 15kgs
-Capon 1.1. 10pcs
-Choma sausages 4kg
-Sausages. 1pkt"
+            "text" => "Sent By: Irene Wairimu  Email: iwairimu@kenchic.com\n\nEmail Subject: TDR Charity - Order for Mama Jay \nEmail Body:\n\nMixed portions 15kgs\nCapon 1.1. 10pcs\nChoma sausages 4kg\nSausages. 1pkt"
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("text", [$this, 'parse_template'], ['template' => "TDR {{ordered_by_name}} - Order for {{customer_name}}", 'config' => ['1' => ['non_greedy' => '1']]], "template_data");
+        $action = new FunctionAction("text", [$this, 'parse_template'], ['template' => "Email Subject: TDR {{ordered_by_name}} - Order for {{customer_name}}", 'config' => [['non_greedy' => '0'], ['non_greedy' => '0']]], "template_data");
 
         $action->execute($data);
 
