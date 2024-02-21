@@ -28,7 +28,7 @@ final class TemplateParserService {
      * ]
      * @return array|false
      */
-    public static function parseMessageFromTemplate($message, $template, $matchConfig=[]) {
+    public static function parseMessageFromTemplate($message, $template, $matchConfig=[], $modifiers="i") {
 
         // Step 1: We seek to get template variables. These are within the double curly brackets
         preg_match_all("/({{.*?}})/", $template, $matches);
@@ -56,7 +56,7 @@ final class TemplateParserService {
         }
 
         // Step 3: We seek to find the values from the message by matching to the template pattern.
-        preg_match("/$pattern/", $message, $values);
+        preg_match("/$pattern/$modifiers", $message, $values);
         array_shift($values); // remove the first group which usually captures whole message.
 
         // Step 4: We return the result as an associative array from the variables and the values.
