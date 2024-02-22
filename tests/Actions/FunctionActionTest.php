@@ -1839,4 +1839,37 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function _testMapObjectToArray()
+    {
+        $data = [
+            "items" => [
+                [
+                    "code" => "PC0001", "name" => "chicken chicken", "unit_of_measure" => [['quantity' => 200, 'uom' => 'PCS']]
+                ],
+                [
+                    "code" => "PC0002", "name" => "beef", "unit_of_measure" => [['quantity' => 30, 'uom' => 'PCS']]
+                ]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $args = [
+            'data_path' => "unit_of_measure.0.uom",
+            'value' => "Bales",
+            'valueFromField' => "",
+            'valueMapping' => null,
+            'conditionalValue' => null,
+            'newField'  => ""
+        ];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'set', 'args' => $args, 'newField' => null, 'strict' => 0, 'condition' => null], "new_items");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }

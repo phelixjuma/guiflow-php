@@ -41,7 +41,7 @@ class SetValueAction implements ActionInterface
 
         // Determine the value to map with.
         $valueToSet = $this->value;
-        if ($this->valueFromField !== null) {
+        if (!empty($this->valueFromField)) {
             $valueToSet = PathResolver::getValueByPath($data, $this->valueFromField);
         }
 
