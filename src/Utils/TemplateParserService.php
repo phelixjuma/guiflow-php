@@ -37,7 +37,6 @@ final class TemplateParserService {
 
         // Step 2: We seek to convert the template into a regex pattern. While at it, we set the variables.
         $pattern = $template;
-        self::escapeRegexMetaCharacters($pattern, ['{','}']); // we escape meta characters, except curly brackets
 
         foreach($matches[1] as $key => $match) {
             $regex = '.*';
@@ -56,7 +55,15 @@ final class TemplateParserService {
         }
 
         // Step 3: We seek to find the values from the message by matching to the template pattern.
+        var_dump("$pattern");
+        var_dump("$modifiers");
         preg_match("/$pattern/$modifiers", $message, $values);
+        var_dump($values);
+
+        if (empty($values)) {
+            return null;
+        }
+
         array_shift($values); // remove the first group which usually captures whole message.
 
         // Step 4: We return the result as an associative array from the variables and the values.
