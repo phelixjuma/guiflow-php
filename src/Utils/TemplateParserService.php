@@ -55,10 +55,7 @@ final class TemplateParserService {
         }
 
         // Step 3: We seek to find the values from the message by matching to the template pattern.
-        var_dump("$pattern");
-        var_dump("$modifiers");
         preg_match("/$pattern/$modifiers", $message, $values);
-        var_dump($values);
 
         if (empty($values)) {
             return null;
