@@ -638,6 +638,23 @@ class Utils
         return $data;
     }
 
+    /**
+     * @param $data
+     * @return int
+     */
+    public static function length($data) {
+        if (empty($data)) {
+            return 0;
+        }
+        if (is_string($data)) {
+            return strlen($data);
+        }
+        if (is_array($data)) {
+            return sizeof($data);
+        }
+        return 0;
+    }
+
     private static function recursiveDivide($numbers) {
 
         // Check if the array is empty or has only one element

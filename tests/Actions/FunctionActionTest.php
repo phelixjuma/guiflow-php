@@ -1876,12 +1876,12 @@ class FunctionActionTest extends TestCase
     public function _testStrLen()
     {
         $data = [
-            "cu_invoice_number" => "pl"
+            "cu_invoice_number" => ["0","9"]
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("cu_invoice_number", [$this, 'strlen'], null, 'cu_serial_number_length', 0, null);
+        $action = new FunctionAction("cu_invoice_number", [$this, 'length'], null, 'cu_serial_number_length', 0, null);
 
         $action->execute($data);
 
