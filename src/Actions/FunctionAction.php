@@ -182,7 +182,7 @@ class FunctionAction implements ActionInterface
         } elseif (isset($this->function[1]) && $this->function['1'] == 'basic_arithmetic') {
             $newValue = Utils::basic_arithmetic(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'length') {
-            $newValue = Utils::length(...$paramValues);
+            $newValue = Utils::length($paramValues[0]);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'parse_template') {
             $newValue = TemplateParserService::parseMessageFromTemplate(...$paramValues);
         }
