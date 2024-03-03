@@ -70,7 +70,7 @@ class FunctionAction implements ActionInterface
         // Prepare function parameters:  We set the current values data as the first param
         $paramValues = [$currentValues];
 
-        if (!empty($this->args)) {
+        if (!empty($this->args) && !is_string($this->args)) {
             foreach ($this->args as $param) {
 
                 if ($this->function['1'] != 'join' && $this->function['1'] != 'map') {
