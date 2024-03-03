@@ -45,7 +45,7 @@ class FunctionAction implements ActionInterface
      * @param $strict
      * @param $condition
      */
-    public function __construct(string $path, $function, array $args, $newField = null, $strict = 0, $condition=null)
+    public function __construct(string $path, $function, array|null $args, $newField = null, $strict = 0, $condition=null)
     {
         $this->path = $path;
         $this->function = $function;
@@ -70,21 +70,23 @@ class FunctionAction implements ActionInterface
         // Prepare function parameters:  We set the current values data as the first param
         $paramValues = [$currentValues];
 
-        foreach ($this->args as $param) {
+        if (!empty($this->args)) {
+            foreach ($this->args as $param) {
 
-            if ($this->function['1'] != 'join' && $this->function['1'] != 'map') {
+                if ($this->function['1'] != 'join' && $this->function['1'] != 'map') {
 
-                if (is_array($param) && isset($param['path'])) {
+                    if (is_array($param) && isset($param['path'])) {
 
-                    $paramPath = $param['path'];
-                    $paramValue = PathResolver::getValueByPath($data, $paramPath);
-                    $paramValues[] = $paramValue;
+                        $paramPath = $param['path'];
+                        $paramValue = PathResolver::getValueByPath($data, $paramPath);
+                        $paramValues[] = $paramValue;
 
+                    } else {
+                        $paramValues[] = self::getFilterCriteria($data, $param);
+                    }
                 } else {
-                    $paramValues[] = self::getFilterCriteria($data, $param);
+                    $paramValues[] = $param;
                 }
-            } else {
-                $paramValues[] = $param;
             }
         }
 
@@ -184,6 +186,7 @@ class FunctionAction implements ActionInterface
         }
         elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
             if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {
+                print_r($paramValues);
                 $newValue = $this->function['1'](...$paramValues);
             } else {
                 $newValue = "";

@@ -1872,4 +1872,21 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function _testStrLen()
+    {
+        $data = [
+            "cu_invoice_number" => "pl"
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("cu_invoice_number", [$this, 'strlen'], null, 'cu_serial_number_length', 0, null);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }
