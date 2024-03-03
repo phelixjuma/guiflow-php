@@ -149,7 +149,7 @@
             "args": {
               "type": [
                 "object",
-                "string",
+                "array",
                 "null"
               ],
               "description": "An object that specifies the arguments for the operation. This is optional and is only used for 'function' and 'customFunction' actions."
