@@ -147,7 +147,10 @@
               "description": "Allows us to set a value based on a given condition being passed"
             },
             "args": {
-              "type": "object",
+              "type": [
+                "object",
+                "null"
+              ],
               "description": "An object that specifies the arguments for the operation. This is optional and is only used for 'function' and 'customFunction' actions."
             },
             "newField": {
