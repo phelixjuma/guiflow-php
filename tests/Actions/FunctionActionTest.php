@@ -1889,4 +1889,30 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function _testConditionalAppend()
+    {
+        $data = [
+            "items" => [
+                ["description" => "Assorted 1kg", "pack" => "Pack: 1 x 1"],
+                ["description" => "Smoked sausage", "pack" => "Pack: 1 x 1"]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $condition = [
+            "operator" => "not matches",
+            "path" => "description",
+            "value" => "\d+\s*(?:G|GM|GMS|KG|KGS|PC|PCS)"
+        ];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'append', 'args' => ['stringsToAppend' => ["[",["path" => "pack"],"]"], "seperator" => "", "useDataAsPathValue" => false, 'valueKey' => "description"], 'newField' => '', 'strict' => 0 ,'condition' => $condition], '', 0, null);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }

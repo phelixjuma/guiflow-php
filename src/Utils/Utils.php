@@ -96,13 +96,15 @@ class Utils
         return $data;
     }
 
-    public static function append($data, $stringsToAppend, $separator = " ", $useDataAsPathValue = true, $valueKey=null, $condition = null)
+    public static function append($data, $dataToAdd, $separator = " ", $useDataAsPathValue = true, $valueKey=null, $condition = null)
     {
+
+        $stringsToAppend = self::getValues($data, $dataToAdd);
 
         $modifiedSeparator = " $separator ";
         $strings = implode($modifiedSeparator, $stringsToAppend);
 
-        // If the data is an array, apply prepend recursively to each element
+        // If the data is an array, apply append recursively to each element
         if (is_array($data) && !self::isObject($data)) {
             foreach ($data as $key => $value) {
                 $data[$key] = self::append($value, $stringsToAppend, $modifiedSeparator, $useDataAsPathValue, $valueKey, $condition);
@@ -111,7 +113,7 @@ class Utils
             return $data;
         }
 
-        // If it's not an array, apply the prepend logic to the string
+        // If it's not an array, apply the append logic to the string
         if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, $useDataAsPathValue)) {
 
             if (self::isObject($data) && !empty($valueKey)) {
