@@ -14,6 +14,7 @@ class UnitConverter
      * @param $quantity
      * @param $from_unit
      * @param $to_unit
+     * @param $invertFactor
      * @return mixed
      */
     public static function convert($conversionTable, $quantity, $from_unit, $to_unit, $invertFactor=false): mixed
