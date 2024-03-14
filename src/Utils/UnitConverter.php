@@ -28,7 +28,7 @@ class UnitConverter
             if ($conversion['from'] == $from_unit && $conversion['to'] == $to_unit) {
 
                 $factor = 1;
-                if (!empty($conversion['factor']) && $conversion['factor'] > 1) {
+                if (!empty($conversion['factor']) && $conversion['factor'] > 0) {
                     $factor = floatval($conversion['factor']);
                     if ($invertFactor) {
                         $factor = 1/$factor;
@@ -45,7 +45,7 @@ class UnitConverter
             if ($conversion['from'] == $to_unit && $conversion['to'] == $from_unit) {
 
                 $factor = 1;
-                if (!empty($conversion['factor']) && $conversion['factor'] > 1) {
+                if (!empty($conversion['factor']) && $conversion['factor'] > 0) {
                     $factor = floatval($conversion['factor']);
                     if ($invertFactor) {
                         $factor = 1/$factor;
@@ -68,7 +68,7 @@ class UnitConverter
      * @param $outputPath
      * @return array
      */
-    public static function convert_multiple($data, $items, $conversionTable, $quantity, $fromUnit, $toUnit, $outputPath): array
+    public static function convert_multiple($data, $items, $conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor, $outputPath): array
     {
         if (isset($conversionTable['path'])) {
             $conversionTable = PathResolver::getValueByPath($data, $conversionTable['path']);
@@ -76,14 +76,14 @@ class UnitConverter
 
         $items = isset($items['path']) ? PathResolver::getValueByPath($data, $items['path']) : $items;
 
-        array_walk($items, function (&$item, $key) use($conversionTable, $quantity, $fromUnit, $toUnit, $outputPath) {
+        array_walk($items, function (&$item, $key) use($conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor, $outputPath) {
 
             $conversionTable = isset($conversionTable['in_item_path']) ? PathResolver::getValueByPath($item, $conversionTable['in_item_path']) : $conversionTable;
             $quantity = isset($quantity['in_item_path']) ? PathResolver::getValueByPath($item, $quantity['in_item_path']) : $quantity;
             $fromUnit = isset($fromUnit['in_item_path']) ? PathResolver::getValueByPath($item, $fromUnit['in_item_path']) : $fromUnit;
             $toUnit = isset($toUnit['in_item_path']) ? PathResolver::getValueByPath($item, $toUnit['in_item_path']) : $toUnit;
 
-            $convertedQuantity = self::convert($conversionTable, $quantity, $fromUnit, $toUnit);
+            $convertedQuantity = self::convert($conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor);
 
             PathResolver::setValueByPath($item,  $outputPath, [
                 "original_value" => $quantity,
