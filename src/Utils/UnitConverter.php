@@ -16,7 +16,7 @@ class UnitConverter
      * @param $to_unit
      * @return mixed
      */
-    public static function convert($conversionTable, $quantity, $from_unit, $to_unit): mixed
+    public static function convert($conversionTable, $quantity, $from_unit, $to_unit, $invertFactor=false): mixed
     {
         if (empty($quantity)) {
             return $quantity;
@@ -30,6 +30,9 @@ class UnitConverter
                 $factor = 1;
                 if (!empty($conversion['factor']) && $conversion['factor'] > 1) {
                     $factor = floatval($conversion['factor']);
+                    if ($invertFactor) {
+                        $factor = 1/$factor;
+                    }
                 }
 
                 return ceil($quantity * $factor);
@@ -44,6 +47,9 @@ class UnitConverter
                 $factor = 1;
                 if (!empty($conversion['factor']) && $conversion['factor'] > 1) {
                     $factor = floatval($conversion['factor']);
+                    if ($invertFactor) {
+                        $factor = 1/$factor;
+                    }
                 }
 
                 return ceil($quantity / $factor);
