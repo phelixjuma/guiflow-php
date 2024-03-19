@@ -32,17 +32,48 @@ class Filter
     }
 
     /**
+     * @param $data
+     * @param $pattern
+     * @return void
+     */
+    private static function excludePatternFromData(&$data, $pattern) {
+
+        if (!is_array($data)) {
+            $data = preg_replace("/$pattern/i", '', $data);
+
+            // Trim and remove multiple spaces to clean up the result
+            $data = preg_replace('/\s+/', ' ', trim($data));
+
+        } else {
+            array_walk($data, function (&$v, $k) use($pattern) {
+                self::excludePatternFromData($v, $pattern);
+            }) ;
+        }
+    }
+
+    /**
      * @param $value
      * @param $term
      * @param $mode
      * @param int $similarityThreshold
+     * @param $termExclusionPattern
+     * @param $valueExclusionPattern
      * @return bool|int
      */
-    private static function matchValueAgainstFilter($value, $term, $mode, int $similarityThreshold=self::DEFAULT_THRESHOLD): bool|int
+    private static function matchValueAgainstFilter($value, $term, $mode, int $similarityThreshold=self::DEFAULT_THRESHOLD, $termExclusionPattern = null, $valueExclusionPattern=null): bool|int
     {
 
         $term = is_array($term) ? array_map('strtolower', $term) : strtolower($term);
         $value = strtolower($value);
+
+        // if exclusion pattern is set, we clean the term and value using the pattern.
+        if (!empty($termExclusionPattern)) {
+            self::excludePatternFromData($term, $termExclusionPattern);
+        }
+        if (!empty($valueExclusionPattern)) {
+            self::excludePatternFromData($value, $valueExclusionPattern);
+        }
+
         $fuzz = new Fuzz();
 
         return match ($mode) {
@@ -85,7 +116,9 @@ class Filter
             return self::matchValueAgainstFilter($value,
                 $filters['term'],
                 $filters['mode'] ?? self::CONTAINS,
-                $filters['threshold'] ?? self::DEFAULT_THRESHOLD);
+                $filters['threshold'] ?? self::DEFAULT_THRESHOLD,
+            $filters['term_exclusion_pattern'] ?? null,
+            $filters['value_exclusion_pattern'] ?? null);
         }
 
         // composite conditions

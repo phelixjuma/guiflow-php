@@ -1915,4 +1915,34 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function _testFilterInArray()
+    {
+        $data = [
+            "items" => [
+                ["description" => "Assorted 1kg", "pack" => "Pack: 1 x 1", "products"  => [
+                    ["description" => "Assorted pack 1kg", "pack" => "Pack: 1 x 1"],
+                    ["description" => "Assorted pack 10kg", "pack" => "Pack: 1 x 1"],
+                    ["description" => "Smoked chicken sausage", "pack" => "Pack: 1 x 1"],
+                    ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1"]
+                ]],
+                ["description" => "Smoked sausage", "pack" => "Pack: 1 x 1", "products"  => [
+                    ["description" => "Assorted pack 1kg", "pack" => "Pack: 1 x 1"],
+                    ["description" => "Assorted pack 10kg", "pack" => "Pack: 1 x 1"],
+                    ["description" => "Smoked chicken sausage", "pack" => "Pack: 1 x 1"],
+                    ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1"]
+                ]]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'products', 'function' => 'filter', 'args' => ["filter_criteria" => ['term' => ["path" => "description"], "mode" => "similar_to", "key" => "description", 'threshold' => "100"]], 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }

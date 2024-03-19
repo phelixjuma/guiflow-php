@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e9d9e64e1b500e78543cbd1a03c924eb",
+    "content-hash": "5d870f5f65098cf1be068e8eb2591e12",
     "packages": [
         {
             "name": "erdalceylan/array-join",
@@ -1952,7 +1952,8 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-openssl": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"
