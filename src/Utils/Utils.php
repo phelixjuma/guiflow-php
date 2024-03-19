@@ -796,10 +796,6 @@ class Utils
      */
     public static function fuzzy_extract_n($data, $query, $choices, $searchKey, $n=10, $order='desc', $fuzzyMethod = 'tokenSetRatio') {
 
-        print_r($query);
-        print_r($choices);
-        print_r($searchKey);
-
         $fuzz = new Fuzz();
 
         if (!empty($query) && !empty($choices)) {
