@@ -55,9 +55,6 @@ class FunctionAction implements ActionInterface
         $this->condition = $condition;
         $this->targetPath = !empty($this->newField) ? $this->newField : $this->path;
 
-        print "\nFunction:\n";
-        print_r($this->function);
-
     }
 
     /**
@@ -107,6 +104,12 @@ class FunctionAction implements ActionInterface
         } elseif (isset($this->function[1]) && $this->function['1'] == 'map') {
 
             list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
+
+            if (method_exists($this->function[0], $function) ) {
+                print "\nFunction $function exists externally\n";
+            } else {
+                print "\nFunction $function does not exist externally\n";
+            }
 
             array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
                 (new FunctionAction($path, [$this, $function], $args, $newField, $strict, $condition))->execute($value);
@@ -192,7 +195,6 @@ class FunctionAction implements ActionInterface
         }
         elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
             if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {
-                print_r($paramValues);
                 $newValue = $this->function['1'](...$paramValues);
             } else {
                 $newValue = "";
