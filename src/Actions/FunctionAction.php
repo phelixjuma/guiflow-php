@@ -106,13 +106,15 @@ class FunctionAction implements ActionInterface
             list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
 
             if (method_exists($this->function[0], $function) ) {
-                print "\nFunction $function exists externally\n";
+                $function = [$this->function[0], $function];
+                //print "\nFunction $function exists externally\n";
             } else {
-                print "\nFunction $function does not exist externally\n";
+                $function = [$this, $function];
+                //print "\nFunction $function does not exist externally\n";
             }
 
             array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
-                (new FunctionAction($path, [$this, $function], $args, $newField, $strict, $condition))->execute($value);
+                (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
             });
             $newValue = $currentData;
 
