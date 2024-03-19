@@ -54,6 +54,10 @@ class FunctionAction implements ActionInterface
         $this->strict = $strict != 0;
         $this->condition = $condition;
         $this->targetPath = !empty($this->newField) ? $this->newField : $this->path;
+
+        print "\nFunction:\n";
+        print_r($this->function);
+
     }
 
     /**
@@ -103,7 +107,6 @@ class FunctionAction implements ActionInterface
         } elseif (isset($this->function[1]) && $this->function['1'] == 'map') {
 
             list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
-            print_r($paramValues);
 
             array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
                 (new FunctionAction($path, [$this, $function], $args, $newField, $strict, $condition))->execute($value);
