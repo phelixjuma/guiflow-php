@@ -1945,4 +1945,34 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function _testFuzzyExtractTopN()
+    {
+        $data = [
+            "items" => [
+                ["description" => "AQuangel 100ml x 24 x 100ml [24 x 100]", "pack" => "Pack: 1 x 1", "products"  => [
+                    ["description" => "Cotaf 100ml", "pack" => "Pack: 1 x 1"],
+                    ["description" => "Aquawett-100ML", "pack" => "Pack: 1 x 1"],
+                    ["description" => "PEARL x 24 x 100ml [24 x 100]", "pack" => "Pack: 1 x 1"],
+                    ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1"]
+                ]],
+                ["description" => "Smoked sausage", "pack" => "Pack: 1 x 1", "products"  => [
+                    ["description" => "Assorted pack 1kg", "pack" => "Pack: 1 x 1"],
+                    ["description" => "Assorted pack 10kg", "pack" => "Pack: 1 x 1"],
+                    ["description" => "Smoked chicken sausage", "pack" => "Pack: 1 x 1"],
+                    ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1"]
+                ]]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => ["query" => ["path" => "description"], "choices" => ["path" => "products"],"searchKey" => "description", "n" => "2"], 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }

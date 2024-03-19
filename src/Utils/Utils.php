@@ -630,6 +630,13 @@ class Utils
                 }
                 return $difference;
             }
+            // similarity score
+            if ($operator == 'similarity_score') {
+
+                $fuzz = new Fuzz();
+
+                return $fuzz->tokenSetRatio($operandValues[0], $operandValues[1]);
+            }
 
         } else {
 
@@ -775,6 +782,38 @@ class Utils
             $response = array_values($extracted);
 
             return !$isList ? $response[0] : $response;
+        }
+        return null;
+    }
+
+    /**
+     * @param $query
+     * @param $choices
+     * @param $searchKey
+     * @param $topN
+     * @param $fuzzyMethod
+     * @return mixed|null
+     */
+    public static function fuzzy_extract_n($data, $query, $choices, $searchKey, $n=10, $order='desc', $fuzzyMethod = 'tokenSetRatio') {
+
+        print_r($query);
+        print_r($choices);
+        print_r($searchKey);
+
+        $fuzz = new Fuzz();
+
+        if (!empty($query) && !empty($choices)) {
+
+            // We add similarity score
+            foreach ($choices as $key => &$choice) {
+                $choice['similarity'] = $fuzz->$fuzzyMethod($query, $choice[$searchKey]);
+            }
+
+            // We sort in descending order
+            $sortedData = self::sortMultiAssocArrayByKey($choices, 'similarity', $order);
+
+            // We get the top n
+            return array_slice($sortedData, 0, $n, true);
         }
         return null;
     }

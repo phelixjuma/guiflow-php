@@ -134,6 +134,8 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::format_date(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_extract_one') {
             $newValue = Utils::fuzzy_extract_one(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_extract_n') {
+            $newValue = Utils::fuzzy_extract_n(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'regex_extract') {
             $newValue = Utils::regex_extract(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'transform') {
