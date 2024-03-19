@@ -107,10 +107,8 @@ class FunctionAction implements ActionInterface
 
             if (method_exists($this->function[0], $function) ) {
                 $function = [$this->function[0], $function];
-                //print "\nFunction $function exists externally\n";
             } else {
                 $function = [$this, $function];
-                //print "\nFunction $function does not exist externally\n";
             }
 
             array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
