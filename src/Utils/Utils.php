@@ -118,14 +118,18 @@ class Utils
 
             if (self::isObject($data) && !empty($valueKey)) {
 
-                $firstData = is_string($data[$valueKey]) ? $data[$valueKey] : "";
-
-                $data[$valueKey] = self::removeExtraSpaces($firstData . $modifiedSeparator . $strings);
-
+                if (is_string($data[$valueKey])) {
+                    $data[$valueKey] = self::removeExtraSpaces($data[$valueKey] . $modifiedSeparator . $strings);
+                } else {
+                    $data[$valueKey] = self::removeExtraSpaces($strings);
+                }
                 return $data;
             }
-            $firstData = is_string($data) ? $data : "";
-            return self::removeExtraSpaces($firstData . $modifiedSeparator . $strings);
+            if (is_string($data)) {
+                return self::removeExtraSpaces($data . $modifiedSeparator . $strings);
+            } else {
+                return self::removeExtraSpaces($strings);
+            }
         }
 
         return $data;
