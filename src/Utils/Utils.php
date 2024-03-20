@@ -140,6 +140,7 @@ class Utils
      * @return string
      */
     private static function enclose($string, $enclosure) {
+        $string = trim($string);
         return match ($enclosure) {
             'brackets' => "($string)",
             'square brackets' => "[$string]",
