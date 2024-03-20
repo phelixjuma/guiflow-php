@@ -101,7 +101,7 @@ class Utils
 
         $stringsToAppend = self::getValues($data, $dataToAdd);
 
-        $modifiedSeparator = $separator == "-" ? " $separator " : $separator;
+        $modifiedSeparator = " $separator ";
         $strings = implode($modifiedSeparator, $stringsToAppend);
 
         // If the data is an array, apply append recursively to each element
@@ -831,7 +831,10 @@ class Utils
      */
     public static function removeExtraSpaces($text) {
         if (!is_null($text)) {
-            return preg_replace('/\s+/', ' ', trim($text));
+            // remove extra spaces
+            $text = preg_replace('/\s+/', ' ', trim($text));
+            // remove spaces around words inside enclosers
+            return preg_replace('/([\(\[\{])\s*(.*?)\s*([\)\]\}])/i', '$1$2$3', $text);
         }
         return $text;
     }
