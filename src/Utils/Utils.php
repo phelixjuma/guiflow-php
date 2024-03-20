@@ -131,11 +131,7 @@ class Utils
                 return self::removeExtraSpaces($strings);
             }
         }
-
-        if (!empty($valueKey)) {
-            return $data[$valueKey];
-        }
-        return is_string($data) ? $data : null;
+        return $data;
     }
 
     /**
