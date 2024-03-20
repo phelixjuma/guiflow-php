@@ -132,7 +132,7 @@ class Utils
             }
         }
 
-        return $data;
+        return is_string($data) ? $data : null;
     }
 
     /**
