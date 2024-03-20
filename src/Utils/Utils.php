@@ -101,7 +101,7 @@ class Utils
 
         $stringsToAppend = self::getValues($data, $dataToAdd);
 
-        $modifiedSeparator = " $separator ";
+        $modifiedSeparator = $separator == "-" ? " $separator " : $separator;
         $strings = implode($modifiedSeparator, $stringsToAppend);
 
         // If the data is an array, apply append recursively to each element
