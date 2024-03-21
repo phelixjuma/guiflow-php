@@ -23,10 +23,13 @@ class UnitConverter
             return $quantity;
         }
 
+        $from_unit = strtolower($from_unit);
+        $to_unit = strtolower($to_unit);
+
         // Direct conversion
         foreach ($conversionTable as $conversion) {
 
-            if ($conversion['from'] == $from_unit && $conversion['to'] == $to_unit) {
+            if (strtolower($conversion['from']) == $from_unit && strtolower($conversion['to']) == $to_unit) {
 
                 $factor = 1;
                 if (!empty($conversion['factor']) && $conversion['factor'] > 0) {
@@ -43,7 +46,7 @@ class UnitConverter
         // Inverse conversion
         foreach ($conversionTable as $conversion) {
 
-            if ($conversion['from'] == $to_unit && $conversion['to'] == $from_unit) {
+            if (strtolower($conversion['from']) == $to_unit && strtolower($conversion['to']) == $from_unit) {
 
                 $factor = 1;
                 if (!empty($conversion['factor']) && $conversion['factor'] > 0) {
