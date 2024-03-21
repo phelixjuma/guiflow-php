@@ -178,6 +178,8 @@ class FunctionAction implements ActionInterface
             $newValue = UnitConverter::convert(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit_multi') {
             $newValue = UnitConverter::convert_multiple(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'get_metric_conversion_table') {
+            $newValue = UnitConverter::get_metric_conversion_table();
         } elseif (isset($this->function[1]) && $this->function['1'] == 'model_mapping') {
             $newValue = ModelMapper::transform(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'make_object_list_unique') {

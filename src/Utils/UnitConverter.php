@@ -95,6 +95,32 @@ class UnitConverter
 
         return $items;
     }
+
+    /**
+     * @return array[]
+     */
+    public static function get_metric_conversion_table(): array
+    {
+        return [
+            // length
+            ["from" => "mm", "to" => "m", "factor" => 0.001],
+            ["from" => "cm", "to" => "m", "factor" => 0.01],
+            ["from" => "dm", "to" => "m", "factor" => 0.1],
+            ["from" => "m", "to" => "m", "factor" => 1],
+            ["from" => "km", "to" => "m", "factor" => 1000],
+
+            // mass
+            ["from" => "mg", "to" => "g", "factor" => 0.001],
+            ["from" => "g", "to" => "g", "factor" => 1],
+            ["from" => "kg", "to" => "g", "factor" => 1000],
+
+            // Volume
+            ["from" => "ml", "to" => "l", "factor" => 0.001],
+            ["from" => "cl", "to" => "l", "factor" => 0.01],
+            ["from" => "l", "to" => "l", "factor" => 1],
+
+        ];
+    }
 }
 
 
