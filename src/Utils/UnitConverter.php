@@ -93,7 +93,7 @@ class UnitConverter
                 "original_value"    => $quantity,
                 "original_unit"     => $fromUnit,
                 "converted_value"   => $convertedQuantity,
-                "converted_unit"    => $convertedQuantity == $quantity ? $fromUnit : $toUnit
+                "converted_unit"    => $toUnit
             ]);
 
         });
