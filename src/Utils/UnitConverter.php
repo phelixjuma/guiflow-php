@@ -19,12 +19,20 @@ class UnitConverter
      */
     public static function convert($conversionTable, $quantity, $from_unit, $to_unit, $invertFactor=false): mixed
     {
-        if (empty($quantity)) {
-            return $quantity;
-        }
 
         $from_unit = strtolower($from_unit);
         $to_unit = strtolower($to_unit);
+
+        $response = [
+            "original_value"    => $quantity,
+            "original_unit"     => $from_unit,
+            "converted_value"   => $quantity,
+            "converted_unit"    => $from_unit
+        ];
+
+        if (empty($quantity)) {
+            return $response;
+        }
 
         // Direct conversion
         foreach ($conversionTable as $conversion) {
@@ -39,7 +47,8 @@ class UnitConverter
                     }
                 }
 
-                return ceil($quantity * $factor);
+                $response['converted_value'] = ceil($quantity * $factor);
+                $response['converted_unit'] = $to_unit;
             }
         }
 
@@ -56,10 +65,11 @@ class UnitConverter
                     }
                 }
 
-                return ceil($quantity / $factor);
+                $response['converted_value'] = ceil($quantity / $factor);
+                $response['converted_unit'] = $to_unit;
             }
         }
-        return $quantity;
+        return $response;
     }
 
     /**
@@ -87,14 +97,9 @@ class UnitConverter
             $fromUnit = isset($fromUnit['in_item_path']) ? PathResolver::getValueByPath($item, $fromUnit['in_item_path']) : $fromUnit;
             $toUnit = isset($toUnit['in_item_path']) ? PathResolver::getValueByPath($item, $toUnit['in_item_path']) : $toUnit;
 
-            $convertedQuantity = self::convert($conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor);
+            $conversionResponse = self::convert($conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor);
 
-            PathResolver::setValueByPath($item,  $outputPath, [
-                "original_value"    => $quantity,
-                "original_unit"     => $fromUnit,
-                "converted_value"   => $convertedQuantity,
-                "converted_unit"    => $toUnit
-            ]);
+            PathResolver::setValueByPath($item,  $outputPath, $conversionResponse);
 
         });
 
