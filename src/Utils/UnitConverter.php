@@ -90,8 +90,10 @@ class UnitConverter
             $convertedQuantity = self::convert($conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor);
 
             PathResolver::setValueByPath($item,  $outputPath, [
-                "original_value" => $quantity,
-                "converted_value" => $convertedQuantity
+                "original_value"    => $quantity,
+                "original_unit"     => $fromUnit,
+                "converted_value"   => $convertedQuantity,
+                "converted_unit"    => $toUnit
             ]);
 
         });
