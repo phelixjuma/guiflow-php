@@ -10,7 +10,7 @@
     "wyndow/fuzzywuzzy": "^0.6.0",
     "erdalceylan/array-join": "^2.1",
     "ext-openssl": "*",
-    "jumaphelix/php-dag": "^1.0"
+    "jumaphelix/php-dag": "^1.1"
   },
   "scripts": {
     "test": "vendor/bin/phpunit"
