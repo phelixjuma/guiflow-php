@@ -57,16 +57,16 @@
         },
         {
             "name": "jumaphelix/php-dag",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jumaphelix/php-dag.git",
-                "reference": "731f68238a9157264f53fd0e6dd87b323027bcd6"
+                "reference": "0991728bb796889c3d8052e17438e24572a82ac8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jumaphelix/php-dag/zipball/731f68238a9157264f53fd0e6dd87b323027bcd6",
-                "reference": "731f68238a9157264f53fd0e6dd87b323027bcd6",
+                "url": "https://api.github.com/repos/jumaphelix/php-dag/zipball/0991728bb796889c3d8052e17438e24572a82ac8",
+                "reference": "0991728bb796889c3d8052e17438e24572a82ac8",
                 "shasum": ""
             },
             "require": {
@@ -95,9 +95,9 @@
             "description": "Implementation of Directed Acyclic Graphs (DAG) based task executions with parallelization in PHP",
             "support": {
                 "issues": "https://github.com/jumaphelix/php-dag/issues",
-                "source": "https://github.com/jumaphelix/php-dag/tree/v1.0.2"
+                "source": "https://github.com/jumaphelix/php-dag/tree/v1.0.3"
             },
-            "time": "2024-03-31T06:26:45+00:00"
+            "time": "2024-03-31T09:54:35+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
