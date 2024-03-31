@@ -39,7 +39,8 @@ class DataTransformerTest extends TestCase
         $dataTransformer = new DataTransformer($config, $this);
         $dataTransformer->transform($data, true);
 
-        //print_r($dataTransformer->workflowExecutor->getResults()[0]->getExecutionTime());
+        print "\nExecution Time:\n";
+        print_r($dataTransformer->workflowExecutor->getResults()[0]->getExecutionTime());
 
         //print "\nAfter\n";
         //print(json_encode($data));
