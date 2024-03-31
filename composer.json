@@ -9,7 +9,8 @@
     "justinrainbow/json-schema": "^5.2",
     "wyndow/fuzzywuzzy": "^0.6.0",
     "erdalceylan/array-join": "^2.1",
-    "ext-openssl": "*"
+    "ext-openssl": "*",
+    "jumaphelix/php-dag": "^1.0"
   },
   "scripts": {
     "test": "vendor/bin/phpunit"

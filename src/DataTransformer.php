@@ -2,6 +2,10 @@
 
 namespace PhelixJuma\DataTransformer;
 
+use JumaPhelix\DAG\DAG;
+use JumaPhelix\DAG\SharedDataManager;
+use JumaPhelix\DAG\Task;
+use JumaPhelix\DAG\TaskExecutor;
 use PhelixJuma\DataTransformer\Actions\AddAction;
 use PhelixJuma\DataTransformer\Actions\DeleteValueAction;
 use PhelixJuma\DataTransformer\Actions\DivideAction;
@@ -21,6 +25,18 @@ class DataTransformer
     private object $functionsClass;
     //private PathResolver $pathResolver;
 
+    private $taskResults = [];
+
+    /**
+     * @var DAG
+     */
+    public DAG $workflowDAG;
+
+    /**
+     * @var TaskExecutor
+     */
+    public TaskExecutor $workflowExecutor;
+
 
     public function __construct(array $config, object $functionsClass)
     {
@@ -35,7 +51,7 @@ class DataTransformer
      * @param $data
      * @return void
      */
-    public function transform(&$data) {
+    public function transform(&$data, $parallelize = false) {
 
         $dataCopy = $data;
         $data = [];
@@ -44,7 +60,7 @@ class DataTransformer
             if (self::isObject($dataCopy)) {
 
                 // For an object, we transform it
-                $this->transformObject($dataCopy);
+                $this->transformObject($dataCopy, $parallelize);
 
                 // Set the response into data: checking if the response has been split or not.
                 if (self::isObject($dataCopy)) {
@@ -57,7 +73,7 @@ class DataTransformer
                 // it's an array, we loop
                 foreach ($dataCopy as $item) {
 
-                    $this->transformObject($item);
+                    $this->transformObject($item, $parallelize);
 
                     // Set the response into data: checking if the response has been split or not.
                     if (self::isObject($item)) {
@@ -76,9 +92,22 @@ class DataTransformer
 
     /**
      * @param $data
+     * @param $isParallel
      * @return void
      */
-    private function transformObject(&$data): void
+    private function transformObject(&$data, $isParallel = false) {
+        if ($isParallel) {
+            $this->transformObjectParallel($data);
+        } else {
+            $this->transformObjectSerial($data);
+        }
+    }
+
+    /**
+     * @param $data
+     * @return void
+     */
+    private function transformObjectSerial(&$data): void
     {
 
         try {
@@ -119,6 +148,134 @@ class DataTransformer
                 } catch (\Exception|\Throwable $e ) {
                 }
             }
+
+        } catch (\Exception|\Throwable $e ) {
+        }
+    }
+
+    private function transformObjectParallel(&$inputData): void
+    {
+
+        try {
+
+            $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
+
+            $workflowDAG = new DAG();
+            $dataManager = new SharedDataManager($inputData);
+
+            //print "\nStarting data:\n";
+            //print_r($inputData);
+
+            foreach ($config as $index => $rule) {
+
+                $skip = $rule['skip'] ?? 0;
+                $ruleStage = "rule_" . (!empty($rule['stage']) ? $rule['stage'] : $index);
+                $ruleDependencies = $rule['dependencies'] ?? [];
+                $condition = $rule['condition'];
+                $actions = $rule['actions'];
+
+                // Define the rule task, which is to evaluate its condition.
+                $ruleTask = new Task($ruleStage, function() use ($ruleStage, $dataManager, $skip, $condition) {
+
+                    // Evaluate the rule's condition to determine if actions should be skipped
+                    //print "\nRunning rule task $ruleStage\n";
+                    $isSkipped = $skip == 1 || !self::evaluateCondition($dataManager->getData(), $condition);
+
+                    //print "\nCompleted rule $ruleStage; skip is $skip. Response is ".json_encode($isSkipped). "\n";
+
+                    return ['isSkipped' => $isSkipped];
+                });
+
+                // Add the rule task to the workflow.
+                $workflowDAG->addTask($ruleTask);
+
+                // Add the actions
+                foreach ($actions as $actionIndex => $action) {
+
+                    $actionStage = "action_" . ( !empty($action['stage']) ? $action['stage'] : $actionIndex);
+                    $actionDependencies = $action['dependencies'] ?? [];
+                    $skipAction = $action['skip'] ?? 0;
+
+                    $actionTask = new Task($actionStage, function($parentResults) use ($dataManager,$actionStage, $action, $skipAction) {
+
+                        //print "\nRunning action task $actionStage\n";
+
+                        $shouldSkipRule = array_reduce($parentResults, function($carry, $result) {
+                            return $carry || (isset($result['isSkipped']) && $result['isSkipped']);
+                        }, false);
+
+                        //print "\nRule skipping is ".json_encode($shouldSkipRule).". Action skipping is ".json_encode($skipAction). "\n";
+
+                        $dataToUse = $dataManager->getData();
+
+                        if (!$shouldSkipRule && !$skipAction) {
+
+                            // Execute the action logic here if the rule was not skipped
+                            if (self::isObject($dataToUse)) {
+                                $this->executeAction($dataToUse, $action);
+                            } else {
+                                array_walk($dataToUse, function (&$value, $key) use($action) {
+                                    $this->executeAction($value, $action);
+                                });
+                            }
+
+                            // We modify the data manager data
+                            $dataManager->modifyData(function($data) use($dataToUse) {
+                                return $dataToUse;
+                            });
+
+                        }
+                        return $dataToUse;
+                    });
+
+                    // Add the action to the workflow
+                    $workflowDAG->addTask($actionTask);
+                    // We add the rule as a dependency to this action.
+                    $workflowDAG->addParent($actionStage, $ruleStage);
+
+                    // Add Action Task dependencies
+                    if (!empty($actionDependencies)) {
+                        foreach ($actionDependencies as $actionDependency) {
+                            $workflowDAG->addParent($actionStage, "action_$actionDependency");
+                        }
+                    }
+                }
+
+                // Add Rule Task dependencies
+                if (!empty($ruleDependencies)) {
+                    foreach ($ruleDependencies as $dependency) {
+                        $workflowDAG->addParent($ruleStage, "action_$dependency");
+                    }
+                }
+            }
+
+            //print "\nTasks:\n";
+            //print_r($workflowDAG->visualize());
+
+            // Initialize the task executor
+            $executor = new TaskExecutor($workflowDAG);
+            $executor->execute();
+
+            $this->workflowDAG = $workflowDAG;
+            $this->workflowExecutor = $executor;
+
+            //$executionTime = $executor->getExecutionTime();
+            //print "\nAll tasks executed in  $executionTime seconds\n";
+
+            //$taskResults = $executor->getTaskResults();
+            //$allResults = $executor->getResults();
+            //$lastResult = $executor->getFinalResult();
+
+            //print "\nAll Results\n";
+            //print_r($allResults[0]->getStatus());
+
+            //print "\nFinal Result\n";
+            //print_r($lastResult->getExecutionTime());
+
+            //print "\nShared Data\n";
+            //print_r($dataManager->getData());
+
+            //print "\nAll tasks completed in {$executor->getExecutionTime()} seconds \n";
 
         } catch (\Exception|\Throwable $e ) {
         }

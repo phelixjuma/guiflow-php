@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5d870f5f65098cf1be068e8eb2591e12",
+    "content-hash": "be0ed06d1274865edfa2fb72c3ce521f",
     "packages": [
         {
             "name": "erdalceylan/array-join",
@@ -54,6 +54,50 @@
                 "source": "https://github.com/erdalceylan/array-join/tree/2.1.0"
             },
             "time": "2020-01-08T07:13:42+00:00"
+        },
+        {
+            "name": "jumaphelix/php-dag",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jumaphelix/php-dag.git",
+                "reference": "731f68238a9157264f53fd0e6dd87b323027bcd6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jumaphelix/php-dag/zipball/731f68238a9157264f53fd0e6dd87b323027bcd6",
+                "reference": "731f68238a9157264f53fd0e6dd87b323027bcd6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-swoole": "*",
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "JumaPhelix\\DAG\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Phelix Juma",
+                    "email": "jumaphelix@gmail.com"
+                }
+            ],
+            "description": "Implementation of Directed Acyclic Graphs (DAG) based task executions with parallelization in PHP",
+            "support": {
+                "issues": "https://github.com/jumaphelix/php-dag/issues",
+                "source": "https://github.com/jumaphelix/php-dag/tree/v1.0.2"
+            },
+            "time": "2024-03-31T06:26:45+00:00"
         },
         {
             "name": "justinrainbow/json-schema",

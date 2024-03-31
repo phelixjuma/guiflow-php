@@ -12,6 +12,14 @@
         "type": "string",
         "description": "A string that represents the description of the rule."
       },
+      "stage": {
+        "type": "string",
+        "description": "Defines a unique identifier for this stage"
+      },
+      "dependencies": {
+        "type": "array",
+        "description": "A list of stages that this specific stage depends on ie its parents that must be executed first before it gets executed"
+      },
       "skip": {
         "type": "string",
         "description": "Defines whether this rule should be skipped or not"
@@ -111,6 +119,14 @@
             "description": {
               "type": "string",
               "description": "The description of what the action does"
+            },
+            "stage": {
+              "type": "string",
+              "description": "Defines a unique identifier for this stage"
+            },
+            "dependencies": {
+              "type": "array",
+              "description": "A list of stages that this specific stage depends on ie its parents that must be executed first before it gets executed"
             },
             "skip": {
               "type": "string",
