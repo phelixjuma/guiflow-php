@@ -26,6 +26,7 @@ class DataTransformer
     //private PathResolver $pathResolver;
 
     private $taskResults = [];
+    public $errors = [];
 
     /**
      * @var DAG
@@ -142,14 +143,18 @@ class DataTransformer
                                     }
                                 }
 
-                            } catch (\Exception|\Throwable $e ) { }
+                            } catch (\Exception|\Throwable $e ) {
+                                $this->errors[] = $e->getMessage();
+                            }
                         }
                     }
                 } catch (\Exception|\Throwable $e ) {
+                    $this->errors[] = $e->getMessage();
                 }
             }
 
         } catch (\Exception|\Throwable $e ) {
+            $this->errors[] = $e->getMessage();
         }
     }
 
@@ -160,7 +165,7 @@ class DataTransformer
 
             $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 
-            $workflowDAG = new DAG();
+            $this->workflowDAG = new DAG();
             $dataManager = new SharedDataManager($inputData);
 
             //print "\nStarting data:\n";
@@ -187,7 +192,7 @@ class DataTransformer
                 });
 
                 // Add the rule task to the workflow.
-                $workflowDAG->addTask($ruleTask);
+                $this->workflowDAG->addTask($ruleTask);
 
                 // Add the actions
                 foreach ($actions as $actionIndex => $action) {
@@ -229,14 +234,14 @@ class DataTransformer
                     });
 
                     // Add the action to the workflow
-                    $workflowDAG->addTask($actionTask);
+                    $this->workflowDAG->addTask($actionTask);
                     // We add the rule as a dependency to this action.
-                    $workflowDAG->addParent($actionStage, $ruleStage);
+                    $this->workflowDAG->addParent($actionStage, $ruleStage);
 
                     // Add Action Task dependencies
                     if (!empty($actionDependencies)) {
                         foreach ($actionDependencies as $actionDependency) {
-                            $workflowDAG->addParent($actionStage, "action_$actionDependency");
+                            $this->workflowDAG->addParent($actionStage, "action_$actionDependency");
                         }
                     }
                 }
@@ -244,20 +249,17 @@ class DataTransformer
                 // Add Rule Task dependencies
                 if (!empty($ruleDependencies)) {
                     foreach ($ruleDependencies as $dependency) {
-                        $workflowDAG->addParent($ruleStage, "action_$dependency");
+                        $this->workflowDAG->addParent($ruleStage, "action_$dependency");
                     }
                 }
             }
 
             //print "\nTasks:\n";
-            //print_r($workflowDAG->visualize());
+            //print_r($this->workflowDAG->visualize());
 
             // Initialize the task executor
-            $executor = new TaskExecutor($workflowDAG);
-            $executor->execute();
-
-            $this->workflowDAG = $workflowDAG;
-            $this->workflowExecutor = $executor;
+            $this->workflowExecutor = new TaskExecutor($this->workflowDAG);
+            $this->workflowExecutor->execute();
 
             //$executionTime = $executor->getExecutionTime();
             //print "\nAll tasks executed in  $executionTime seconds\n";
@@ -278,6 +280,7 @@ class DataTransformer
             //print "\nAll tasks completed in {$executor->getExecutionTime()} seconds \n";
 
         } catch (\Exception|\Throwable $e ) {
+            $this->errors[] = $e->getMessage();
         }
     }
 
