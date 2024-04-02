@@ -42,8 +42,8 @@ class DataTransformerTest extends TestCase
         print "\nExecution Time:\n";
         print_r($dataTransformer->workflowExecutor->getResults()[0]->getExecutionTime());
 
-        //print "\nAfter\n";
-        //print(json_encode($data));
+        print "\nAfter\n";
+        print(json_encode($data));
 
         //print_r($data);
 

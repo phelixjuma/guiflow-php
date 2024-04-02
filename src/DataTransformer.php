@@ -166,7 +166,7 @@ class DataTransformer
             $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 
             $this->workflowDAG = new DAG();
-            //$dataManager = new SharedDataManager($inputData);
+            $dataManager = new SharedDataManager($inputData);
 
             foreach ($config as $index => $rule) {
 
@@ -177,10 +177,10 @@ class DataTransformer
                 $actions = $rule['actions'];
 
                 // Define the rule task, which is to evaluate its condition.
-                $ruleTask = new Task($ruleStage, function() use ($ruleStage, $inputData, $skip, $condition) {
+                $ruleTask = new Task($ruleStage, function() use ($ruleStage, $dataManager, $skip, $condition) {
 
                     // Evaluate the rule's condition to determine if actions should be skipped
-                    $isSkipped = $skip == 1 || !self::evaluateCondition($inputData, $condition);
+                    $isSkipped = $skip == 1 || !self::evaluateCondition($dataManager->getData(), $condition);
 
                     return ['isSkipped' => $isSkipped];
                 });
@@ -195,32 +195,33 @@ class DataTransformer
                     $actionDependencies = $action['dependencies'] ?? [];
                     $skipAction = $action['skip'] ?? 0;
 
-                    $actionTask = new Task($actionStage, function($parentResults) use ($inputData,$actionStage, $action, $skipAction) {
+                    $actionTask = new Task($actionStage, function($parentResults) use ($dataManager,$actionStage, $action, $skipAction) {
 
                         $shouldSkipRule = array_reduce($parentResults, function($carry, $result) {
                             return $carry || (isset($result['isSkipped']) && $result['isSkipped']);
                         }, false);
 
-                        //$dataToUse = $dataManager->getData();
+                        $dataToUse = $dataManager->getData();
 
                         if (!$shouldSkipRule && !$skipAction) {
 
                             // Execute the action logic here if the rule was not skipped
-                            if (self::isObject($inputData)) {
-                                $this->executeAction($inputData, $action);
+                            if (self::isObject($dataToUse)) {
+                                $this->executeAction($dataToUse, $action);
                             } else {
-                                array_walk($inputData, function (&$value, $key) use($action) {
+                                array_walk($dataToUse, function (&$value, $key) use($action) {
                                     $this->executeAction($value, $action);
                                 });
                             }
 
                             // We modify the data manager data
-                            //$dataManager->modifyData(function($data) use($dataToUse) {
-                            //    return $dataToUse;
-                            //});
+                            $dataManager->modifyData(function($data) use(&$dataToUse) {
+                                return $dataToUse;
+                            });
 
                         }
-                        return $inputData;
+
+                        return $dataToUse;
                     });
 
                     // Add the action to the workflow
