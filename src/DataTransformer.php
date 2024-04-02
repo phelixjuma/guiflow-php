@@ -168,9 +168,6 @@ class DataTransformer
             $this->workflowDAG = new DAG();
             $dataManager = new SharedDataManager($inputData);
 
-            //print "\nStarting data:\n";
-            //print_r($inputData);
-
             foreach ($config as $index => $rule) {
 
                 $skip = $rule['skip'] ?? 0;
