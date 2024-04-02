@@ -201,7 +201,7 @@ class DataTransformer
                             return $carry || (isset($result['isSkipped']) && $result['isSkipped']);
                         }, false);
 
-                        $dataToUse = $dataManager->getData();
+                        $dataToUse = &$dataManager->getData();
 
                         if (!$shouldSkipRule && !$skipAction) {
 
@@ -215,7 +215,7 @@ class DataTransformer
                             }
 
                             // We modify the data manager data
-                            $dataManager->modifyData(function($data) use(&$dataToUse) {
+                            $dataManager->modifyData(function($currentData) use(&$dataToUse) {
                                 return $dataToUse;
                             });
 
