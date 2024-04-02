@@ -166,7 +166,7 @@ class DataTransformer
             $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 
             $this->workflowDAG = new DAG();
-            $dataManager = new SharedDataManager($inputData);
+            //$dataManager = new SharedDataManager($inputData);
 
             foreach ($config as $index => $rule) {
 
@@ -177,13 +177,10 @@ class DataTransformer
                 $actions = $rule['actions'];
 
                 // Define the rule task, which is to evaluate its condition.
-                $ruleTask = new Task($ruleStage, function() use ($ruleStage, $dataManager, $skip, $condition) {
+                $ruleTask = new Task($ruleStage, function() use ($ruleStage, $inputData, $skip, $condition) {
 
                     // Evaluate the rule's condition to determine if actions should be skipped
-                    //print "\nRunning rule task $ruleStage\n";
-                    $isSkipped = $skip == 1 || !self::evaluateCondition($dataManager->getData(), $condition);
-
-                    //print "\nCompleted rule $ruleStage; skip is $skip. Response is ".json_encode($isSkipped). "\n";
+                    $isSkipped = $skip == 1 || !self::evaluateCondition($inputData, $condition);
 
                     return ['isSkipped' => $isSkipped];
                 });
@@ -198,36 +195,32 @@ class DataTransformer
                     $actionDependencies = $action['dependencies'] ?? [];
                     $skipAction = $action['skip'] ?? 0;
 
-                    $actionTask = new Task($actionStage, function($parentResults) use ($dataManager,$actionStage, $action, $skipAction) {
-
-                        //print "\nRunning action task $actionStage\n";
+                    $actionTask = new Task($actionStage, function($parentResults) use ($inputData,$actionStage, $action, $skipAction) {
 
                         $shouldSkipRule = array_reduce($parentResults, function($carry, $result) {
                             return $carry || (isset($result['isSkipped']) && $result['isSkipped']);
                         }, false);
 
-                        //print "\nRule skipping is ".json_encode($shouldSkipRule).". Action skipping is ".json_encode($skipAction). "\n";
-
-                        $dataToUse = $dataManager->getData();
+                        //$dataToUse = $dataManager->getData();
 
                         if (!$shouldSkipRule && !$skipAction) {
 
                             // Execute the action logic here if the rule was not skipped
-                            if (self::isObject($dataToUse)) {
-                                $this->executeAction($dataToUse, $action);
+                            if (self::isObject($inputData)) {
+                                $this->executeAction($inputData, $action);
                             } else {
-                                array_walk($dataToUse, function (&$value, $key) use($action) {
+                                array_walk($inputData, function (&$value, $key) use($action) {
                                     $this->executeAction($value, $action);
                                 });
                             }
 
                             // We modify the data manager data
-                            $dataManager->modifyData(function($data) use($dataToUse) {
-                                return $dataToUse;
-                            });
+                            //$dataManager->modifyData(function($data) use($dataToUse) {
+                            //    return $dataToUse;
+                            //});
 
                         }
-                        return $dataToUse;
+                        return $inputData;
                     });
 
                     // Add the action to the workflow
@@ -251,30 +244,9 @@ class DataTransformer
                 }
             }
 
-            //print "\nTasks:\n";
-            //print_r($this->workflowDAG->visualize());
-
             // Initialize the task executor
             $this->workflowExecutor = new TaskExecutor($this->workflowDAG);
             $this->workflowExecutor->execute();
-
-            //$executionTime = $executor->getExecutionTime();
-            //print "\nAll tasks executed in  $executionTime seconds\n";
-
-            //$taskResults = $executor->getTaskResults();
-            //$allResults = $executor->getResults();
-            //$lastResult = $executor->getFinalResult();
-
-            //print "\nAll Results\n";
-            //print_r($allResults[0]->getStatus());
-
-            //print "\nFinal Result\n";
-            //print_r($lastResult->getExecutionTime());
-
-            //print "\nShared Data\n";
-            //print_r($dataManager->getData());
-
-            //print "\nAll tasks completed in {$executor->getExecutionTime()} seconds \n";
 
         } catch (\Exception|\Throwable $e ) {
             $this->errors[] = $e->getMessage();
