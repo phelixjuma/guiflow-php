@@ -119,11 +119,12 @@ class FunctionAction implements ActionInterface
             //    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
             //});
 
-            // Initialize parallelizer to execute the function on every list item concurrently
             $parallelizer = new DAG();
             $dataManager = new SharedDataManager($currentData);
 
-            foreach ($currentData as $index => $data) {
+            $size = sizeof($currentData);
+
+            for ($index = 0; $index < $size; $index++) {
 
                 $task = new Task($index, function() use ($index, $dataManager, $path, $function, $args, $newField, $strict, $condition) {
 

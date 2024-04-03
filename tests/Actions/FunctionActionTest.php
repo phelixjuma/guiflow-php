@@ -1893,6 +1893,7 @@ class FunctionActionTest extends TestCase
     public function _testConditionalAppend()
     {
         $data = [
+            "customer_name" => "Naivas",
             "items" => [
                 ["description" => "Assorted 1kg", "pack" => "Pack: 1 x 1"],
                 ["description" => "Smoked sausage", "pack" => "Pack: 1 x 1"]
