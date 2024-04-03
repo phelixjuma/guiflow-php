@@ -2,6 +2,10 @@
 
 namespace PhelixJuma\DataTransformer\Actions;
 
+use JumaPhelix\DAG\DAG;
+use JumaPhelix\DAG\SharedDataManager;
+use JumaPhelix\DAG\Task;
+use JumaPhelix\DAG\TaskExecutor;
 use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
 use PhelixJuma\DataTransformer\Utils\DataJoiner;
 use PhelixJuma\DataTransformer\Utils\DataReducer;
@@ -111,9 +115,31 @@ class FunctionAction implements ActionInterface
                 $function = [$this, $function];
             }
 
-            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
-                (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
-            });
+            //array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
+            //    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
+            //});
+
+            // Initialize parallelizer to execute the function on every list item concurrently
+            $parallelizer = new DAG();
+            $dataManager = new SharedDataManager($currentData);
+
+            foreach ($currentData as $index => $data) {
+
+                $task = new Task($index, function() use ($index, $dataManager, $path, $function, $args, $newField, $strict, $condition) {
+
+                    $dataToUse = &$dataManager->getData();
+
+                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataToUse[$index]);
+
+                    $dataManager->modifyData(function() use(&$dataToUse) {
+                        return $dataToUse;
+                    });
+                    return $dataToUse;
+                });
+                $parallelizer->addTask($task);
+            }
+            (new TaskExecutor($parallelizer))->execute();
+
             $newValue = $currentData;
 
         } elseif (isset($this->function[1]) && $this->function['1'] == 'set') {

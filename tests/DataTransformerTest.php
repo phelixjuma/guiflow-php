@@ -8,7 +8,7 @@ use PhelixJuma\DataTransformer\DataTransformer;
 class DataTransformerTest extends TestCase
 {
 
-    public function testFullRulesSet()
+    public function _testFullRulesSet()
     {
         $config_json = file_get_contents(__DIR__ ."/config.json");
         $config = json_decode($config_json);

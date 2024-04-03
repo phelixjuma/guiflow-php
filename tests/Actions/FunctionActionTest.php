@@ -1911,6 +1911,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
+        //print "\nTest data:\n";
         //print_r($data);
 
         $this->assertEquals($data, $expectedData);

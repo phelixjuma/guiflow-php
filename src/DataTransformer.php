@@ -201,6 +201,7 @@ class DataTransformer
                             return $carry || (isset($result['isSkipped']) && $result['isSkipped']);
                         }, false);
 
+                        // We must pass data by reference since all transformers must work on the same data
                         $dataToUse = &$dataManager->getData();
 
                         if (!$shouldSkipRule && !$skipAction) {
@@ -226,6 +227,7 @@ class DataTransformer
 
                     // Add the action to the workflow
                     $this->workflowDAG->addTask($actionTask);
+
                     // We add the rule as a dependency to this action.
                     $this->workflowDAG->addParent($actionStage, $ruleStage);
 
