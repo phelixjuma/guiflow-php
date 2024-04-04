@@ -6,6 +6,7 @@ use JumaPhelix\DAG\DAG;
 use JumaPhelix\DAG\SharedDataManager;
 use JumaPhelix\DAG\Task;
 use JumaPhelix\DAG\TaskExecutor;
+use  Swoole\Coroutine;
 use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
 use PhelixJuma\DataTransformer\Utils\DataJoiner;
 use PhelixJuma\DataTransformer\Utils\DataReducer;
@@ -115,31 +116,37 @@ class FunctionAction implements ActionInterface
                 $function = [$this, $function];
             }
 
-            //array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
-            //    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
-            //});
+            //Swoole\Runtime::enableCoroutine();
 
-            $parallelizer = new DAG();
-            $dataManager = new SharedDataManager($currentData);
-
-            $size = sizeof($currentData);
-
-            for ($index = 0; $index < $size; $index++) {
-
-                $task = new Task($index, function() use ($index, $dataManager, $path, $function, $args, $newField, $strict, $condition) {
-
-                    $dataToUse = &$dataManager->getData();
-
-                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataToUse[$index]);
-
-                    $dataManager->modifyData(function() use(&$dataToUse) {
-                        return $dataToUse;
+            Coroutine\run(function() use(&$currentData, $path, $function, $args, $newField, $strict, $condition) {
+                array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
+                    Coroutine\go(function () use($path, $function, $args, $newField, $strict, $condition, &$value) {
+                        (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
                     });
-                    return $dataToUse;
                 });
-                $parallelizer->addTask($task);
-            }
-            (new TaskExecutor($parallelizer))->execute();
+            });
+
+//            $parallelizer = new DAG();
+//            $dataManager = new SharedDataManager($currentData);
+//
+//            $size = sizeof($currentData);
+//
+//            for ($index = 0; $index < $size; $index++) {
+//
+//                $task = new Task($index, function() use ($index, $dataManager, $path, $function, $args, $newField, $strict, $condition) {
+//
+//                    $dataToUse = &$dataManager->getData();
+//
+//                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataToUse[$index]);
+//
+//                    $dataManager->modifyData(function() use(&$dataToUse) {
+//                        return $dataToUse;
+//                    });
+//                    return $dataToUse;
+//                });
+//                $parallelizer->addTask($task);
+//            }
+//            (new TaskExecutor($parallelizer))->execute();
 
             $newValue = $currentData;
 
