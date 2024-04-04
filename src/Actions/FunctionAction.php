@@ -132,19 +132,21 @@ class FunctionAction implements ActionInterface
                 $function = [$this, $function];
             }
 
-//            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
-//                Coroutine\go(function () use($path, $function, $args, $newField, $strict, $condition, &$value) {
-//                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
-//                });
-//            });
-
-
             $count = sizeof($currentData);
+            $wg = new Coroutine\WaitGroup();
+
             for ($index = 0; $index < $count; $index++) {
-                Coroutine\go(function () use(&$currentData, $index, $path, $function, $args, $newField, $strict, $condition, &$value) {
+                $wg->add();
+                Coroutine\go(function () use(&$currentData, $index, $path, $function, $args, $newField, $strict, $condition, $wg) {
+                    // execute the task
                     (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($currentData[$index]);
+                    // Signal completion
+                    $wg->done();
                 });
             }
+
+            // Wait for all tasks to complete
+            $wg->wait();
 
             $newValue = $currentData;
 

@@ -207,7 +207,34 @@
           "strict": "0",
           "condition": ""
         },
-        "newField": "created_by",
+        "newField": "",
+        "strict": "0",
+        "condition": ""
+      },
+      {
+        "description": "Get the pack unit of measure",
+        "stage": "append_pack_size",
+        "dependencies": ["get_pack_unit_of_measure"],
+        "skip": "0",
+        "action": "function",
+        "path": "items",
+        "function": "map_parallel",
+        "args": {
+          "path": "",
+          "function": "set",
+          "args": {
+            "data_path": "",
+            "value": "",
+            "valueFromField": "created_by",
+            "valueMapping": "",
+            "conditionalValue":"",
+            "newField": "created_by_full"
+          },
+          "newField": "",
+          "strict": "0",
+          "condition": ""
+        },
+        "newField": "",
         "strict": "0",
         "condition": ""
       }
