@@ -118,13 +118,17 @@ class FunctionAction implements ActionInterface
 
             //Swoole\Runtime::enableCoroutine();
 
-            Coroutine\run(function() use(&$currentData, $path, $function, $args, $newField, $strict, $condition) {
-                array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
-                    Coroutine\go(function () use($path, $function, $args, $newField, $strict, $condition, &$value) {
-                        (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
-                    });
-                });
+            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
+                (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
             });
+
+//            Coroutine\run(function() use(&$currentData, $path, $function, $args, $newField, $strict, $condition) {
+//                array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
+//                    Coroutine\go(function () use($path, $function, $args, $newField, $strict, $condition, &$value) {
+//                        (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
+//                    });
+//                });
+//            });
 
 //            $parallelizer = new DAG();
 //            $dataManager = new SharedDataManager($currentData);
