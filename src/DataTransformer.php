@@ -144,17 +144,31 @@ class DataTransformer
                                 }
 
                             } catch (\Exception|\Throwable $e ) {
-                                $this->errors[] = $e->getMessage();
+                                $error = [
+                                    'action'    => $action['stage'],
+                                    'message' => $e->getMessage(),
+                                    'trace' => $e->getTrace()
+                                ];
+                                $this->errors[] = $error;
                             }
                         }
                     }
                 } catch (\Exception|\Throwable $e ) {
-                    $this->errors[] = $e->getMessage();
+                    $error = [
+                        'rule'  => $rule['stage'],
+                        'message' => $e->getMessage(),
+                        'trace' => $e->getTrace()
+                    ];
+                    $this->errors[] = $error;
                 }
             }
 
         } catch (\Exception|\Throwable $e ) {
-            $this->errors[] = $e->getMessage();
+            $error = [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTrace()
+            ];
+            $this->errors[] = $error;
         }
     }
 
