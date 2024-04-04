@@ -116,9 +116,16 @@ class FunctionAction implements ActionInterface
                 $function = [$this, $function];
             }
 
-            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
-                (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
-            });
+            foreach ($currentData as &$value) {
+                try {
+                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
+                } catch (\Exception|\Throwable $e) {
+                }
+            }
+
+            //array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
+            //    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
+            //});
 
             $newValue = $currentData;
 
@@ -139,7 +146,10 @@ class FunctionAction implements ActionInterface
                 $wg->add();
                 Coroutine\go(function () use(&$currentData, $index, $path, $function, $args, $newField, $strict, $condition, $wg) {
                     // execute the task
-                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($currentData[$index]);
+                    try {
+                        (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($currentData[$index]);
+                    } catch (\Exception|\Throwable $e) {
+                    }
                     // Signal completion
                     $wg->done();
                 });
