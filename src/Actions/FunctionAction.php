@@ -132,11 +132,19 @@ class FunctionAction implements ActionInterface
                 $function = [$this, $function];
             }
 
-            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
-                Coroutine\go(function () use($path, $function, $args, $newField, $strict, $condition, &$value) {
-                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
+//            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
+//                Coroutine\go(function () use($path, $function, $args, $newField, $strict, $condition, &$value) {
+//                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
+//                });
+//            });
+
+
+            $count = sizeof($currentData);
+            for ($index = 0; $index < $count; $index++) {
+                Coroutine\go(function () use(&$currentData, $index, $path, $function, $args, $newField, $strict, $condition, &$value) {
+                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($currentData[$index]);
                 });
-            });
+            }
 
             $newValue = $currentData;
 
