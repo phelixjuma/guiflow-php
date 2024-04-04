@@ -116,41 +116,27 @@ class FunctionAction implements ActionInterface
                 $function = [$this, $function];
             }
 
-            //Swoole\Runtime::enableCoroutine();
-
-//            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
-//                (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
-//            });
-
-            Coroutine\run(function() use(&$currentData, $path, $function, $args, $newField, $strict, $condition) {
-                array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
-                    Coroutine\go(function () use($path, $function, $args, $newField, $strict, $condition, &$value) {
-                        (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
-                    });
-                });
+            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
+                (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
             });
 
-//            $parallelizer = new DAG();
-//            $dataManager = new SharedDataManager($currentData);
-//
-//            $size = sizeof($currentData);
-//
-//            for ($index = 0; $index < $size; $index++) {
-//
-//                $task = new Task($index, function() use ($index, $dataManager, $path, $function, $args, $newField, $strict, $condition) {
-//
-//                    $dataToUse = &$dataManager->getData();
-//
-//                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataToUse[$index]);
-//
-//                    $dataManager->modifyData(function() use(&$dataToUse) {
-//                        return $dataToUse;
-//                    });
-//                    return $dataToUse;
-//                });
-//                $parallelizer->addTask($task);
-//            }
-//            (new TaskExecutor($parallelizer))->execute();
+            $newValue = $currentData;
+
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'map_parallel') {
+
+            list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
+
+            if (method_exists($this->function[0], $function) ) {
+                $function = [$this->function[0], $function];
+            } else {
+                $function = [$this, $function];
+            }
+
+            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
+                Coroutine\go(function () use($path, $function, $args, $newField, $strict, $condition, &$value) {
+                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
+                });
+            });
 
             $newValue = $currentData;
 

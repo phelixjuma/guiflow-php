@@ -184,6 +184,32 @@
           "return_field": "selling_quantity"
         },
         "newField": "items.*.original_value.number_of_cases"
+      },
+      {
+        "description": "Get the pack unit of measure",
+        "stage": "get_pack_unit_of_measure",
+        "dependencies": [],
+        "action": "function",
+        "path": "items",
+        "function": "map_parallel",
+        "args": {
+          "path": "",
+          "function": "set",
+          "args": {
+            "data_path": "",
+            "value": "Phelix",
+            "valueFromField": "",
+            "valueMapping": "",
+            "conditionalValue":"",
+            "newField": "created_by"
+          },
+          "newField": "",
+          "strict": "0",
+          "condition": ""
+        },
+        "newField": "created_by",
+        "strict": "0",
+        "condition": ""
       }
     ]
   },

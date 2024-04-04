@@ -8,7 +8,7 @@ use PhelixJuma\DataTransformer\DataTransformer;
 class DataTransformerTest extends TestCase
 {
 
-    public function _testFullRulesSet()
+    public function testFullRulesSet()
     {
         $config_json = file_get_contents(__DIR__ ."/config.json");
         $config = json_decode($config_json);
@@ -39,8 +39,8 @@ class DataTransformerTest extends TestCase
         $dataTransformer = new DataTransformer($config, $this);
         $dataTransformer->transform($data, true);
 
-        print "\nExecution Time:\n";
-        print_r($dataTransformer->workflowExecutor->getResults()[0]->getExecutionTime());
+        //print "\nExecution Time:\n";
+        //print_r($dataTransformer->workflowExecutor->getResults()[0]->getExecutionTime());
 
         print "\nAfter\n";
         print(json_encode($data));

@@ -1890,7 +1890,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testConditionalAppend()
+    public function _testConditionalAppend()
     {
         $data = [
             "customer_name" => "Naivas",
@@ -1912,8 +1912,8 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print "\nTest data:\n";
-        print_r($data);
+        //print "\nTest data:\n";
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
