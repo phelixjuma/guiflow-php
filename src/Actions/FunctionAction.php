@@ -118,9 +118,9 @@ class FunctionAction implements ActionInterface
 
             //Swoole\Runtime::enableCoroutine();
 
-            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
-                (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
-            });
+//            array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
+//                (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
+//            });
 
 //            Coroutine\run(function() use(&$currentData, $path, $function, $args, $newField, $strict, $condition) {
 //                array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
@@ -130,27 +130,27 @@ class FunctionAction implements ActionInterface
 //                });
 //            });
 
-//            $parallelizer = new DAG();
-//            $dataManager = new SharedDataManager($currentData);
-//
-//            $size = sizeof($currentData);
-//
-//            for ($index = 0; $index < $size; $index++) {
-//
-//                $task = new Task($index, function() use ($index, $dataManager, $path, $function, $args, $newField, $strict, $condition) {
-//
-//                    $dataToUse = &$dataManager->getData();
-//
-//                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataToUse[$index]);
-//
-//                    $dataManager->modifyData(function() use(&$dataToUse) {
-//                        return $dataToUse;
-//                    });
-//                    return $dataToUse;
-//                });
-//                $parallelizer->addTask($task);
-//            }
-//            (new TaskExecutor($parallelizer))->execute();
+            $parallelizer = new DAG();
+            $dataManager = new SharedDataManager($currentData);
+
+            $size = sizeof($currentData);
+
+            for ($index = 0; $index < $size; $index++) {
+
+                $task = new Task($index, function() use ($index, $dataManager, $path, $function, $args, $newField, $strict, $condition) {
+
+                    $dataToUse = &$dataManager->getData();
+
+                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataToUse[$index]);
+
+                    $dataManager->modifyData(function() use(&$dataToUse) {
+                        return $dataToUse;
+                    });
+                    return $dataToUse;
+                });
+                $parallelizer->addTask($task);
+            }
+            (new TaskExecutor($parallelizer))->execute();
 
             $newValue = $currentData;
 
