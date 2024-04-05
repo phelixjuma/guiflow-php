@@ -1977,4 +1977,37 @@ class FunctionActionTest extends TestCase
 
         $this->assertEquals($data, $expectedData);
     }
+
+    public function testMultipleRegexMapper()
+    {
+        $data = [
+            "items" => [
+                ["description" => "PIX 100CJ SKARA LCJ M"],
+                ["description" => "24 X SOG OSHOTHANE"],
+            ]
+        ];
+
+        $expectedData = [];
+
+        $mappers = [
+            [
+                "description" => "Check for common misspelt numbers that are immediately followed by common units of measure",
+                "order" => "1",
+                "data" => ['pattern' => "\b([ISOBZL]+)(?=\s*(?:G|GM|GMS|GRM|GRMS)\b)", 'modifiers' => "i", "replacements" => ['I' => '1', 'l' => '1', 'S' => '5', 'O' => '0', 'B' => '8', 'Z' => '2']]
+            ],
+            [
+                "description" => "Correct common misspelt units of measure based on common misspellings immediately following a number",
+                "order" => "2",
+                "data" => ['pattern' => "\b(\d+\s*(?:CJ))\b", 'modifiers' => "i", "replacements" => ['CJ' => 'G']]
+            ]
+        ];
+
+        $action = new FunctionAction("items.*.description", [$this, 'regex_mapper_multiple'], ["mappers" => $mappers, "sort_by_order" => "1"], '', 0, null);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
 }

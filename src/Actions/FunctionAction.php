@@ -194,6 +194,8 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::concat_multi_array_assoc(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'custom_preg_replace') {
             $newValue = Utils::custom_preg_replace(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'regex_mapper_multiple') {
+            $newValue = Utils::regex_mapper_multiple(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'remove_repeated_words') {
             $newValue = Utils::remove_repeated_words(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'assoc_array_sum_if') {

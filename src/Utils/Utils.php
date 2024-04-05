@@ -304,6 +304,62 @@ class Utils
 
     /**
      * @param $data
+     * @param $pattern
+     * @param $modifier
+     * @param $replacementsMapper
+     * @return array|string|string[]
+     * @throws \Exception
+     */
+    public static function regex_mapper_multiple($data, $mappers, $sortByOrder=false)
+    {
+
+        // We sort the pattern
+        if ($sortByOrder) {
+            self::sortMultiAssocArrayByKey($mappers, 'order', 'asc');
+        }
+
+        $newData = null;
+        if (is_array($data)) {
+            foreach ($data as $d) {
+                $newData[] = self::regex_mapper_multiple($d, $mappers);
+            }
+        } else {
+
+            $newData = $data;
+
+            foreach ($mappers as $mapper) {
+
+                $pattern = $mapper['data']['pattern'];
+                $modifiers = $mapper['data']['modifiers'];
+                $replacementsMapper = $mapper['data']['replacements'];
+
+                // prepare replacements
+                array_walk($replacementsMapper, function (&$v, $k) {
+                    $v = str_ireplace("[space]", " ", $v);
+                });
+
+                // prepare pattern
+                $pattern = '/' . self::custom_preg_escape(self::full_unescape($pattern)) . '/'.$modifiers;
+
+                $newData = preg_replace_callback($pattern, function($matches) use($replacementsMapper) {
+                    $replacementPattern = implode("|",array_keys($replacementsMapper));
+                    return preg_replace_callback("/(?:$replacementPattern)/i", function($match) use ($replacementsMapper) {
+                        return $replacementsMapper[$match[0]]; // Do replacements
+                    }, $matches[1]);
+                }, $newData);
+
+                if (preg_last_error() !== PREG_NO_ERROR) {
+                    //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
+                }
+            }
+
+        }
+
+        return $newData;
+    }
+
+    /**
+     * @param $data
      * @param $conditionField
      * @param $conditionOperator
      * @param $conditionValue
