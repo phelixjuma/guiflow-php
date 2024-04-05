@@ -337,6 +337,7 @@ class Utils
                 array_walk($replacementsMapper, function (&$v, $k) {
                     $v = str_ireplace("[space]", " ", $v);
                 });
+                $replacementsMapper = array_change_key_case($replacementsMapper, CASE_UPPER);
 
                 // prepare pattern
                 $pattern = '/' . self::custom_preg_escape(self::full_unescape($pattern)) . '/'.$modifiers;
@@ -344,7 +345,7 @@ class Utils
                 $newData = preg_replace_callback($pattern, function($matches) use($replacementsMapper) {
                     $replacementPattern = implode("|",array_keys($replacementsMapper));
                     return preg_replace_callback("/(?:$replacementPattern)/i", function($match) use ($replacementsMapper) {
-                        return $replacementsMapper[$match[0]]; // Do replacements
+                        return $replacementsMapper[strtoupper($match[0])]; // Do replacements
                     }, $matches[1]);
                 }, $newData);
 

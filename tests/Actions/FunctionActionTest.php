@@ -1984,6 +1984,8 @@ class FunctionActionTest extends TestCase
             "items" => [
                 ["description" => "PIX 100CJ SKARA LCJ M"],
                 ["description" => "24 X SOG OSHOTHANE"],
+                ["description" => "10 X log OSHOTHANE"],
+                ["description" => "10 X lopes AQUAWETT"],
             ]
         ];
 
