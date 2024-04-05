@@ -289,6 +289,8 @@ class Utils
      */
     public static function custom_preg_replace($data, $pattern, $replacement)
     {
+        $replacement = str_ireplace("[space]", " ", $replacement);
+
         $newData = null;
         if (is_array($data)) {
             foreach ($data as $d) {
