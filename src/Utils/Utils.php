@@ -976,6 +976,7 @@ class Utils
                 foreach ($mappings as $search => $replace) {
 
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
+                    $replace = str_ireplace("[space]", " ", $replace);
 
                     $value = preg_replace($pattern, $replace, $value);
 
