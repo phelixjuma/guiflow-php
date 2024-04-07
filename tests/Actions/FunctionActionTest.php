@@ -1986,23 +1986,67 @@ class FunctionActionTest extends TestCase
                 ["description" => "24 X SOG OSHOTHANE"],
                 ["description" => "10 X log OSHOTHANE"],
                 ["description" => "10 X lopes AQUAWETT"],
+                ["description" => "10 X loopes AQUAWETT"],
+                ["description" => "10 X 10 pes AQUAWETT"],
+                ["description" => "SOOMI AQUAWETT"],
+                ["description" => "/ LTR AQUAWETT"],
+                ["description" => "10M' AQUAWETT"],
+            ]
+        ];
+
+        $mappers = [
+            [
+                "description" => "Correct common misspelt units of measure based on common misspellings immediately following a number",
+                "order" => "1",
+                "data" => [
+                    'pattern' => "\b(\d+\s*(?:CJ))\b",
+                    'modifiers' => "i",
+                    "replacements" => [
+                        ["pattern" => "CJ", "replacement" => "G"]
+                    ]
+                ]
+            ],
+            [
+                "description" => "Correct ML being misspelt as MI or M'. Pattern checks where MI or M' appears at the end of a word or line ",
+                "order" => "2",
+                "data" => [
+                    'pattern' => "\b(\w*\s*(?:MI|M'))(?=\s|$)",
+                    'modifiers' => "i",
+                    "replacements" => [
+                        ["pattern" => "M(I|')", "replacement" => "ML"]
+                    ]
+                ]
+            ],
+            [
+                "description" => "",
+                "order" => "3",
+                "data" => [
+                    'pattern' => "\b((?:lo+|\d+\s*)pes)\b",
+                    'modifiers' => "i",
+                    "replacements" => [
+                        ["pattern" => "PES", "replacement" => "PCS"]
+                    ]
+                ]
+            ],
+            [
+                "description" => "Check for common misspelt numbers that are immediately followed by common units of measure",
+                "order" => "4",
+                "data" => [
+                    'pattern' => "(?<=^|\s)([ISOBZL\/]+)(?=\s*(?:L|LTR|LT|LTS|Liters|Liter|Litre|Litres|ML|MLS|KG|G|GM|GMS|GRM|GRMS|CM|MM|PC|PCS)\b|\s|$)",
+                    'modifiers' => "i",
+                    "replacements" => [
+                        ["pattern" => "I|L|\/", "replacement" => "1"],
+                        ["pattern" => "S", "replacement" => "5"],
+                        ["pattern" => "O", "replacement" => "0"],
+                        ["pattern" => "B", "replacement" => "8"],
+                        ["pattern" => "Z", "replacement" => "2"]
+                    ]
+                ]
             ]
         ];
 
         $expectedData = [];
 
-        $mappers = [
-            [
-                "description" => "Check for common misspelt numbers that are immediately followed by common units of measure",
-                "order" => "1",
-                "data" => ['pattern' => "\b([ISOBZL]+)(?=\s*(?:G|GM|GMS|GRM|GRMS)\b)", 'modifiers' => "i", "replacements" => ['I' => '1', 'l' => '1', 'S' => '5', 'O' => '0', 'B' => '8', 'Z' => '2']]
-            ],
-            [
-                "description" => "Correct common misspelt units of measure based on common misspellings immediately following a number",
-                "order" => "2",
-                "data" => ['pattern' => "\b(\d+\s*(?:CJ))\b", 'modifiers' => "i", "replacements" => ['CJ' => 'G']]
-            ]
-        ];
 
         $action = new FunctionAction("items.*.description", [$this, 'regex_mapper_multiple'], ["mappers" => $mappers, "sort_by_order" => "1"], '', 0, null);
 

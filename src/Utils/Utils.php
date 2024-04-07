@@ -333,20 +333,24 @@ class Utils
                 $modifiers = $mapper['data']['modifiers'];
                 $replacementsMapper = $mapper['data']['replacements'];
 
-                // prepare replacements
-                array_walk($replacementsMapper, function (&$v, $k) {
-                    $v = str_ireplace("[space]", " ", $v);
-                });
-                $replacementsMapper = array_change_key_case($replacementsMapper, CASE_UPPER);
-
                 // prepare pattern
-                $pattern = '/' . self::custom_preg_escape(self::full_unescape($pattern)) . '/'.$modifiers;
+                $pattern = '/' . self::full_unescape($pattern) . '/'.$modifiers;
 
-                $newData = preg_replace_callback($pattern, function($matches) use($replacementsMapper) {
-                    $replacementPattern = implode("|",array_keys($replacementsMapper));
-                    return preg_replace_callback("/(?:$replacementPattern)/i", function($match) use ($replacementsMapper) {
-                        return $replacementsMapper[strtoupper($match[0])]; // Do replacements
-                    }, $matches[1]);
+                $newData = preg_replace_callback($pattern, function($matches) use($pattern, $newData, $replacementsMapper) {
+
+                    $replacement = $matches[1];
+
+                    foreach ($replacementsMapper as $rMapper) {
+
+                        $replacementPattern = str_ireplace("[space]", " ", $rMapper['pattern']);
+
+                        $replacement = preg_replace_callback("/(?:{$replacementPattern})/i", function($match) use ($rMapper) {
+                            return $rMapper['replacement'];
+                        }, $replacement);
+                    }
+
+                    return $replacement;
+
                 }, $newData);
 
                 if (preg_last_error() !== PREG_NO_ERROR) {
