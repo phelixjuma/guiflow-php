@@ -304,11 +304,9 @@ class Utils
 
     /**
      * @param $data
-     * @param $pattern
-     * @param $modifier
-     * @param $replacementsMapper
-     * @return array|string|string[]
-     * @throws \Exception
+     * @param $mappers
+     * @param $sortByOrder
+     * @return array|mixed|string|string[]
      */
     public static function regex_mapper_multiple($data, $mappers, $sortByOrder=false)
     {
@@ -336,7 +334,7 @@ class Utils
                 // prepare pattern
                 $pattern = '/' . self::full_unescape($pattern) . '/'.$modifiers;
 
-                $newData = preg_replace_callback($pattern, function($matches) use($pattern, $newData, $replacementsMapper) {
+                $tempNewData = preg_replace_callback($pattern, function($matches) use($pattern, $newData, $replacementsMapper) {
 
                     $replacement = $matches[1];
 
@@ -344,14 +342,23 @@ class Utils
 
                         $replacementPattern = str_ireplace("[space]", " ", $rMapper['pattern']);
 
-                        $replacement = preg_replace_callback("/(?:{$replacementPattern})/i", function($match) use ($rMapper) {
+                        $tempReplacement = preg_replace_callback("/(?:{$replacementPattern})/i", function($match) use ($rMapper) {
                             return $rMapper['replacement'];
                         }, $replacement);
+
+                        if (!empty($tempReplacement)) {
+                            $replacement = $tempReplacement;
+                        }
+
                     }
 
                     return $replacement;
 
                 }, $newData);
+
+                if (!empty($tempNewData)) {
+                    $newData = $tempNewData;
+                }
 
                 if (preg_last_error() !== PREG_NO_ERROR) {
                     //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));

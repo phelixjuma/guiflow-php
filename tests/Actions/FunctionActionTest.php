@@ -1991,6 +1991,8 @@ class FunctionActionTest extends TestCase
                 ["description" => "SOOMI AQUAWETT"],
                 ["description" => "/ LTR AQUAWETT"],
                 ["description" => "10M' AQUAWETT"],
+                ["description" => "XRIEX 250g Skana"],
+                ["description" => "XSom' degree"],
             ]
         ];
 
