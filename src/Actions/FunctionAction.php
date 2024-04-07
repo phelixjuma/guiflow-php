@@ -66,6 +66,7 @@ class FunctionAction implements ActionInterface
      * @param $data
      * @return void
      * @throws UnknownOperatorException
+     * @throws \Exception
      */
     public function execute(&$data)
     {
@@ -122,10 +123,6 @@ class FunctionAction implements ActionInterface
                 } catch (\Exception|\Throwable $e) {
                 }
             }
-
-            //array_walk($currentData, function (&$value, $key) use($path, $function, $args, $newField, $strict, $condition) {
-            //    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
-            //});
 
             $newValue = $currentData;
 
