@@ -307,6 +307,7 @@ class Utils
      * @param $mappers
      * @param $sortByOrder
      * @return array|mixed|string|string[]
+     * @throws \Exception
      */
     public static function regex_mapper_multiple($data, $mappers, $sortByOrder=false)
     {
@@ -325,43 +326,51 @@ class Utils
 
             $newData = $data;
 
+
             foreach ($mappers as $mapper) {
 
-                $pattern = $mapper['data']['pattern'];
-                $modifiers = $mapper['data']['modifiers'];
-                $replacementsMapper = $mapper['data']['replacements'];
+                try {
 
-                // prepare pattern
-                $pattern = '/' . self::full_unescape($pattern) . '/'.$modifiers;
+                    $pattern = $mapper['data']['pattern'];
+                    $modifiers = $mapper['data']['modifiers'];
+                    $replacementsMapper = $mapper['data']['replacements'];
 
-                $tempNewData = preg_replace_callback($pattern, function($matches) use($pattern, $newData, $replacementsMapper) {
+                    // prepare pattern
+                    $pattern = '/' . self::full_unescape($pattern) . '/'.$modifiers;
 
-                    $replacement = $matches[1];
+                    $tempNewData = preg_replace_callback($pattern, function($matches) use($pattern, $newData, $replacementsMapper) {
 
-                    foreach ($replacementsMapper as $rMapper) {
+                        $replacement = $matches[1];
 
-                        $replacementPattern = str_ireplace("[space]", " ", $rMapper['pattern']);
+                        foreach ($replacementsMapper as $rMapper) {
 
-                        $tempReplacement = preg_replace_callback("/(?:{$replacementPattern})/i", function($match) use ($rMapper) {
-                            return $rMapper['replacement'];
-                        }, $replacement);
+                            $replacementPattern = str_ireplace("[space]", " ", $rMapper['pattern']);
 
-                        if (!empty($tempReplacement)) {
-                            $replacement = $tempReplacement;
+                            $tempReplacement = preg_replace_callback("(?:{$replacementPattern})/i", function($match) use ($rMapper) {
+                                return $rMapper['replacement'];
+                            }, $replacement);
+
+                            if (!empty($tempReplacement)) {
+                                $replacement = $tempReplacement;
+                            }
+
                         }
 
+                        return $replacement;
+
+                    }, $newData);
+
+                    if (!empty($tempNewData)) {
+                        $newData = $tempNewData;
                     }
 
-                    return $replacement;
+                    if (preg_last_error() !== PREG_NO_ERROR) {
+                        throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
+                    }
 
-                }, $newData);
-
-                if (!empty($tempNewData)) {
-                    $newData = $tempNewData;
-                }
-
-                if (preg_last_error() !== PREG_NO_ERROR) {
-                    //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
+                } catch (\Exception $e) {
+                    print $e->getMessage();
+                    throw new \Exception($e->getMessage());
                 }
             }
 
