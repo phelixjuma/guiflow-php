@@ -346,7 +346,7 @@ class Utils
 
                             $replacementPattern = str_ireplace("[space]", " ", $rMapper['pattern']);
 
-                            $tempReplacement = preg_replace_callback("(?:{$replacementPattern})/i", function($match) use ($rMapper) {
+                            $tempReplacement = preg_replace_callback("/(?:{$replacementPattern})/i", function($match) use ($rMapper) {
                                 return $rMapper['replacement'];
                             }, $replacement);
 
