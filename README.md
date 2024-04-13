@@ -18,7 +18,7 @@ Check the [documentation](docs/documentation.md) for more details
 # INSTALLATION
 
 ```
-composer require phelixjuma/guiflow-php
+composer require phelixjuma/guiflow
 ```
 
 # USAGE
