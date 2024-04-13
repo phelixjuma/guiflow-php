@@ -480,3 +480,6 @@ Flattening deeply nested data structures into a simpler, one-level object is a c
   "primary_phone": "555-1234"
 }
 ```
+
+
+For full reference of the workflow schema, refer to this [reference](schema_doc.html).
