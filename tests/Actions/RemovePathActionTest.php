@@ -1,9 +1,9 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Tests\Actions;
+namespace PhelixJuma\GUIFlow\Tests\Actions;
 
-use PhelixJuma\DataTransformer\Actions\DeleteValueAction;
-use PhelixJuma\DataTransformer\Actions\RemovePathAction;
+use PhelixJuma\GUIFlow\Actions\DeleteValueAction;
+use PhelixJuma\GUIFlow\Actions\RemovePathAction;
 use PHPUnit\Framework\TestCase;
 
 class RemovePathActionTest extends TestCase

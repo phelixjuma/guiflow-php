@@ -1,289 +1,113 @@
 [
   {
     "rule": "Get customers list",
-    "skip": "0",
-    "description": "",
     "stage": "get_customers_list",
+    "description": "Gets list of customers from external source",
     "dependencies": [],
+    "skip": "0",
     "condition": "always",
     "actions": [
       {
-        "description": "",
+        "action": "function",
+        "description": "Get the list of customers from external source",
         "stage": "get_customers_list",
         "dependencies": [],
-        "action": "function",
-        "path": "customers_list",
-        "function": "get_master_data",
-        "args": {
-          "type": "customers"
+        "skip": "0",
+        "params": {
+          "path": "customers_list",
+          "function": "user_defined_function",
+          "args": {
+            "function_name": "get_master_data",
+            "type": "customers"
+          },
+          "newField": "",
+          "strict": "",
+          "condition": ""
         }
       }
     ]
   },
   {
     "rule": "Match customer",
-    "skip": "0",
-    "description": "match_customers",
     "stage": "match_customers",
-    "dependencies": ["get_customers_list"],
+    "description": "Matches customer from external data using customer name",
+    "dependencies": [
+      "get_customers_list"
+    ],
+    "skip": "0",
     "condition": {
       "path": "customers_list",
       "operator": "exists"
     },
     "actions": [
       {
+        "action": "function",
         "description": "",
         "stage": "search_customer",
         "dependencies": [],
-        "action": "function",
-        "path": "customer_name",
-        "function": "semantic_search",
-        "args": {
-          "corpus": {
-            "path": "customers_list"
+        "skip": "0",
+        "params": {
+          "path": "customer_name",
+          "function": "user_defined_function",
+          "args": {
+            "function_name": "semantic_search",
+            "corpus": {
+              "path": "customers_list"
+            },
+            "corpus_key": "BPNAME",
+            "master_data_type": "customers",
+            "similarity_threshold": "80"
           },
-          "corpus_key": "BPNAME",
-          "master_data_type": "customers",
-          "similarity_threshold": "80"
+          "newField": "",
+          "strict": "",
+          "condition": ""
         }
       },
       {
-        "description": "",
+        "action": "delete",
+        "description": "Delete customers list",
         "stage": "delete_customer_list",
-        "dependencies": ["search_customer"],
-        "skip": "0",
-        "action": "remove_path",
-        "path": "customers_list"
+        "dependencies": [
+          "search_customer"
+        ],
+        "skip": "1",
+        "params": {
+          "path": "customers_list"
+        }
       }
     ]
   },
   {
-    "rule": "Get products list",
-    "skip": "0",
+    "rule": "Process Items",
+    "stage": "process_items",
     "description": "",
-    "stage": "get_products_list",
     "dependencies": [],
+    "skip": "0",
     "condition": "always",
     "actions": [
       {
-        "description": "",
-        "stage": "get_product_list",
-        "dependencies": [],
         "action": "function",
-        "path": "products_list",
-        "function": "get_master_data",
-        "args": {
-          "type": "all products"
-        }
-      }
-    ]
-  },
-  {
-    "rule": "Get brand code from product name",
-    "skip": "0",
-    "description": "",
-    "stage": "get_product_brand",
-    "dependencies": ["get_product_list"],
-    "condition": {
-      "path": "products_list",
-      "operator": "exists"
-    },
-    "actions": [
-      {
-        "description": "",
-        "stage": "set_product_principal_code",
-        "dependencies": [],
-        "action": "function",
-        "path": "products_list.*.ItemCode",
-        "function": "custom_preg_replace",
-        "args": {
-          "pattern": "/^([A-Z]*).*$/",
-          "replacement": "$1"
-        },
-        "newField": "products_list.*.PrincipalCode"
-      }
-    ]
-  },
-  {
-    "rule": "Match Products",
-    "skip": "0",
-    "description": "",
-    "stage": "match_products",
-    "dependencies": ["get_product_list"],
-    "condition": {
-      "path": "products_list",
-      "operator": "exists"
-    },
-    "actions": [
-      {
-        "description": "",
-        "stage": "match_products",
-        "dependencies": [],
-        "action": "function",
-        "path": "items",
-        "function": "semantic_match",
-        "args": {
-          "matching_key": "name",
-          "corpus": {
-            "path": "products_list"
-          },
-          "corpus_key": "ItemName",
-          "master_data_type": "all products",
-          "similarity_threshold": "80"
-        }
-      },
-      {
-        "description": "",
-        "stage": "delete_products_list",
-        "dependencies": ["match_products"],
-        "skip": "0",
-        "action": "remove_path",
-        "path": "products_list"
-      }
-    ]
-  },
-  {
-    "rule": "Set item quantity",
-    "skip": "0",
-    "description": "",
-    "stage": "set_product_quantity",
-    "dependencies": [],
-    "condition": {
-      "path": "items.*.original_value.unit_of_measure",
-      "operator": "exists"
-    },
-    "actions": [
-      {
-        "description": "",
-        "stage": "get_item_number_of_pieces",
-        "dependencies": [],
-        "action": "function",
-        "path": "items.*.original_value.unit_of_measure",
-        "function": "assoc_array_find",
-        "args": {
-          "condition_field": "selling_unit",
-          "condition_operator": "similar_to",
-          "condition_value": "Pieces - PCS",
-          "condition_threshold": "80",
-          "return_field": "selling_quantity"
-        },
-        "newField": "items.*.original_value.number_of_pieces"
-      },
-      {
-        "description": "",
+        "description": "Get number of cases",
         "stage": "get_item_number_of_cases",
         "dependencies": [],
-        "action": "function",
-        "path": "items.*.original_value.unit_of_measure",
-        "function": "assoc_array_find",
-        "args": {
-          "condition_field": "selling_unit",
-          "condition_operator": "similar_to",
-          "condition_value": "Cases - CS",
-          "condition_threshold": "80",
-          "return_field": "selling_quantity"
-        },
-        "newField": "items.*.original_value.number_of_cases"
-      },
-      {
-        "description": "Get the pack unit of measure",
-        "stage": "get_pack_unit_of_measure",
-        "dependencies": [],
-        "action": "function",
-        "path": "items",
-        "function": "map_parallel",
-        "args": {
-          "path": "",
-          "function": "set",
-          "args": {
-            "data_path": "",
-            "value": "Phelix",
-            "valueFromField": "",
-            "valueMapping": "",
-            "conditionalValue":"",
-            "newField": "created_by"
-          },
-          "newField": "",
-          "strict": "0",
-          "condition": ""
-        },
-        "newField": "",
-        "strict": "0",
-        "condition": ""
-      },
-      {
-        "description": "Get the pack unit of measure",
-        "stage": "append_pack_size",
-        "dependencies": ["get_pack_unit_of_measure"],
         "skip": "0",
-        "action": "function",
-        "path": "items",
-        "function": "map_parallel",
-        "args": {
-          "path": "",
-          "function": "set",
+        "params": {
+          "path": "items.*.original_value.unit_of_measure",
+          "function": "assoc_array_find",
           "args": {
-            "data_path": "",
-            "value": "",
-            "valueFromField": "created_by",
-            "valueMapping": "",
-            "conditionalValue":"",
-            "newField": "created_by_full"
+            "condition": {
+              "path": "selling_unit",
+              "operator": "similar_to",
+              "value": "Cases - CS",
+              "similarity_threshold": "80",
+              "tokenize_similarity": "0"
+            },
+            "return_field": "selling_quantity"
           },
-          "newField": "",
-          "strict": "0",
+          "newField": "items.*.original_value.number_of_cases",
+          "strict": "",
           "condition": ""
-        },
-        "newField": "",
-        "strict": "0",
-        "condition": ""
-      }
-    ]
-  },
-  {
-    "rule": "Split orders for different brands",
-    "skip": "0",
-    "description": "",
-    "stage": "split_orders",
-    "dependencies": [],
-    "condition": {
-      "path": "items.*.matched_value.PrincipalCode",
-      "operator": "exists"
-    },
-    "actions": [
-      {
-        "description": "",
-        "stage": "split_items",
-        "dependencies": [],
-        "action": "function",
-        "path": "",
-        "function": "split",
-        "args": {
-          "split_path": "items",
-          "criteria_path": "items.*.matched_value.PrincipalCode"
         }
-      }
-    ]
-  },
-  {
-    "rule": "Get brand code",
-    "skip": "0",
-    "description": "",
-    "stage": "get_brand_code",
-    "dependencies": [],
-    "condition": {
-      "path": "items.*.matched_value.PrincipalCode",
-      "operator": "exists"
-    },
-    "actions": [
-      {
-        "description": "",
-        "stage": "set_item_principal_code",
-        "dependencies": [],
-        "action": "set",
-        "path": "PrincipalCode",
-        "value": "",
-        "valueFromField": "items.0.matched_value.PrincipalCode"
       }
     ]
   }

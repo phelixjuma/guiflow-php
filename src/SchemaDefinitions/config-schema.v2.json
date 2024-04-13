@@ -1,0 +1,2370 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Rules",
+  "description": "List of rules. Rules are an encapsulation for a list of actions to perform if the rule condition passes",
+  "type": "array",
+  "uniqueItems": true,
+  "definitions": {
+    "condition": {
+      "title": "Condition",
+      "oneOf": [
+        {
+          "title": "Condition for Set Function",
+          "type": "object",
+          "properties": {
+            "operator": {
+              "type": "string",
+              "enum": [
+                "==", "!=", "gt", "gte", "lt", "lte", "contains","not contains", "matches", "not matches",
+                "regex", "in", "no in", "in list all", "not in list all", "in list any", "not in list any", "like",
+                "similar_to"
+              ]
+            },
+            "value": {
+              "type": [
+                "string",
+                "integer",
+                "boolean",
+                "array",
+                "object"
+              ]
+            }
+          },
+          "required": [
+            "operator",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Existence Checker Condition",
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
+                "exists",
+                "not exists"
+              ]
+            }
+          },
+          "required": [
+            "path",
+            "operator"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "True/False Condition",
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          },
+          "required": [
+            "path",
+            "operator"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Simple Condition",
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
+                "==", "!=", "gt", "gte", "lt", "lte", "contains","not contains", "matches", "not matches",
+                "regex", "in", "no in", "in list all", "not in list all", "in list any", "not in list any", "like",
+                "similar_to"
+              ]
+            },
+            "value": {
+              "type": [
+                "string",
+                "integer",
+                "boolean",
+                "array",
+                "object"
+              ]
+            },
+            "similarity_threshold": {
+              "type": "string"
+            },
+            "tokenize_similarity": {
+              "type": "string",
+              "enum": ["1", "0"]
+            }
+          },
+          "required": [
+            "path",
+            "operator",
+            "value",
+            "similarity_threshold",
+            "tokenize_similarity"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Nested Conditions",
+          "type": "object",
+          "properties": {
+            "operator": {
+              "type": "string",
+              "enum": [
+                "AND",
+                "OR"
+              ]
+            },
+            "conditions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/condition"
+              }
+            }
+          },
+          "required": [
+            "operator",
+            "conditions"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "No Condition",
+          "type": "string",
+          "const": ""
+        },
+        {
+          "title": "Always True Condition",
+          "type": "string",
+          "const": "always"
+        }
+      ]
+    },
+    "filterConditions": {
+      "title": "Filter Criteria",
+      "oneOf": [
+        {
+          "title": "Simple Condition",
+          "type": "object",
+          "properties": {
+            "term": {
+              "type": "string"
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "==", "!=", ">", ">=", "<", "<=", "in", "not in", "regex", "true", "false", "empty", "not empty",
+                "startswith", "endswith", "similar_to", "contains"
+              ]
+            },
+            "key": {
+              "type": "string"
+            },
+            "similarity_threshold": {
+              "type": "string"
+            },
+            "term_exclusion_pattern": {
+              "type": "string"
+            },
+            "value_exclusion_pattern": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "term",
+            "mode",
+            "key",
+            "similarity_threshold", "term_exclusion_pattern", "value_exclusion_pattern"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Nested Conditions",
+          "type": "object",
+          "properties": {
+            "operator": {
+              "type": "string",
+              "enum": [
+                "AND",
+                "OR"
+              ]
+            },
+            "conditions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/filterConditions"
+              }
+            }
+          },
+          "required": [
+            "operator",
+            "conditions"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "functionParams": {
+      "title": "params",
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "The (part of) data the function will operate on"
+        },
+        "function": {
+          "type": "string",
+          "description": "The name of the function to be executed.",
+          "enum": [
+            "user_defined_function",
+            "transform", "filter", "split", "merge", "map",
+            "map_parallel", "set", "join", "reducer",
+            "sort_multi_by_key", "format_date",
+            "fuzzy_extract_one", "fuzzy_extract_n",
+            "regex_extract",
+            "append", "prepend", "concat", "concat_multi_array_assoc",
+            "custom_preg_replace", "regex_mapper_multiple",
+            "remove_repeated_words", "assoc_array_sum_if",
+            "assoc_array_find",
+            "get_from_object", "flatten_objects",
+            "expand_lists", "flatten_and_expand",
+            "rename_object_keys", "date_add_substract_days",
+            "date_format", "date_diff", "convert_unit",
+            "convert_unit_multi", "get_metric_conversion_table",
+            "model_mapping", "make_object_list_unique",
+            "duplicate_list_item", "get_random_string",
+            "basic_arithmetic", "length", "parse_template",
+            "strtolower","strtoupper","trim", "ucwords","strlen", "explode", "implode", "nl2br", "number_format",
+            "levenshtein", "similar_text", "soundex","str_contains", "str_ireplace", "str_replace", "substr", "strtr",
+            "strtotime",
+            "sort",
+            "round", "floor", "ceil", "abs", "exp", "max", "min", "pow", "sqrt", "array_sum","count", "sizeof",
+            "json_encode", "json_decode",
+            "intval", "floatval"
+          ]
+        },
+        "args": {
+          "anyOf": [
+            {
+              "title": "user_defined_function",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "user_defined_function"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/user_defined_function"
+              }
+            },
+            {
+              "title": "transform",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "transform"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/transform"
+              }
+            },
+            {
+              "title": "filter",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "filter"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/filter"
+              }
+            },
+            {
+              "title": "split",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "split"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/split"
+              }
+            },
+            {
+              "title": "merge",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "merge"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/merge"
+              }
+            },
+            {
+              "title": "map",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "map"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/map"
+              }
+            },
+            {
+              "title": "map_parallel",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "map_parallel"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/map_parallel"
+              }
+            },
+            {
+              "title": "set",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "set"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/set"
+              }
+            },
+            {
+              "title": "join",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "join"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/join"
+              }
+            },
+            {
+              "title": "reducer",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "reducer"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/reducer"
+              }
+            },
+            {
+              "title": "sort_multi_by_key",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "sort_multi_by_key"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/sort_multi_by_key"
+              }
+            },
+            {
+              "title": "format_date",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "format_date"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/format_date"
+              }
+            },
+            {
+              "title": "fuzzy_extract_one",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "fuzzy_extract_one"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/fuzzy_extract_one"
+              }
+            },
+            {
+              "title": "fuzzy_extract_n",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "fuzzy_extract_n"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/fuzzy_extract_n"
+              }
+            },
+            {
+              "title": "regex_extract",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "regex_extract"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/regex_extract"
+              }
+            },
+            {
+              "title": "append",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "append"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/append"
+              }
+            },
+            {
+              "title": "prepend",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "prepend"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/prepend"
+              }
+            },
+            {
+              "title": "concat",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "concat"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/concat"
+              }
+            },
+            {
+              "title": "concat_multi_array_assoc",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "concat_multi_array_assoc"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/concat_multi_array_assoc"
+              }
+            },
+            {
+              "title": "custom_preg_replace",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "custom_preg_replace"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/custom_preg_replace"
+              }
+            },
+            {
+              "title": "regex_mapper_multiple",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "regex_mapper_multiple"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/regex_mapper_multiple"
+              }
+            },
+            {
+              "title": "remove_repeated_words",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "remove_repeated_words"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/remove_repeated_words"
+              }
+            },
+            {
+              "title": "assoc_array_sum_if",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "assoc_array_sum_if"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/assoc_array_sum_if"
+              }
+            },
+            {
+              "title": "assoc_array_find",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "assoc_array_find"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/assoc_array_find"
+              }
+            },
+            {
+              "title": "get_from_object",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "get_from_object"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/get_from_object"
+              }
+            },
+            {
+              "title": "flatten_objects",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "flatten_objects"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/flatten_objects"
+              }
+            },
+            {
+              "title": "expand_lists",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "expand_lists"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/expand_lists"
+              }
+            },
+            {
+              "title": "flatten_and_expand",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "flatten_and_expand"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/flatten_and_expand"
+              }
+            },
+            {
+              "title": "rename_object_keys",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "rename_object_keys"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/rename_object_keys"
+              }
+            },
+            {
+              "title": "date_add_substract_days",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "date_add_substract_days"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/date_add_substract_days"
+              }
+            },
+            {
+              "title": "date_format",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "date_format"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/date_format"
+              }
+            },
+            {
+              "title": "date_diff",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "date_diff"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/date_diff"
+              }
+            },
+            {
+              "title": "convert_unit",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "convert_unit"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/convert_unit"
+              }
+            },
+            {
+              "title": "convert_unit_multi",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "convert_unit_multi"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/convert_unit_multi"
+              }
+            },
+            {
+              "title": "get_metric_conversion_table",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "get_metric_conversion_table"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/get_metric_conversion_table"
+              }
+            },
+            {
+              "title": "model_mapping",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "model_mapping"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/model_mapping"
+              }
+            },
+            {
+              "title": "make_object_list_unique",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "make_object_list_unique"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/make_object_list_unique"
+              }
+            },
+            {
+              "title": "duplicate_list_item",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "duplicate_list_item"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/duplicate_list_item"
+              }
+            },
+            {
+              "title": "get_random_string",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "get_random_string"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/get_random_string"
+              }
+            },
+            {
+              "title": "basic_arithmetic",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "basic_arithmetic"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/basic_arithmetic"
+              }
+            },
+            {
+              "title": "length",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "length"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/length"
+              }
+            },
+            {
+              "title": "parse_template",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "parse_template"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/parse_template"
+              }
+            },
+            {
+              "title": "No Additional Params",
+              "properties": {},
+              "additionalProperties": false
+            }
+          ]
+        },
+        "newField": {
+          "type": "string",
+          "description": "The field to store the result of the function."
+        },
+        "strict": {
+          "type": "string",
+          "description": "Specifies whether the function execution should be strict."
+        },
+        "condition": {
+          "$ref": "#/definitions/condition",
+          "default": ""
+        }
+      },
+      "required": [
+        "path",
+        "function",
+        "args",
+        "newField",
+        "strict",
+        "condition"
+      ],
+      "additionalProperties": false
+    },
+    "transform": {
+      "type": "object",
+      "properties": {
+        "transformer": {
+          "type": "string",
+          "enum": ["str_replace", "preg_replace", "explode", "string_to_date_time", "dictionary_mapper", "regex_mapper"]
+        },
+        "transformer_args": {
+          "anyOf": [
+            {
+              "title": "str_replace",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "str_replace"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "search": {
+                    "type": "string"
+                  },
+                  "replacement": {
+                    "type": "string"
+                  }
+                },
+                "required": ["search", "replacement"],
+                "additionalProperties": false
+              }
+            },
+            {
+              "title": "preg_replace",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "preg_replace"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "pattern": {
+                    "type": "string"
+                  },
+                  "replacement": {
+                    "type": "string"
+                  },
+                  "add_spacer": {
+                    "type": "string",
+                    "enum": ["1", "0"]
+                  },
+                  "is_case_sensitive": {
+                    "type": "string",
+                    "enum": ["1", "0"]
+                  }
+                },
+                "required": ["pattern", "replacement", "add_spacer", "is_case_sensitive"],
+                "additionalProperties": false
+              }
+            },
+            {
+              "title": "explode",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "explode"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "separator": {
+                    "type": "string"
+                  }
+                },
+                "required": ["separator"],
+                "additionalProperties": false
+              }
+            },
+            {
+              "title": "string_to_date_time",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "string_to_date_time"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "format": {
+                    "type": "string",
+                    "enum": [
+                      "Y-m-d",
+                      "m/d/Y",
+                      "d.m.Y",
+                      "Y-m-d H:i:s",
+                      "D, M d, Y"
+                    ]
+                  },
+                  "pre_modifier": {
+                    "type": "string"
+                  },
+                  "post_modifier": {
+                    "type": "string"
+                  }
+                },
+                "required": ["format", "pre_modifier", "post_modifier"],
+                "additionalProperties": false
+              }
+            },
+            {
+              "title": "dictionary_mapper",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "dictionary_mapper"
+                  }
+                }
+              },
+              "then": {
+                "description": "Add key-value pairs where the value represented under key is replaced the key's value",
+                "properties": {
+                  "mappings": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["mappings"],
+                "additionalProperties": false
+              }
+            },
+            {
+              "title": "regex_mapper",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "regex_mapper"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "mappings": {
+                    "anyOf": [
+                      {
+                        "description": "Key-Value where key represents the search pattern and value represents the replacement",
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "pattern": {
+                              "type": "string"
+                            },
+                            "replacement": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["pattern", "replacement"],
+                          "additionalProperties": false
+                        }
+                      }
+                    ]
+                  },
+                  "is_case_sensitive": {
+                    "type": "string",
+                    "enum": ["1", "0"]
+                  }
+                },
+                "required": ["mappings", "is_case_sensitive"],
+                "additionalProperties": false
+              }
+            }
+          ]
+        },
+        "transformer_target_keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "transformer",
+        "transformer_args",
+        "transformer_target_keys"
+      ],
+      "additionalProperties": false
+    },
+    "filter": {
+      "type": "object",
+      "properties": {
+        "filter_criteria": {
+          "$ref": "#/definitions/filterConditions"
+        }
+      },
+      "required": [
+        "filter_criteria"
+      ],
+      "additionalProperties": false
+    },
+    "split": {
+      "title": "Split or group data",
+      "type": "object",
+      "properties": {
+        "split_path": {
+          "description": "The path to the data to be split.",
+          "type": "string"
+        },
+        "criteria_path": {
+          "description": "The path that determines the criteria for splitting. Akin to 'groupBy'",
+          "type": "string"
+        }
+      },
+      "required": ["split_path", "criteria_path"],
+      "additionalProperties": false
+    },
+    "merge": {
+      "type": "object",
+      "properties": {
+        "left": {
+          "description": "The left-side data",
+          "oneOf": [
+            {
+              "type": "array"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": ["path"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "right": {
+          "description": "The right-side data",
+          "oneOf": [
+            {
+              "type": "array"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": ["path"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "join": {
+          "description": "The criteria to use for joining",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["inner", "left", "right"]
+            },
+            "on": {
+              "type": "string"
+            }
+          },
+          "required": ["type", "on"],
+          "additionalProperties": false
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "group_by": {
+          "type": "string"
+        }
+      },
+      "required": ["left", "right", "join", "fields", "group_by"],
+      "additionalProperties": false
+    },
+    "map": {
+      "$ref": "#/definitions/functionParams"
+    },
+    "map_parallel": {
+      "$ref": "#/definitions/functionParams"
+    },
+    "set": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "join": {
+      "description": "Used to concatenate lists of data. Different from merge in that it simply appends one list to another",
+      "type": "object",
+      "properties": {
+        "join_paths": {
+          "description": "Paths to the subsets of data to be concatenated",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "criteria": {
+          "description": "The conditions to be met for the joining to be done. Two datasets are only merged if both meet the criteria",
+          "$ref": "#/definitions/condition"
+        }
+      },
+      "required": ["join_paths", "criteria"],
+      "additionalProperties": false
+    },
+    "reducer": {
+      "description": "Gets one value from a list of data, based on the specified reducer function",
+      "oneOf": [
+        {
+          "title": "Min or Max",
+          "description": "Get the min or max value from the data",
+          "properties": {
+            "reducer": {
+              "type": "string",
+              "enum": ["min", "max"]
+            }
+          },
+          "required": ["reducer"],
+          "additionalProperties": false
+        },
+        {
+          "title": "Modal or Priority Reducer",
+          "description": "Modal returns the most common value and if there is a tie, it uses the priority list to break the tie. Priority reducer picks the data with the highest priority",
+          "properties": {
+            "reducer": {
+              "type": "string",
+              "enum": ["modal_value", "priority_reducer"]
+            },
+            "priority": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "default": {
+              "type": "string"
+            }
+          },
+          "required": ["reducer", "priority", "default"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "sort_multi_by_key": {
+      "description": "Sort a list of objects based on a specified object key",
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "order": {
+          "type": "string",
+          "enum": ["asc", "desc"]
+        }
+      },
+      "required": ["key", "order"],
+      "additionalProperties": false
+    },
+    "format_date": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": [
+            "Y-m-d",
+            "m/d/Y",
+            "d.m.Y",
+            "Y-m-d H:i:s",
+            "D, M d, Y"
+          ]
+        }
+      },
+      "required": ["format"],
+      "additionalProperties": false
+    },
+    "fuzzy_extract_one": {
+      "type": "object",
+      "properties": {
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "min_score": {
+          "type": "string"
+        },
+        "default_choice": {
+          "type": "string"
+        },
+        "fuzzy_method": {
+          "type": "string",
+          "enum": ["ratio", "partialRatio", "weightedRatio", "tokenSetRatio", "tokenSortRatio", "tokenSetPartialRatio", "tokenSortPartialRatio"],
+          "default": "tokenSetRatio"
+        }
+      },
+      "required": ["choices", "min_score", "default_choice", "fuzzy_method"],
+      "additionalProperties": false
+    },
+    "fuzzy_extract_n": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "choices": {
+          "oneOf": [
+            {
+              "title": "Get data from path",
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "title": "Set the choices data",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "search_key": {
+          "type": "string"
+        },
+        "n": {
+          "type": "string"
+        },
+        "order": {
+          "type": "string",
+          "enum": ["asc", "desc"]
+        },
+        "fuzzy_method": {
+          "type": "string",
+          "enum": ["ratio", "partialRatio", "weightedRatio", "tokenSetRatio", "tokenSortRatio", "tokenSetPartialRatio", "tokenSortPartialRatio"],
+          "default": "tokenSetRatio"
+        }
+      },
+      "required": ["query", "choices", "search_key", "n", "order", "fuzzy_method"],
+      "additionalProperties": false
+    },
+    "regex_extract": {
+      "type": "object",
+      "properties": {
+        "pattern": {
+          "type": "string"
+        },
+        "capture_group_number": {
+          "description": "The number, from 1, of the capture group for backreference",
+          "type": "string"
+        },
+        "is_case_sensitive": {
+          "type": "string",
+          "enum": ["1", "0"]
+        },
+        "return_subject_on_null": {
+          "description": "If no search matches the pattern, whether or not to return the whole data",
+          "type": "string",
+          "enum": ["1", "0"]
+        }
+      },
+      "required": ["pattern", "capture_group_number", "is_case_sensitive", "return_subject_on_null"],
+      "additionalProperties": false
+    },
+    "append": {
+      "type": "object",
+      "properties": {
+        "data_to_append": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "separator": {
+          "type": "string"
+        },
+        "use_data_as_path_value": {
+          "description": "Can be used when condition is set. Should be true when the condition specifies a path that should be referenced in the data",
+          "type": "string",
+          "enum": ["1", "0"]
+        },
+        "value_key": {
+          "description": "Used when appending data within a list of objects. The key specifies which object key the final result should be set in",
+          "type": "string"
+        }
+      },
+      "required": ["data_to_append", "separator", "use_data_as_path_value", "value_key"],
+      "additionalProperties": false
+    },
+    "prepend": {
+      "type": "object",
+      "properties": {
+        "data_to_prepend": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "separator": {
+          "type": "string"
+        },
+        "use_data_as_path_value": {
+          "description": "Can be used when condition is set. Should be true when the condition specifies a path that should be referenced in the data",
+          "type": "string",
+          "enum": ["1", "0"]
+        },
+        "value_key": {
+          "description": "Used when appending data within a list of objects. The key specifies which object key the final result should be set in",
+          "type": "string"
+        }
+      },
+      "required": ["data_to_prepend", "separator", "use_data_as_path_value", "value_key"],
+      "additionalProperties": false
+    },
+    "concat": {
+      "type": "object",
+      "properties": {
+        "data_to_concat": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "separator": {
+          "type": "string"
+        },
+        "enclosure": {
+          "type": "string",
+          "enum": ["brackets", "square brackets", "curly brackets", "forward strokes", "backward strokes", "double quotes", "single quotes"]
+        }
+      },
+      "required": ["data_to_concat", "separator", "enclosure"],
+      "additionalProperties": false
+    },
+    "concat_multi_array_assoc": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "newField": {
+          "description": "The field where concatenated string should be set",
+          "type": "string"
+        },
+        "separator": {
+          "type": "string"
+        },
+        "enclosure": {
+          "type": "string",
+          "enum": ["brackets", "square brackets", "curly brackets", "forward strokes", "backward strokes", "double quotes", "single quotes"]
+        }
+      },
+      "required": ["fields", "newField", "separator", "enclosure"],
+      "additionalProperties": false
+    },
+    "custom_preg_replace": {
+      "type": "object",
+      "properties": {
+        "pattern": {
+          "type": "string"
+        },
+        "replacement": {
+          "description": "This accepts both string and capture group numbers prepended with the dollar sign eg $1, $2...",
+          "type": "string"
+        }
+      },
+      "required": ["pattern", "replacement"],
+      "additionalProperties": false
+    },
+    "regex_mapper_multiple": {
+      "type": "object",
+      "properties": {
+        "mappers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "description": "Explains what this mapper does",
+                "type": "string"
+              },
+              "order": {
+                "description": "Use this for sorting which mapper is to be executed before which ones",
+                "type": "string"
+              },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "pattern": {
+                    "type": "string"
+                  },
+                  "modifiers": {
+                    "type": "string"
+                  },
+                  "replacements": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "pattern": {
+                          "type": "string"
+                        },
+                        "replacement":{
+                          "type": "string"
+                        }
+                      },
+                      "required": ["pattern", "replacement"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": ["pattern", "modifiers", "replacements"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["description", "order", "data"],
+            "additionalProperties": false
+          }
+        },
+        "sort_by_order": {
+          "type": "string",
+          "enum": ["1", "0"]
+        }
+      },
+      "required": ["mappers", "sort_by_order"],
+      "additionalProperties": false
+    },
+    "remove_repeated_words": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "assoc_array_sum_if": {
+      "description": "Conditionally summate specific colum in a list of objects if the object mets the set criteria",
+      "type": "object",
+      "properties": {
+        "sum_field": {
+          "type": "string",
+          "description": "The key/field that is to be summated"
+        },
+        "condition": {
+          "$ref": "#/definitions/condition"
+        }
+      },
+      "required": ["sum_field", "condition"],
+      "additionalProperties": false
+    },
+    "assoc_array_find": {
+      "type": "object",
+      "properties": {
+        "condition": {
+          "$ref": "#/definitions/condition"
+        },
+        "return_field": {
+          "type": "string",
+          "description": "The key/field for the object data you want returned. If not set, the entire object is returned"
+        }
+      },
+      "required": ["condition", "return_field"],
+      "additionalProperties": false
+    },
+    "get_from_object": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        }
+      },
+      "required": ["key"],
+      "additionalProperties": false
+    },
+    "flatten_objects": {
+      "description": "Flattens an object. Child objects are removed and their values set on the parent using parent.child path notation",
+      "type": "object",
+      "properties": {
+        "key_prefix": {
+          "description": "A prefix for the flattened keys. Optional",
+          "type": "string"
+        }
+      },
+      "required": ["key_prefix"],
+      "additionalProperties": false
+    },
+    "expand_lists": {
+      "description": "Expands complex nested array into a simple one-level array of objects. Nested objects are brought to the parent level. Nested arrays are expanded and split eg ['preferences' => ['colors' => ['blue', 'green']]] becomes [['preferences.colors' => 'blue'],['preferences.colors' => 'green']]",
+      "type": "object",
+      "properties": {
+        "key_prefix": {
+          "description": "A prefix for the flattened keys. Optional",
+          "type": "string"
+        }
+      },
+      "required": ["key_prefix"],
+      "additionalProperties": false
+    },
+    "flatten_and_expand": {
+      "description": "This first flattens the data using the flatten_objects function and then expands the list using the expand_lists function",
+      "type": "object",
+      "properties": {
+        "key_prefix": {
+          "description": "A prefix for the flattened keys. Optional",
+          "type": "string"
+        }
+      },
+      "required": ["key_prefix"],
+      "additionalProperties": false
+    },
+    "rename_object_keys": {
+      "type": "object",
+      "properties": {
+        "key_map": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["key_map"],
+      "additionalProperties": false
+    },
+    "date_add_substract_days": {
+      "type": "object",
+      "properties": {
+        "days": {
+          "type": "string"
+        },
+        "operator": {
+          "type": "string",
+          "enum": ["add","sub"]
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "Y-m-d",
+            "m/d/Y",
+            "d.m.Y",
+            "Y-m-d H:i:s",
+            "D, M d, Y"
+          ]
+        }
+      },
+      "required": ["days", "operator", "format"],
+      "additionalProperties": false
+    },
+    "date_format": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": [
+            "Y-m-d",
+            "m/d/Y",
+            "d.m.Y",
+            "Y-m-d H:i:s",
+            "D, M d, Y"
+          ]
+        }
+      },
+      "required": ["format"],
+      "additionalProperties": false
+    },
+    "date_diff": {
+      "type": "object",
+      "properties": {
+        "end_date": {
+          "type": "string"
+        },
+        "period": {
+          "description": "The unit for the date difference: years (y), months (m), days (d), hours (h), minutes (i), seconds (s)",
+          "type": "string",
+          "enum": ["y", "m", "d", "h", "i", "s"]
+        }
+      },
+      "required": ["end_date", "period"],
+      "additionalProperties": false
+    },
+    "convert_unit": {
+      "description": "Convert quantity from one unit to another. Must take in a valid conversion table as the data. A valid conversion table is a list of objects with object keys: to (unit to convert to), from (unit to convert from), factor (the conversion multiple between the from and to units). Example: {'from': 'cm', 'to': 'm', 'factor': 0.01}",
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "string"
+        },
+        "from_unit": {
+          "type": "string"
+        },
+        "to_unit": {
+          "type": "string"
+        },
+        "invert_factor": {
+          "description": "Whether or not the factor in conversion table should be inverted or not",
+          "type": "string",
+          "enum": ["1", "0"]
+        }
+      },
+      "required": ["quantity", "from_unit", "to_unit", "invert_factor"],
+      "additionalProperties": false
+    },
+    "convert_unit_multi": {
+      "description": "Convert units similar to convert_unit function but working on a list of objects data.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "description": "The list of objects data where each object will have the quantity converted",
+          "oneOf": [
+            {
+              "title": "Get data from path",
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "title": "Set the data",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "conversion_table": {
+          "oneOf": [
+            {
+              "title": "Get data from path",
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "title": "Set the data",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "quantity": {
+          "type": "object",
+          "properties": {
+            "in_item_path": {
+              "type": "string"
+            }
+          }
+        },
+        "from_unit": {
+          "type": "object",
+          "properties": {
+            "in_item_path": {
+              "type": "string"
+            }
+          }
+        },
+        "to_unit": {
+          "type": "object",
+          "properties": {
+            "in_item_path": {
+              "type": "string"
+            }
+          }
+        },
+        "invert_factor": {
+          "description": "Whether or not the factor in conversion table should be inverted or not",
+          "type": "string",
+          "enum": ["1", "0"]
+        },
+        "output_path": {
+          "description": "The field path where the conversion results will be stored",
+          "type": "string"
+        }
+      },
+      "required": ["items", "conversion_table", "quantity", "from_unit", "to_unit", "invert_factor", "output_path"],
+      "additionalProperties": false
+    },
+    "get_metric_conversion_table": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "model_mapping": {
+      "description": "Convert from one data model to another",
+      "type": "object",
+      "properties": {
+        "model_mapping": {
+          "description": "The keys define the source data paths while the values define the mapped (new) data paths",
+          "oneOf": [
+            {
+              "type": "object",
+              "description": "Key-Value with Key as new data path and value as origin data path",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "array",
+              "description": "A List showing from and to data paths",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from_path": {
+                    "type": "string"
+                  },
+                  "to_path": {
+                    "type": "string"
+                  }
+                },
+                "required": ["from_path", "to_path"],
+                "additionalProperties": false
+              }
+            }
+          ]
+        },
+        "inverted": {
+          "description": "If inverted is yes, the mapping is done in the opposite direction ie model mapping keys will be the new data while values will be source data paths",
+          "type": "string",
+          "enum": ["1", "0"]
+        }
+      },
+      "required": ["model_mapping", "inverted"],
+      "additionalProperties": false
+    },
+    "make_object_list_unique": {
+      "description": "Returns a list with all duplicate objects removed to ensure objects are unique",
+      "type": "object",
+      "properties": {
+        "unique_key_path": {
+          "description": "Key/field to check uniqueness on",
+          "type": "string"
+        },
+        "rank_key_path": {
+          "description": "Key/field for ranking to choose on which copy of the duplicated objects to retain",
+          "type": "string"
+        },
+        "rank_order": {
+          "description": "The ranking ordr for the rank_key_path",
+          "type": "string",
+          "enum": ["desc", "asc"],
+          "default": "desc"
+        }
+      },
+      "required": ["unique_key_path", "rank_key_path", "rank_order"],
+      "additionalProperties": false
+    },
+    "duplicate_list_item": {
+      "description": "Duplicate specific objects within a list. Has an option to modify the duplicated copy",
+      "type": "object",
+      "properties": {
+        "replacement_key": {
+          "description": "The search key used to match the duplicated object to its replacement data",
+          "type": "string"
+        },
+        "replacement_data": {
+          "description": "The replacement data. For each replacement, add a new property defining the replacement_key name used for search",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "replacements": {
+                "description": "Keys/properties define the field to replace and the property value defines the value to replace onto that field",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": true,
+            "maxProperties": 2
+          }
+        },
+        "condition": {
+          "description": "The condition that the object must meet for it to be duplicated",
+          "$ref": "#/definitions/condition"
+        }
+      },
+      "required": ["replacement_key", "replacement_data", "condition"],
+      "additionalProperties": false
+    },
+    "get_random_string": {
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "string"
+        },
+        "alphabet": {
+          "type": "string"
+        }
+      },
+      "required": ["length", "alphabet"],
+      "additionalProperties": false
+    },
+    "basic_arithmetic": {
+      "type": "object",
+      "properties": {
+        "operator": {
+          "type": "string",
+          "enum": ["add", "subtract", "multiply","divide", "similarity_score"]
+        },
+        "operands": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "title": "Get data from path",
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "description": "Set data",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "default_value": {
+          "oneOf": [
+            {
+              "title": "Get data from path",
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "description": "Set data",
+              "type": "string"
+            }
+          ]
+        },
+        "modulo_handler": {
+          "type": "string",
+          "enum": ["ceil", "floor"]
+        },
+        "decimal_places": {
+          "type": "string"
+        }
+      },
+      "required": ["operator", "operands", "default_value", "modulo_handler", "decimal_places"],
+      "additionalProperties": false
+    },
+    "length": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "parse_template": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "description": "Template text where variables are denoted as {{variable_name}}",
+          "type": "string"
+        },
+        "config": {
+          "description": "Configure how the template variables in the template should matched. Number of configs should equal the number of template variables in the regex template",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "non_greedy": {
+                "type": "string",
+                "enum": ["1", "0"]
+              },
+              "only_numbers": {
+                "type": "string",
+                "enum": ["1", "0"]
+              },
+              "only_letters": {
+                "type": "string",
+                "enum": ["1", "0"]
+              }
+            },
+            "required": ["non_greedy", "only_numbers", "only_letters"],
+            "additionalProperties": false
+          }
+        },
+        "modifiers": {
+          "type": "string"
+        }
+      },
+      "required": ["template", "config", "modifiers"],
+      "additionalProperties": false
+    },
+    "user_defined_function": {
+      "type": "object",
+      "properties": {
+        "function_name": {
+          "type": "string"
+        }
+      },
+      "required": ["function_name"],
+      "additionalProperties": true
+    }
+  },
+  "items": {
+    "type": "object",
+    "properties": {
+      "rule": {
+        "title": "Name of the Rule",
+        "type": "string",
+        "description": "A string that represents the name of the rule."
+      },
+      "stage": {
+        "type": "string",
+        "description": "Defines a unique identifier for this rule"
+      },
+      "description": {
+        "title": "Description of the Rule",
+        "type": "string",
+        "description": "A string that represents the description of the rule."
+      },
+      "dependencies": {
+        "description": "A list of stages that this specific stage depends on ie its parents that must be executed first before it gets executed. Rule dependencies can only be actions and not other rules",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "uniqueItems": true
+      },
+      "skip": {
+        "type": "string",
+        "description": "Defines whether this rule should be skipped or not. If skipped, all the actions under this rule will be skipped",
+        "enum": [
+          "0",
+          "1"
+        ],
+        "default": "0"
+      },
+      "condition": {
+        "$ref": "#/definitions/condition"
+      },
+      "actions": {
+        "title": "List of Actions",
+        "description": "An array of actions to be executed in order.",
+        "type": "array",
+        "uniqueItems": true,
+        "items": {
+          "oneOf": [
+            {
+              "title": "Arithmetic Action",
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "add",
+                    "subtract",
+                    "multiply",
+                    "divide"
+                  ],
+                  "description": "The arithmetic operation to be performed."
+                },
+                "stage": {
+                  "type": "string",
+                  "description": "Defines a unique identifier for this rule"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "The description of what the arithmetic action does"
+                },
+                "dependencies": {
+                  "description": "A list of stages that this specific stage depends on ie its parents that must be executed first before it gets executed. Rule dependencies can only be actions and not other rules",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "skip": {
+                  "type": "string",
+                  "description": "Defines whether this rule should be skipped or not. If skipped, all the actions under this rule will be skipped",
+                  "enum": [
+                    "0",
+                    "1"
+                  ],
+                  "default": "0"
+                },
+                "params": {
+                  "description": "Action Parameters",
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "The (part of) data the function will operate on"
+                    },
+                    "value": {
+                      "type": [
+                        "string",
+                        "integer",
+                        "boolean",
+                        "array",
+                        "object"
+                      ],
+                      "description": "The value to be used as the argument for the operation."
+                    },
+                    "valueFromField": {
+                      "type": "string",
+                      "description": "The field from which to derive the value for the operation."
+                    },
+                    "newField": {
+                      "type": "string",
+                      "description": "The field to store the result of the operation."
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "value",
+                    "valueFromField",
+                    "newField"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "action",
+                "description",
+                "stage",
+                "dependencies",
+                "skip",
+                "params"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "title": "Delete or Remove Path Action",
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "delete",
+                    "remove_path"
+                  ],
+                  "description": "The operation to delete or remove a path."
+                },
+                "stage": {
+                  "type": "string",
+                  "description": "Defines a unique identifier for this rule"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "The description of what the arithmetic action does"
+                },
+                "dependencies": {
+                  "type": "array",
+                  "description": "A list of stages that this specific stage depends on ie its parents that must be executed first before it gets executed. Rule dependencies can only be actions and not other rules"
+                },
+                "skip": {
+                  "type": "string",
+                  "description": "Defines whether this rule should be skipped or not. If skipped, all the actions under this rule will be skipped",
+                  "enum": ["0", "1"]
+                },
+                "params": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "The path to be deleted or removed."
+                    }
+                  },
+                  "required": ["path"],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "action",
+                "description",
+                "stage",
+                "dependencies",
+                "skip",
+                "params"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "title": "Set Action",
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "set"
+                  ],
+                  "description": "Sets a new value for the given path."
+                },
+                "stage": {
+                  "type": "string",
+                  "description": "Defines a unique identifier for this rule"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "The description of what the arithmetic action does"
+                },
+                "dependencies": {
+                  "type": "array",
+                  "description": "A list of stages that this specific stage depends on ie its parents that must be executed first before it gets executed. Rule dependencies can only be actions and not other rules"
+                },
+                "skip": {
+                  "type": "string",
+                  "description": "Defines whether this rule should be skipped or not. If skipped, all the actions under this rule will be skipped",
+                  "enum": ["0", "1"]
+                },
+                "params": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "The data path where the value is to be set."
+                    },
+                    "value": {
+                      "type": [
+                        "string",
+                        "integer",
+                        "boolean",
+                        "array",
+                        "object",
+                        "null"
+                      ],
+                      "description": "The value to set. Optional if using valueFromField."
+                    },
+                    "valueFromField": {
+                      "type": "string",
+                      "description": "The JSON path from which to copy a value. Optional if using value."
+                    },
+                    "valueMapping": {
+                      "type": [
+                        "object",
+                        "null",
+                        "string"
+                      ],
+                      "description": "Maps values from valueFromField to new values. Used only with valueFromField."
+                    },
+                    "conditionalValue": {
+                      "type": [
+                        "array"
+                      ],
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "condition": {
+                            "$ref": "#/definitions/condition"
+                          },
+                          "value": {
+                            "type": [
+                              "string",
+                              "integer",
+                              "boolean",
+                              "array",
+                              "object",
+                              "null"
+                            ],
+                            "description": "The value to set if the condition is true."
+                          },
+                          "valueFromField": {
+                            "type": "string",
+                            "description": "The field from which to derive the value if the condition is true. Optional."
+                          }
+                        },
+                        "required": [
+                          "condition",
+                          "value",
+                          "valueFromField"
+                        ]
+                      },
+                      "description": "Sets the value based on a condition."
+                    },
+                    "newField": {
+                      "type": "string",
+                      "description": "The new field to create or update with the set value."
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "value",
+                    "valueFromField",
+                    "valueMapping",
+                    "conditionalValue",
+                    "newField"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "action",
+                "description",
+                "stage",
+                "dependencies",
+                "skip",
+                "params"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "title": "Function Action",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "function"
+                  ],
+                  "description": "Executes a specified function."
+                },
+                "stage": {
+                  "type": "string",
+                  "description": "Defines a unique identifier for this rule"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "The description of what the arithmetic action does"
+                },
+                "dependencies": {
+                  "type": "array",
+                  "description": "A list of stages that this specific stage depends on ie its parents that must be executed first before it gets executed. Rule dependencies can only be actions and not other rules"
+                },
+                "skip": {
+                  "type": "string",
+                  "description": "Defines whether this rule should be skipped or not. If skipped, all the actions under this rule will be skipped",
+                  "enum": ["0", "1"]
+                },
+                "params":{
+                  "$ref": "#/definitions/functionParams"
+                }
+              },
+              "required": [
+                "action",
+                "description",
+                "stage",
+                "dependencies",
+                "skip",
+                "params"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "required": [
+      "rule",
+      "stage",
+      "description",
+      "dependencies",
+      "skip",
+      "condition",
+      "actions"
+    ],
+    "additionalProperties": false
+  }
+}

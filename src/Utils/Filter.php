@@ -1,6 +1,6 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Utils;
+namespace PhelixJuma\GUIFlow\Utils;
 
 use FuzzyWuzzy\Fuzz;
 

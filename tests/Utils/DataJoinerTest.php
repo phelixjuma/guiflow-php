@@ -1,11 +1,11 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Tests\Utils;
+namespace PhelixJuma\GUIFlow\Tests\Utils;
 
-use PhelixJuma\DataTransformer\Actions\FunctionAction;
-use PhelixJuma\DataTransformer\Utils\ConfigurationValidator;
-use PhelixJuma\DataTransformer\Utils\DataJoiner;
-use PhelixJuma\DataTransformer\Utils\Filter;
+use PhelixJuma\GUIFlow\Actions\FunctionAction;
+use PhelixJuma\GUIFlow\Utils\ConfigurationValidator;
+use PhelixJuma\GUIFlow\Utils\DataJoiner;
+use PhelixJuma\GUIFlow\Utils\Filter;
 use PHPUnit\Framework\TestCase;
 
 class DataJoinerTest extends TestCase

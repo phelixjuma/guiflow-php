@@ -1,28 +1,29 @@
 {
-  "name": "phelixjuma/php-data-transformer",
-  "description": "A PHP package to transform data based on a set of configurable rules.",
+  "name": "phelixjuma/guiflow",
+  "description": "GUIFlow is a no-code workflow builder",
   "type": "library",
   "license": "MIT",
   "require": {
     "php": ">=8.0",
     "ext-json": "*",
-    "justinrainbow/json-schema": "^5.2",
     "wyndow/fuzzywuzzy": "^0.6.0",
     "erdalceylan/array-join": "^2.1",
     "ext-openssl": "*",
-    "jumaphelix/php-dag": "^1.1"
+    "jumaphelix/php-dag": "^1.1",
+    "opis/json-schema": "^2.3"
   },
   "scripts": {
-    "test": "vendor/bin/phpunit"
+    "test": "vendor/bin/phpunit",
+    "human-json": "generate-schema-doc ../src/SchemaDefinitions/config-schema.v2.json --config template_name=js_offline"
   },
   "autoload": {
     "psr-4": {
-      "PhelixJuma\\DataTransformer\\": "src/"
+      "PhelixJuma\\GUIFlow\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "PhelixJuma\\DataTransformer\\Tests\\": "tests/"
+      "PhelixJuma\\GUIFlow\\Tests\\": "tests/"
     }
   },
   "require-dev": {

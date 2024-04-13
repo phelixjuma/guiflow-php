@@ -1,8 +1,8 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Tests\Actions;
+namespace PhelixJuma\GUIFlow\Tests\Actions;
 
-use PhelixJuma\DataTransformer\Actions\SubtractAction;
+use PhelixJuma\GUIFlow\Actions\SubtractAction;
 use PHPUnit\Framework\TestCase;
 
 class SubtractActionTest extends TestCase

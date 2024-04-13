@@ -1,8 +1,8 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Actions;
+namespace PhelixJuma\GUIFlow\Actions;
 
-use PhelixJuma\DataTransformer\Utils\PathResolver;
+use PhelixJuma\GUIFlow\Utils\PathResolver;
 
 class MultiplyAction implements ActionInterface
 {

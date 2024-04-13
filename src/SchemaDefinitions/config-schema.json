@@ -1,30 +1,35 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Rules",
+  "description": "List of rules. Rules are an encapsulation for a list of actions to perform if the rule condition passes",
   "type": "array",
   "items": {
     "type": "object",
     "properties": {
       "rule": {
+        "title": "Name of the Rule",
         "type": "string",
         "description": "A string that represents the name of the rule."
       },
       "description": {
+        "title": "Description of the Rule",
         "type": "string",
         "description": "A string that represents the description of the rule."
       },
       "stage": {
         "type": "string",
-        "description": "Defines a unique identifier for this stage"
+        "description": "Defines a unique identifier for this rule"
       },
       "dependencies": {
         "type": "array",
-        "description": "A list of stages that this specific stage depends on ie its parents that must be executed first before it gets executed"
+        "description": "A list of stages that this specific stage depends on ie its parents that must be executed first before it gets executed. Rule dependencies can only be actions and not other rules"
       },
       "skip": {
         "type": "string",
-        "description": "Defines whether this rule should be skipped or not"
+        "description": "Defines whether this rule should be skipped or not. If skipped, all the actions under this rule will be skipped"
       },
       "condition": {
+        "title": "The condition which must return true for the actions under this rule to be executed",
         "oneOf": [
           {
             "type": "object",
@@ -98,6 +103,8 @@
         ]
       },
       "actions": {
+        "title": "List of Actions",
+        "description": "An array of actions to be executed in order.",
         "type": "array",
         "items": {
           "type": "object",
@@ -206,8 +213,7 @@
               "args"
             ]
           }
-        },
-        "description": "An array of actions to be executed in order."
+        }
       }
     },
     "required": [

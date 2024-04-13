@@ -1,6 +1,6 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Exceptions;
+namespace PhelixJuma\GUIFlow\Exceptions;
 
 class DivisionByZeroException extends \Exception
 {

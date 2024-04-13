@@ -1,25 +1,25 @@
 <?php
 
-namespace PhelixJuma\DataTransformer;
+namespace PhelixJuma\GUIFlow;
 
 use JumaPhelix\DAG\DAG;
 use JumaPhelix\DAG\SharedDataManager;
 use JumaPhelix\DAG\Task;
 use JumaPhelix\DAG\TaskExecutor;
-use PhelixJuma\DataTransformer\Actions\AddAction;
-use PhelixJuma\DataTransformer\Actions\DeleteValueAction;
-use PhelixJuma\DataTransformer\Actions\DivideAction;
-use PhelixJuma\DataTransformer\Actions\FunctionAction;
-use PhelixJuma\DataTransformer\Actions\MultiplyAction;
-use PhelixJuma\DataTransformer\Actions\RemovePathAction;
-use PhelixJuma\DataTransformer\Actions\SetValueAction;
-use PhelixJuma\DataTransformer\Actions\SubtractAction;
-use PhelixJuma\DataTransformer\Conditions\CompositeCondition;
-use PhelixJuma\DataTransformer\Conditions\SimpleCondition;
-use PhelixJuma\DataTransformer\Utils\ConfigurationValidator;
-use PhelixJuma\DataTransformer\Utils\PathResolver;
+use PhelixJuma\GUIFlow\Actions\AddAction;
+use PhelixJuma\GUIFlow\Actions\DeleteValueAction;
+use PhelixJuma\GUIFlow\Actions\DivideAction;
+use PhelixJuma\GUIFlow\Actions\FunctionAction;
+use PhelixJuma\GUIFlow\Actions\MultiplyAction;
+use PhelixJuma\GUIFlow\Actions\RemovePathAction;
+use PhelixJuma\GUIFlow\Actions\SetValueAction;
+use PhelixJuma\GUIFlow\Actions\SubtractAction;
+use PhelixJuma\GUIFlow\Conditions\CompositeCondition;
+use PhelixJuma\GUIFlow\Conditions\SimpleCondition;
+use PhelixJuma\GUIFlow\Utils\ConfigurationValidator;
+use PhelixJuma\GUIFlow\Utils\PathResolver;
 
-class DataTransformer
+class Workflow
 {
     private array $config;
     private object $functionsClass;
@@ -45,14 +45,16 @@ class DataTransformer
         $this->functionsClass = $functionsClass;
 
         // Validate the configuration against the schema
-        ConfigurationValidator::validate($this->config);
+        ConfigurationValidator::validate($this->config, 'v2');
     }
 
     /**
      * @param $data
+     * @param bool $parallelize
      * @return void
      */
-    public function transform(&$data, $parallelize = false) {
+    public function run(&$data, bool $parallelize = false): void
+    {
 
         $dataCopy = $data;
         $data = [];
@@ -61,7 +63,7 @@ class DataTransformer
             if (self::isObject($dataCopy)) {
 
                 // For an object, we transform it
-                $this->transformObject($dataCopy, $parallelize);
+                $this->runWorkFlowOnObject($dataCopy, $parallelize);
 
                 // Set the response into data: checking if the response has been split or not.
                 if (self::isObject($dataCopy)) {
@@ -74,7 +76,7 @@ class DataTransformer
                 // it's an array, we loop
                 foreach ($dataCopy as $item) {
 
-                    $this->transformObject($item, $parallelize);
+                    $this->runWorkFlowOnObject($item, $parallelize);
 
                     // Set the response into data: checking if the response has been split or not.
                     if (self::isObject($item)) {
@@ -96,11 +98,11 @@ class DataTransformer
      * @param $isParallel
      * @return void
      */
-    private function transformObject(&$data, $isParallel = false) {
+    private function runWorkFlowOnObject(&$data, $isParallel = false) {
         if ($isParallel) {
-            $this->transformObjectParallel($data);
+            $this->runWorkFlowOnObjectParallel($data);
         } else {
-            $this->transformObjectSerial($data);
+            $this->runWorkFlowOnObjectSerial($data);
         }
     }
 
@@ -108,7 +110,7 @@ class DataTransformer
      * @param $data
      * @return void
      */
-    private function transformObjectSerial(&$data): void
+    private function runWorkFlowOnObjectSerial(&$data): void
     {
 
         try {
@@ -172,7 +174,11 @@ class DataTransformer
         }
     }
 
-    private function transformObjectParallel(&$inputData): void
+    /**
+     * @param $inputData
+     * @return void
+     */
+    private function runWorkFlowOnObjectParallel(&$inputData): void
     {
 
         try {
@@ -323,27 +329,31 @@ class DataTransformer
      */
     private function executeAction(&$data, $action)
     {
+
+        // get the action class
         $actionClass = self::getActionClass($action);
+        // get the action parameters
+        $actionParams = $action['params'];
 
         switch ($action['action']) {
             case 'add':
             case 'subtract':
             case 'multiply':
             case 'divide':
-                $actionInstance = new $actionClass($action['path'], $action['value'] ?? null, $action['valueFromField'] ?? null, $action['newField'] ?? null);
+                $actionInstance = new $actionClass($actionParams['path'], $actionParams['value'] ?? null, $actionParams['valueFromField'] ?? null, $actionParams['newField'] ?? null);
                 break;
             case 'set':
-                $actionInstance = new $actionClass($action['path'], $action['value'] ?? null, $action['valueFromField'] ?? null, $action['valueMapping'] ?? null, $action['conditionalValue'] ?? null, $action['newField'] ?? null);
+                $actionInstance = new $actionClass($actionParams['path'], $actionParams['value'] ?? null, $actionParams['valueFromField'] ?? null, $actionParams['valueMapping'] ?? null, $actionParams['conditionalValue'] ?? null, $actionParams['newField'] ?? null);
                 break;
             case 'remove_path':
             case 'delete':
-                $actionInstance = new $actionClass($action['path']);
+                $actionInstance = new $actionClass($actionParams['path']);
                 break;
             case 'function':
-                $actionInstance = new $actionClass($action['path'], [$this->functionsClass, $action['function']], $action['args'] ?? [], $action['newField'] ?? null, $action['strict'] ?? null, $action['condition'] ?? null);
+                $actionInstance = new $actionClass($actionParams['path'], [$this->functionsClass, $actionParams['function']], $actionParams['args'] ?? [], $actionParams['newField'] ?? null, $actionParams['strict'] ?? null, $actionParams['condition'] ?? null);
                 break;
             default:
-                throw new \InvalidArgumentException('Unknown action type: ' . $action['action']);
+                throw new \InvalidArgumentException('Unknown action type: ' . $actionParams['action']);
         }
         $actionInstance->execute($data);
     }

@@ -1,10 +1,10 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Tests\Conditions;
+namespace PhelixJuma\GUIFlow\Tests\Conditions;
 
-use PhelixJuma\DataTransformer\Conditions\CompositeCondition;
+use PhelixJuma\GUIFlow\Conditions\CompositeCondition;
 use PHPUnit\Framework\TestCase;
-use PhelixJuma\DataTransformer\Utils\PathResolver;
+use PhelixJuma\GUIFlow\Utils\PathResolver;
 
 class CompundConditionTest extends TestCase
 {

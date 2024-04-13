@@ -1,22 +1,18 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Actions;
+namespace PhelixJuma\GUIFlow\Actions;
 
-use JumaPhelix\DAG\DAG;
-use JumaPhelix\DAG\SharedDataManager;
-use JumaPhelix\DAG\Task;
-use JumaPhelix\DAG\TaskExecutor;
 use  Swoole\Coroutine;
-use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
-use PhelixJuma\DataTransformer\Utils\DataJoiner;
-use PhelixJuma\DataTransformer\Utils\DataReducer;
-use PhelixJuma\DataTransformer\Utils\Filter;
-use PhelixJuma\DataTransformer\Utils\ModelMapper;
-use PhelixJuma\DataTransformer\Utils\Randomiser;
-use PhelixJuma\DataTransformer\Utils\TemplateParserService;
-use PhelixJuma\DataTransformer\Utils\UnitConverter;
-use PhelixJuma\DataTransformer\Utils\Utils;
-use PhelixJuma\DataTransformer\Utils\PathResolver;
+use PhelixJuma\GUIFlow\Exceptions\UnknownOperatorException;
+use PhelixJuma\GUIFlow\Utils\DataJoiner;
+use PhelixJuma\GUIFlow\Utils\DataReducer;
+use PhelixJuma\GUIFlow\Utils\Filter;
+use PhelixJuma\GUIFlow\Utils\ModelMapper;
+use PhelixJuma\GUIFlow\Utils\Randomiser;
+use PhelixJuma\GUIFlow\Utils\TemplateParserService;
+use PhelixJuma\GUIFlow\Utils\UnitConverter;
+use PhelixJuma\GUIFlow\Utils\Utils;
+use PhelixJuma\GUIFlow\Utils\PathResolver;
 
 class FunctionAction implements ActionInterface
 {
@@ -45,10 +41,10 @@ class FunctionAction implements ActionInterface
     /**
      * @param string $path
      * @param $function
-     * @param array $args
-     * @param $newField
-     * @param $strict
-     * @param $condition
+     * @param array|null $args
+     * @param null $newField
+     * @param int $strict
+     * @param null $condition
      */
     public function __construct(string $path, $function, array|null $args, $newField = null, $strict = 0, $condition=null)
     {
@@ -197,8 +193,6 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::remove_repeated_words(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'assoc_array_sum_if') {
             $newValue = Utils::assoc_array_sum_if(...$paramValues);
-        } elseif (isset($this->function[1]) && $this->function['1'] == 'assoc_array_set_if') {
-            $newValue = Utils::assoc_array_set_if(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'assoc_array_find') {
             $newValue = Utils::assoc_array_find(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'get_from_object') {
@@ -239,6 +233,13 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::length($paramValues[0]);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'parse_template') {
             $newValue = TemplateParserService::parseMessageFromTemplate(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'user_defined_function') {
+            // function name is at index 1 (index 0 is the data).
+            $functionName = $paramValues[1];
+            // We get the UDF's params which start from index 2 onwards (0 - data, 1 - function name)
+            $functionParams = array_slice($paramValues, 2);
+            // We call the user defined function
+            $newValue = call_user_func_array([$this->function[0],$functionName], $functionParams);
         }
         elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
             if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {

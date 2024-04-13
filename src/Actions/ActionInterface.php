@@ -1,6 +1,6 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Actions;
+namespace PhelixJuma\GUIFlow\Actions;
 
 interface ActionInterface
 {

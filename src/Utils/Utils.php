@@ -1,15 +1,15 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Utils;
+namespace PhelixJuma\GUIFlow\Utils;
 
 use ArrayJoin\Builder;
 use ArrayJoin\On;
 use FuzzyWuzzy\Fuzz;
 use FuzzyWuzzy\Process;
-use PhelixJuma\DataTransformer\Actions\FunctionAction;
-use PhelixJuma\DataTransformer\Conditions\SimpleCondition;
-use PhelixJuma\DataTransformer\DataTransformer;
-use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
+use PhelixJuma\GUIFlow\Actions\FunctionAction;
+use PhelixJuma\GUIFlow\Conditions\SimpleCondition;
+use PhelixJuma\GUIFlow\Workflow;
+use PhelixJuma\GUIFlow\Exceptions\UnknownOperatorException;
 
 class Utils
 {
@@ -82,7 +82,7 @@ class Utils
         }
 
         // If it's not an array, apply the prepend logic to the string
-        if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, $useDataAsPathValue)) {
+        if (empty($condition) || Workflow::evaluateCondition($data, $condition, $useDataAsPathValue)) {
 
             if (self::isObject($data) && !empty($valueKey)) {
 
@@ -114,7 +114,7 @@ class Utils
         }
 
         // If it's not an array, apply the append logic to the string
-        if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, $useDataAsPathValue)) {
+        if (empty($condition) || Workflow::evaluateCondition($data, $condition, $useDataAsPathValue)) {
 
             if (self::isObject($data) && !empty($valueKey)) {
 
@@ -381,22 +381,18 @@ class Utils
 
     /**
      * @param $data
-     * @param $conditionField
-     * @param $conditionOperator
-     * @param $conditionValue
-     * @param $conditionSimilarityThreshold
      * @param $sumField
-     * @return mixed
-     * @throws UnknownOperatorException
+     * @param $condition
+     * @return int|mixed
      */
-    public static function assoc_array_sum_if($data, $conditionField, $conditionOperator, $conditionValue, $conditionSimilarityThreshold = 80, $sumField = null)
+    public static function assoc_array_sum_if($data, $sumField, $condition)
     {
 
         $sum = 0;
 
         if (!empty($data) && is_array($data)) {
             foreach ($data as $d) {
-                if (SimpleCondition::compare($d[$conditionField], $conditionOperator, $conditionValue, $conditionSimilarityThreshold)) {
+                if (Workflow::evaluateCondition($d, $condition, true)) {
                     $sum += $d[$sumField];
                 }
             }
@@ -406,74 +402,25 @@ class Utils
 
     /**
      * @param $data
-     * @param $operations
-     * @return mixed
-     * @throws UnknownOperatorException
-     */
-    public static function assoc_array_set_if($data, $operations = [])
-    {
-
-        if (!empty($operations)) {
-            foreach ($operations as $operation) {
-//                $setField = $operation['setField'];
-//                $setValue,
-//                $conditionField,
-//                $conditionOperator,
-//                $conditionValue,
-//                $conditionSimilarityThreshold
-                extract($operation);
-
-                $operation_value = isset($operation_value['path']) ? PathResolver::getValueByPath($data, $operation_value['path']) : $operation_value;
-
-                if (!empty($data) && is_array($data)) {
-                    foreach ($data as &$d) {
-                        if (SimpleCondition::compare($d[$condition_field], $condition_operator, $condition_value, $condition_similarity_threshold ?? null)) {
-                            $d[$operation_field] = $operation_value;
-                        }
-                    }
-                }
-
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param $data
-     * @param $conditionField
-     * @param $conditionOperator
-     * @param $conditionValue
-     * @param $conditionSimilarityThreshold
-     * @param $conditionSimilarityTokenize
+     * @param $condition
      * @param $returnKey
-     * @return mixed
-     * @throws UnknownOperatorException
+     * @return array|mixed
      */
-    public static function assoc_array_find($data, $conditionField, $conditionOperator, $conditionValue, $conditionSimilarityThreshold = 80, $conditionSimilarityTokenize= false, $returnKey = null)
+    public static function assoc_array_find($data, $condition, $returnKey = null)
     {
-
-        $response = null;
 
         if (!empty($data) && is_array($data)) {
+            foreach ($data as $d) {
 
-            if (array_key_exists($conditionField, $data[0])) {
-                foreach ($data as $d) {
-
-                    if (SimpleCondition::compare($d[$conditionField], $conditionOperator, $conditionValue, $conditionSimilarityThreshold, $conditionSimilarityTokenize)) {
-                        if (!empty($returnKey)) {
-                            return $d[$returnKey];
-                        }
-                        return $d;
+                if (Workflow::evaluateCondition($d, $condition, true)) {
+                    if (!empty($returnKey)) {
+                        return $d[$returnKey];
                     }
-                }
-            } else {
-                foreach ($data as $d) {
-                    $response[] = self::assoc_array_find($d, $conditionField, $conditionOperator, $conditionValue, $conditionSimilarityThreshold, $conditionSimilarityTokenize, $returnKey);
+                    return $d;
                 }
             }
         }
-        return $response;
+        return null;
     }
 
     /**
@@ -609,8 +556,9 @@ class Utils
 
     /**
      * @param $data
-     * @param $condition
-     * @param $replacement
+     * @param string $replacementKey The search key used to match the duplicated object to its replacement data
+     * @param array $replacement The replacement data. For each replacement, add a new property defining the replacement_key name used for search
+     * @param mixed $condition
      * @return mixed
      */
     public static function duplicate_list_item($data, $replacementKey = null, $replacement = null, $condition = null) {
@@ -619,7 +567,7 @@ class Utils
 
         for ($i = 0; $i < $length; $i++) {
 
-            if (DataTransformer::evaluateCondition($data[$i], $condition)) {
+            if (Workflow::evaluateCondition($data[$i], $condition)) {
 
                 $newItem = $data[$i];
 
@@ -664,7 +612,7 @@ class Utils
     public static function basic_arithmetic($data, $operator, $operands, $defaultValue = "", $moduloHandler='round', $decimalPlaces = 2, $condition = null) {
 
         // Check condition
-        if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, false)) {
+        if (empty($condition) || Workflow::evaluateCondition($data, $condition, false)) {
 
             $operandValues = [];
 
@@ -1052,7 +1000,15 @@ class Utils
 
                 $modifier = !$isCaseSensitive ? 'i' : '';
 
-                foreach ($mappings as $search => $replace) {
+                foreach ($mappings as $key => $mapping) {
+
+                    if (is_array($mapping) && isset($mapping['pattern']) && $mapping['replacement']) {
+                        $search = $mapping['pattern'];
+                        $replace = $mapping['replacement'];
+                    } else {
+                        $search = $key;
+                        $replace = $mapping;
+                    }
 
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
                     $replace = str_ireplace("[space]", " ", $replace);
@@ -1072,7 +1028,7 @@ class Utils
         if (is_array($data)) {
             foreach ($data as $key => $value) {
 
-                if (empty($condition) || DataTransformer::evaluateCondition($value, $condition, true)) {
+                if (empty($condition) || Workflow::evaluateCondition($value, $condition, true)) {
 
                     if (is_array($value)) {
                         $data[$key] = self::transform_data($value, $transformFunction, $args, $targetKeys);
@@ -1089,7 +1045,7 @@ class Utils
             }
         } elseif (empty($targetKeys)) {
 
-            if (empty($condition) || DataTransformer::evaluateCondition($data, $condition, true)) {
+            if (empty($condition) || Workflow::evaluateCondition($data, $condition, true)) {
                 return isset($specialFunctions[$transformFunction])
                     ? $specialFunctions[$transformFunction]($data, ...$args)
                     : (!empty($args) ? $transformFunction($data, ...$args) : $transformFunction($data));
@@ -1114,6 +1070,7 @@ class Utils
     }
 
     /**
+     * Flattens an object. Child objects are removed and their values set on the parent using parent.child path notation
      * @param $obj
      * @param $prefix
      * @return array
@@ -1141,6 +1098,7 @@ class Utils
     }
 
     /**
+     * Flattens complex nested array into a simple one-level array of objects. Nested objects are brought to the parent level. Nested arrays are expanded and split eg ["preferences" => ["colors" => ["blue", "green"]]] becomes [["preferences.colors" => "blue"],["preferences.colors" => "green"]]
      * @param $data
      * @param $prefix
      * @param $siblings
@@ -1249,8 +1207,7 @@ class Utils
         return $foundData;
     }
 
-    public static function searchMultiArrayByKeyReturnKeys
-    ($arrayData, $searchKey, $searchValue) {
+    public static function searchMultiArrayByKeyReturnKeys($arrayData, $searchKey, $searchValue) {
         $size = is_array($arrayData) ? sizeof($arrayData) : 0;
         for ($i = 0; $i < $size; $i++) {
             if (strtolower($arrayData[$i][$searchKey]) == strtolower($searchValue)) {

@@ -1,10 +1,10 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Tests\Conditions;
+namespace PhelixJuma\GUIFlow\Tests\Conditions;
 
 use PHPUnit\Framework\TestCase;
-use PhelixJuma\DataTransformer\Conditions\SimpleCondition;
-use PhelixJuma\DataTransformer\Utils\PathResolver;
+use PhelixJuma\GUIFlow\Conditions\SimpleCondition;
+use PhelixJuma\GUIFlow\Utils\PathResolver;
 
 class SimpleConditionTest extends TestCase
 {

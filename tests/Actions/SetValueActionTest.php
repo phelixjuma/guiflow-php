@@ -1,8 +1,8 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Tests\Actions;
+namespace PhelixJuma\GUIFlow\Tests\Actions;
 
-use PhelixJuma\DataTransformer\Actions\SetValueAction;
+use PhelixJuma\GUIFlow\Actions\SetValueAction;
 use PHPUnit\Framework\TestCase;
 
 class SetValueActionTest extends TestCase

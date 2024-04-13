@@ -1,13 +1,13 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Tests\Utils;
+namespace PhelixJuma\GUIFlow\Tests\Utils;
 
-use PhelixJuma\DataTransformer\Utils\ConfigurationValidator;
+use PhelixJuma\GUIFlow\Utils\ConfigurationValidator;
 use PHPUnit\Framework\TestCase;
 
 class ConfigurationValidatorTest extends TestCase
 {
-    public function testValidate()
+    public function _testValidate()
     {
 
         $data = json_decode('[

@@ -1,8 +1,8 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Tests\Actions;
+namespace PhelixJuma\GUIFlow\Tests\Actions;
 
-use PhelixJuma\DataTransformer\Actions\DivideAction;
+use PhelixJuma\GUIFlow\Actions\DivideAction;
 use PHPUnit\Framework\TestCase;
 
 class DivideActionTest extends TestCase

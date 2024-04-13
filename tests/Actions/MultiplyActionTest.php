@@ -1,8 +1,8 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Tests\Actions;
+namespace PhelixJuma\GUIFlow\Tests\Actions;
 
-use PhelixJuma\DataTransformer\Actions\MultiplyAction;
+use PhelixJuma\GUIFlow\Actions\MultiplyAction;
 use PHPUnit\Framework\TestCase;
 
 class MultiplyActionTest extends TestCase

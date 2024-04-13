@@ -1,9 +1,9 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Actions;
+namespace PhelixJuma\GUIFlow\Actions;
 
-use PhelixJuma\DataTransformer\Exceptions\MissingValueMappingException;
-use PhelixJuma\DataTransformer\Utils\PathResolver;
+use PhelixJuma\GUIFlow\Exceptions\MissingValueMappingException;
+use PhelixJuma\GUIFlow\Utils\PathResolver;
 
 class RemovePathAction implements ActionInterface
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Tests\Utils;
+namespace PhelixJuma\GUIFlow\Tests\Utils;
 
-use PhelixJuma\DataTransformer\Actions\FunctionAction;
-use PhelixJuma\DataTransformer\Utils\ConfigurationValidator;
-use PhelixJuma\DataTransformer\Utils\Filter;
+use PhelixJuma\GUIFlow\Actions\FunctionAction;
+use PhelixJuma\GUIFlow\Utils\ConfigurationValidator;
+use PhelixJuma\GUIFlow\Utils\Filter;
 use PHPUnit\Framework\TestCase;
 
 class FilterTest extends TestCase

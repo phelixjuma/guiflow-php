@@ -1,10 +1,10 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Actions;
+namespace PhelixJuma\GUIFlow\Actions;
 
-use PhelixJuma\DataTransformer\DataTransformer;
-use PhelixJuma\DataTransformer\Utils\PathResolver;
-use PhelixJuma\DataTransformer\Utils\Utils;
+use PhelixJuma\GUIFlow\Workflow;
+use PhelixJuma\GUIFlow\Utils\PathResolver;
+use PhelixJuma\GUIFlow\Utils\Utils;
 
 class SetValueAction implements ActionInterface
 {
@@ -63,7 +63,7 @@ class SetValueAction implements ActionInterface
                         $useDataAsPathValue = $conditionV['useDataAsPathValue'] ?? true;
 
                         // We check if the condition is a pass
-                        if (DataTransformer::evaluateCondition($currentValue, $conditionV['condition'], $useDataAsPathValue)) {
+                        if (Workflow::evaluateCondition($currentValue, $conditionV['condition'], $useDataAsPathValue)) {
                             // We set the value
                             if (!empty($conditionV['valueFromField'])) {
                                 $valueFromField = PathResolver::getValueByPath($data, $conditionV['valueFromField']);
@@ -100,7 +100,7 @@ class SetValueAction implements ActionInterface
                     $useDataAsPathValue = $conditionV['useDataAsPathValue'] ?? true;
 
                     // We check if the condition is a pass
-                    if (DataTransformer::evaluateCondition($currentValues, $conditionV['condition'], $useDataAsPathValue)) {
+                    if (Workflow::evaluateCondition($currentValues, $conditionV['condition'], $useDataAsPathValue)) {
                         // We set the value
                         if (!empty($conditionV['valueFromField'])) {
                             $newValue = PathResolver::getValueByPath($data, $conditionV['valueFromField']);

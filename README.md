@@ -1,6 +1,8 @@
-# PHELIXJUMA's PHP DATA TRANSFORMER
+# GUIFlow 
 
-This is a workflow-oriented data transformer implemented in PHP.
+GUIFlow is a no-code workflow builder. 
+
+Check the [documentation](docs/documentation.md) for more details
 
 
 # REQUIREMENTS
@@ -16,7 +18,7 @@ This is a workflow-oriented data transformer implemented in PHP.
 # INSTALLATION
 
 ```
-composer require phelixjuma/php-data-transformer
+composer require phelixjuma/guiflow-php
 ```
 
 # USAGE
@@ -44,9 +46,10 @@ $config = json_decode('[{
     },
     "actions": [
       {
-        "description": "",
         "stage": "split_items",
+        "description": "",
         "dependencies": [],
+        "skip":"0",
         "action": "function",
         "path": "",
         "function": "split",
@@ -58,14 +61,14 @@ $config = json_decode('[{
     ]
   }]');
   
-class functionsClass {
-    // class that defines some of the functions in the workflow eg split() function
+class userDefinedFunctionsClass {
+    // class that defines all user defined functions outside the package ecosystem. 
 }
 
-$functionsObj = new functionClass();
+$udfObj = new userDefinedFunctionsClass();
 
-$dataTransformer = new DataTransformer($config, $functionsObj);
-$dataTransformer->transform($data, true); // set second parameter to true for parallel execution
+$workflow = new Workflow($config, $udfObj);
+$workflow->run($data, true); // set second parameter to true for parallel execution        
 
 print_r($data); // this will show the modified data
 

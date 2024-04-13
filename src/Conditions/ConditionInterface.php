@@ -1,6 +1,6 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Conditions;
+namespace PhelixJuma\GUIFlow\Conditions;
 
 interface ConditionInterface
 {

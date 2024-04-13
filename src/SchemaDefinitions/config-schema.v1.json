@@ -1,0 +1,225 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Rules",
+  "description": "List of rules. Rules are an encapsulation for a list of actions to perform if the rule condition passes",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "rule": {
+        "title": "Name of the Rule",
+        "type": "string",
+        "description": "A string that represents the name of the rule."
+      },
+      "description": {
+        "title": "Description of the Rule",
+        "type": "string",
+        "description": "A string that represents the description of the rule."
+      },
+      "stage": {
+        "type": "string",
+        "description": "Defines a unique identifier for this rule"
+      },
+      "dependencies": {
+        "type": "array",
+        "description": "A list of stages that this specific stage depends on ie its parents that must be executed first before it gets executed. Rule dependencies can only be actions and not other rules"
+      },
+      "skip": {
+        "type": "string",
+        "description": "Defines whether this rule should be skipped or not. If skipped, all the actions under this rule will be skipped"
+      },
+      "condition": {
+        "title": "The condition which must return true for the actions under this rule to be executed",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string",
+                "enum": [
+                  "exists",
+                  "not exists"
+                ]
+              }
+            },
+            "required": [
+              "path",
+              "operator"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "integer",
+                  "boolean",
+                  "array",
+                  "object"
+                ]
+              }
+            },
+            "required": [
+              "path",
+              "operator",
+              "value"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "operator": {
+                "type": "string",
+                "enum": [
+                  "AND",
+                  "OR"
+                ]
+              },
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/items/properties/condition"
+                }
+              }
+            },
+            "required": [
+              "operator",
+              "conditions"
+            ]
+          },
+          {
+            "type": "string"
+          }
+        ]
+      },
+      "actions": {
+        "title": "List of Actions",
+        "description": "An array of actions to be executed in order.",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "add",
+                "subtract",
+                "multiply",
+                "divide",
+                "set",
+                "delete",
+                "remove_path",
+                "function"
+              ],
+              "description": "The operation to be performed."
+            },
+            "description": {
+              "type": "string",
+              "description": "The description of what the action does"
+            },
+            "stage": {
+              "type": "string",
+              "description": "Defines a unique identifier for this stage"
+            },
+            "dependencies": {
+              "type": "array",
+              "description": "A list of stages that this specific stage depends on ie its parents that must be executed first before it gets executed"
+            },
+            "skip": {
+              "type": "string",
+              "description": "Defines whether this action should be skipped or not"
+            },
+            "path": {
+              "type": "string",
+              "description": "The field to be used as the argument for the operation."
+            },
+            "value": {
+              "type": [
+                "string",
+                "integer",
+                "boolean",
+                "array",
+                "object"
+              ],
+              "description": "The value to be used as the argument for the operation. This is optional and is only used for 'set', 'add', 'subtract', 'multiply', 'divide' actions."
+            },
+            "valueFromField": {
+              "type": "string",
+              "description": "The field to be used as the argument for the operation. This is optional and is only used for 'set' action."
+            },
+            "valueMapping": {
+              "type": [
+                "object",
+                "null",
+                "string"
+              ],
+              "description": "An object that maps values of the valueFromField to values of the field. This is optional and is only used for 'set' action with valueFromField."
+            },
+            "conditionalValue": {
+              "type": "array",
+              "description": "Allows us to set a value based on a given condition being passed"
+            },
+            "args": {
+              "type": [
+                "object",
+                "array",
+                "null"
+              ],
+              "description": "An object that specifies the arguments for the operation. This is optional and is only used for 'function' and 'customFunction' actions."
+            },
+            "newField": {
+              "type": "string",
+              "description": "The field to store the result of the operation."
+            },
+            "function": {
+              "type": "string",
+              "description": "The name of the function to be executed. This is optional and is only used for 'function' and 'customFunction' actions."
+            }
+          },
+          "required": [
+            "action",
+            "path"
+          ],
+          "dependencies": {
+            "value": [
+              "path"
+            ],
+            "valueFromField": [
+              "path"
+            ],
+            "conditionalValue": [
+              "path"
+            ],
+            "valueMapping": [
+              "valueFromField"
+            ],
+            "args": [
+              "function"
+            ],
+            "newField": [
+              "path"
+            ],
+            "function": [
+              "args"
+            ]
+          }
+        }
+      }
+    },
+    "required": [
+      "rule",
+      "condition",
+      "actions"
+    ]
+  }
+}

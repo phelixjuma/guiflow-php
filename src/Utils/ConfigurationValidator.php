@@ -1,34 +1,54 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Utils;
+namespace PhelixJuma\GUIFlow\Utils;
 
-namespace PhelixJuma\DataTransformer\Utils;
+namespace PhelixJuma\GUIFlow\Utils;
 
-use JsonSchema\Validator;
-use JsonSchema\Constraints\Constraint;
+use Opis\JsonSchema\Errors\ErrorFormatter;
+use Opis\JsonSchema\ValidationResult;
+use Opis\JsonSchema\Validator;
 
 class ConfigurationValidator
 {
-    public static function validate($data): bool
+
+    public static function validate($data, $schemaVersion = null): bool
     {
 
-        $schema = self::getSchema();
+        $schema = self::getSchema($schemaVersion);
 
-        $validator = new Validator;
-        $validator->validate($data, $schema, Constraint::CHECK_MODE_APPLY_DEFAULTS);
+        $validator = new Validator();
 
-        if ($validator->isValid()) {
+        $result = $validator->validate($data, $schema);
+
+        if ($result->isValid()) {
             return true;
         } else {
-            $errors = [];
-            foreach ($validator->getErrors() as $error) {
-                $errors[] = sprintf("[%s] %s", $error['property'], $error['message']);
-            }
+
+            $errors = ((new ErrorFormatter())->format($result->error()));
+
             throw new \InvalidArgumentException(implode(', ', $errors));
         }
     }
 
-    public static function getSchema() {
-        return json_decode(file_get_contents(__DIR__ . "/config-schema.json"));
+    /**
+     * @param $v
+     * @return string
+     */
+    public static function getSchemaPath($v = null): string
+    {
+
+        if (!empty($v)) {
+            $extension = ".$v.json";
+        } else {
+            $extension = ".json";
+        }
+        return dirname(__DIR__) . DIRECTORY_SEPARATOR . "SchemaDefinitions/config-schema{$extension}";
+    }
+
+    public static function getSchema($v = null) {
+
+        $schemaPath = self::getSchemaPath($v);
+
+        return json_decode(file_get_contents($schemaPath));
     }
 }

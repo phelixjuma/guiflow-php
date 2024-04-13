@@ -6,7 +6,7 @@
  * @package Kuza\Krypton
  */
 
-namespace PhelixJuma\DataTransformer\Utils;
+namespace PhelixJuma\GUIFlow\Utils;
 
 /**
  * Class for handling random string generation

@@ -1,11 +1,11 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Conditions;
+namespace PhelixJuma\GUIFlow\Conditions;
 
 use FuzzyWuzzy\Fuzz;
-use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
-use PhelixJuma\DataTransformer\Utils\PathResolver;
-use PhelixJuma\DataTransformer\Utils\Utils;
+use PhelixJuma\GUIFlow\Exceptions\UnknownOperatorException;
+use PhelixJuma\GUIFlow\Utils\PathResolver;
+use PhelixJuma\GUIFlow\Utils\Utils;
 
 class SimpleCondition implements ConditionInterface
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Conditions;
+namespace PhelixJuma\GUIFlow\Conditions;
 
-use PhelixJuma\DataTransformer\Utils\PathResolver;
+use PhelixJuma\GUIFlow\Utils\PathResolver;
 
 class CompositeCondition implements ConditionInterface
 {

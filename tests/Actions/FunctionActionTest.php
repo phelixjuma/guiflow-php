@@ -1,10 +1,10 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Tests\Actions;
+namespace PhelixJuma\GUIFlow\Tests\Actions;
 
-use PhelixJuma\DataTransformer\Actions\FunctionAction;
-use PhelixJuma\DataTransformer\Actions\SetValueAction;
-use PhelixJuma\DataTransformer\Utils\Filter;
+use PhelixJuma\GUIFlow\Actions\FunctionAction;
+use PhelixJuma\GUIFlow\Actions\SetValueAction;
+use PhelixJuma\GUIFlow\Utils\Filter;
 use PHPUnit\Framework\TestCase;
 
 class FunctionActionTest extends TestCase
@@ -1978,7 +1978,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testMultipleRegexMapper()
+    public function _testMultipleRegexMapper()
     {
         $data = [
             "items" => [

@@ -1,9 +1,9 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Utils;
+namespace PhelixJuma\GUIFlow\Utils;
 
-use PhelixJuma\DataTransformer\Conditions\SimpleCondition;
-use PhelixJuma\DataTransformer\Exceptions\UnknownOperatorException;
+use PhelixJuma\GUIFlow\Conditions\SimpleCondition;
+use PhelixJuma\GUIFlow\Exceptions\UnknownOperatorException;
 
 
 class DataJoiner

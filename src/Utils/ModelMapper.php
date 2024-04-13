@@ -1,6 +1,6 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Utils;
+namespace PhelixJuma\GUIFlow\Utils;
 
 class ModelMapper {
 
@@ -17,7 +17,16 @@ class ModelMapper {
 
         $result = [];
 
-        foreach ($mapping as $targetPath => $originPath) {
+        foreach ($mapping as $key => $value) {
+
+            if (is_array($value) && isset($value['from_path']) && $value['to_path']) {
+                $originPath = $value['from_path'];
+                $targetPath = $value['to_path'];
+            } else {
+                $targetPath = $key;
+                $originPath = $value;
+            }
+
             if ($inverted) {
                 $value = PathResolver::getValueByPath($data, $targetPath);
                 PathResolver::setValueByPath($result, $originPath, $value);

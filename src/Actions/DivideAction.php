@@ -1,9 +1,9 @@
 <?php
 
-namespace PhelixJuma\DataTransformer\Actions;
+namespace PhelixJuma\GUIFlow\Actions;
 
-use PhelixJuma\DataTransformer\Exceptions\DivisionByZeroException;
-use PhelixJuma\DataTransformer\Utils\PathResolver;
+use PhelixJuma\GUIFlow\Exceptions\DivisionByZeroException;
+use PhelixJuma\GUIFlow\Utils\PathResolver;
 
 class DivideAction implements ActionInterface
 {
