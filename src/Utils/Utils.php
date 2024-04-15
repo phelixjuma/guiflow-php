@@ -697,6 +697,26 @@ class Utils
         return 0;
     }
 
+    /**
+     * @param $data
+     * @return array|float|int|mixed|null
+     */
+    public static function absolute_value($data) {
+
+        if (empty($data)) {
+            return null;
+        }
+        if (!is_array($data)) {
+            return is_numeric($data) ? abs($data) : $data;
+        }
+
+        foreach ($data as &$d) {
+            $d = self::absolute_value($d);
+        }
+
+        return $data;
+    }
+
     private static function recursiveDivide($numbers) {
 
         // Check if the array is empty or has only one element
@@ -995,9 +1015,9 @@ class Utils
                 $mappings = array_change_key_case($mappings, CASE_LOWER);
                 return $mappings[strtolower($value)] ?? $value;
             },
-            'regex_mapper' => function($value, $mappings, $isCaseSensitive = false) {
+            'regex_mapper' => function($value, $mappings, $is_case_sensitive = false) {
 
-                $modifier = !$isCaseSensitive ? 'i' : '';
+                $modifier = !$is_case_sensitive ? 'i' : '';
 
                 foreach ($mappings as $key => $mapping) {
 

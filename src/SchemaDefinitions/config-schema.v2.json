@@ -341,7 +341,7 @@
             "map_parallel", "set", "join", "reducer",
             "sort_multi_by_key", "format_date",
             "fuzzy_extract_one", "fuzzy_extract_n",
-            "regex_extract",
+            "regex_extract","absolute_value",
             "append", "prepend", "concat", "concat_multi_array_assoc",
             "custom_preg_replace", "regex_mapper_multiple",
             "remove_repeated_words", "assoc_array_sum_if",
@@ -519,6 +519,19 @@
               },
               "then": {
                 "$ref": "#/definitions/format_date"
+              }
+            },
+            {
+              "title": "absolute_value",
+              "if": {
+                "properties": {
+                  "function": {
+                    "const": "absolute_value"
+                  }
+                }
+              },
+              "then": {
+                "$ref": "#/definitions/absolute_value"
               }
             },
             {
@@ -1325,6 +1338,11 @@
         }
       },
       "required": ["format"],
+      "additionalProperties": false
+    },
+    "absolute_value": {
+      "type": "object",
+      "properties": {},
       "additionalProperties": false
     },
     "fuzzy_extract_one": {
