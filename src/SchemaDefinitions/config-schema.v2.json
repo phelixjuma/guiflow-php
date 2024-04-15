@@ -5,36 +5,70 @@
   "type": "array",
   "uniqueItems": true,
   "definitions": {
+    "valueOrPath": {
+      "oneOf": [
+        {
+          "title": "Textual Value",
+          "type": "string"
+        },
+        {
+          "title": "List of Textual Values",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "title": "Value from Path",
+          "type": "object",
+          "properties": {
+            "path":{
+              "type": "string"
+            }
+          },
+          "required": ["path"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "valueOrInItemPath": {
+      "oneOf": [
+        {
+          "title": "Textual Value",
+          "type": "string"
+        },
+        {
+          "title": "List of Textual Values",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "title": "Value from In Item Path",
+          "type": "object",
+          "properties": {
+            "in_item_path":{
+              "type": "string"
+            }
+          },
+          "required": ["in_item_path"],
+          "additionalProperties": false
+        }
+      ]
+    },
     "condition": {
       "title": "Condition",
       "oneOf": [
         {
-          "title": "Condition for Set Function",
-          "type": "object",
-          "properties": {
-            "operator": {
-              "type": "string",
-              "enum": [
-                "==", "!=", "gt", "gte", "lt", "lte", "contains","not contains", "matches", "not matches",
-                "regex", "in", "no in", "in list all", "not in list all", "in list any", "not in list any", "like",
-                "similar_to"
-              ]
-            },
-            "value": {
-              "type": [
-                "string",
-                "integer",
-                "boolean",
-                "array",
-                "object"
-              ]
-            }
-          },
-          "required": [
-            "operator",
-            "value"
-          ],
-          "additionalProperties": false
+          "title": "Always True Condition",
+          "type": "string",
+          "const": "always"
+        },
+        {
+          "title": "No Condition",
+          "type": "string",
+          "const": ""
         },
         {
           "title": "Existence Checker Condition",
@@ -89,25 +123,45 @@
               "type": "string",
               "enum": [
                 "==", "!=", "gt", "gte", "lt", "lte", "contains","not contains", "matches", "not matches",
-                "regex", "in", "no in", "in list all", "not in list all", "in list any", "not in list any", "like",
+                "regex", "in", "no in", "in list all", "not in list all", "in list any", "not in list any", "like"
+              ]
+            },
+            "value": {
+              "$ref": "#/definitions/valueOrPath"
+            }
+          },
+          "required": [
+            "path",
+            "operator",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Simple Condition for Similarity",
+          "description": "Uses Fuzzy string matching to calculate similarity between strings",
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
                 "similar_to"
               ]
             },
             "value": {
-              "type": [
-                "string",
-                "integer",
-                "boolean",
-                "array",
-                "object"
-              ]
+              "$ref": "#/definitions/valueOrPath"
             },
             "similarity_threshold": {
+              "description": "Minimum Fuzzy Ratio between 0-100 (similarity score) for condition to be true",
               "type": "string"
             },
             "tokenize_similarity": {
               "type": "string",
-              "enum": ["1", "0"]
+              "enum": ["1", "0"],
+              "default": "0"
             }
           },
           "required": [
@@ -144,14 +198,65 @@
           "additionalProperties": false
         },
         {
-          "title": "No Condition",
-          "type": "string",
-          "const": ""
-        },
-        {
-          "title": "Always True Condition",
-          "type": "string",
-          "const": "always"
+          "title": "Condition for Set Function (no path)",
+          "type": "object",
+          "oneOf": [
+            {
+              "title": "Simple",
+              "properties": {
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    "==", "!=", "gt", "gte", "lt", "lte", "contains","not contains", "matches", "not matches",
+                    "regex", "in", "no in", "in list all", "not in list all", "in list any", "not in list any", "like",
+                    "similar_to"
+                  ]
+                },
+                "value": {
+                  "$ref": "#/definitions/valueOrPath"
+                }
+              },
+              "required": [
+                "operator",
+                "value"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "title": "Existence Checker",
+              "type": "object",
+              "properties": {
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    "exists",
+                    "not exists"
+                  ]
+                }
+              },
+              "required": [
+                "operator"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "title": "True/False",
+              "type": "object",
+              "properties": {
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              },
+              "required": [
+                "operator"
+              ],
+              "additionalProperties": false
+            }
+          ]
         }
       ]
     },
@@ -163,7 +268,7 @@
           "type": "object",
           "properties": {
             "term": {
-              "type": "string"
+              "$ref": "#/definitions/valueOrPath"
             },
             "mode": {
               "type": "string",
@@ -886,11 +991,13 @@
                   },
                   "add_spacer": {
                     "type": "string",
-                    "enum": ["1", "0"]
+                    "enum": ["1", "0"],
+                    "default": "1"
                   },
                   "is_case_sensitive": {
                     "type": "string",
-                    "enum": ["1", "0"]
+                    "enum": ["1", "0"],
+                    "default": "0"
                   }
                 },
                 "required": ["pattern", "replacement", "add_spacer", "is_case_sensitive"],
@@ -928,14 +1035,7 @@
               "then": {
                 "properties": {
                   "format": {
-                    "type": "string",
-                    "enum": [
-                      "Y-m-d",
-                      "m/d/Y",
-                      "d.m.Y",
-                      "Y-m-d H:i:s",
-                      "D, M d, Y"
-                    ]
+                    "type": "string"
                   },
                   "pre_modifier": {
                     "type": "string"
@@ -1011,7 +1111,8 @@
                   },
                   "is_case_sensitive": {
                     "type": "string",
-                    "enum": ["1", "0"]
+                    "enum": ["1", "0"],
+                    "default": "0"
                   }
                 },
                 "required": ["mappings", "is_case_sensitive"],
@@ -1122,7 +1223,11 @@
           }
         },
         "group_by": {
-          "type": "string"
+          "description": "List of fields to group the data by",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": ["left", "right", "join", "fields", "group_by"],
@@ -1216,14 +1321,7 @@
       "type": "object",
       "properties": {
         "format": {
-          "type": "string",
-          "enum": [
-            "Y-m-d",
-            "m/d/Y",
-            "d.m.Y",
-            "Y-m-d H:i:s",
-            "D, M d, Y"
-          ]
+          "type": "string"
         }
       },
       "required": ["format"],
@@ -1321,16 +1419,19 @@
         },
         "capture_group_number": {
           "description": "The number, from 1, of the capture group for backreference",
-          "type": "string"
+          "type": "string",
+          "default": "0"
         },
         "is_case_sensitive": {
           "type": "string",
-          "enum": ["1", "0"]
+          "enum": ["1", "0"],
+          "default": "0"
         },
         "return_subject_on_null": {
           "description": "If no search matches the pattern, whether or not to return the whole data",
           "type": "string",
-          "enum": ["1", "0"]
+          "enum": ["1", "0"],
+          "default": "1"
         }
       },
       "required": ["pattern", "capture_group_number", "is_case_sensitive", "return_subject_on_null"],
@@ -1340,19 +1441,10 @@
       "type": "object",
       "properties": {
         "data_to_append": {
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "path": {
-                  "type": "string"
-                }
-              }
-            }
-          ]
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/valueOrPath"
+          }
         },
         "separator": {
           "type": "string"
@@ -1360,7 +1452,8 @@
         "use_data_as_path_value": {
           "description": "Can be used when condition is set. Should be true when the condition specifies a path that should be referenced in the data",
           "type": "string",
-          "enum": ["1", "0"]
+          "enum": ["1", "0"],
+          "default": "1"
         },
         "value_key": {
           "description": "Used when appending data within a list of objects. The key specifies which object key the final result should be set in",
@@ -1374,19 +1467,10 @@
       "type": "object",
       "properties": {
         "data_to_prepend": {
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "path": {
-                  "type": "string"
-                }
-              }
-            }
-          ]
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/valueOrPath"
+          }
         },
         "separator": {
           "type": "string"
@@ -1394,7 +1478,8 @@
         "use_data_as_path_value": {
           "description": "Can be used when condition is set. Should be true when the condition specifies a path that should be referenced in the data",
           "type": "string",
-          "enum": ["1", "0"]
+          "enum": ["1", "0"],
+          "default": "1"
         },
         "value_key": {
           "description": "Used when appending data within a list of objects. The key specifies which object key the final result should be set in",
@@ -1408,26 +1493,17 @@
       "type": "object",
       "properties": {
         "data_to_concat": {
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "path": {
-                  "type": "string"
-                }
-              }
-            }
-          ]
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/valueOrPath"
+          }
         },
         "separator": {
           "type": "string"
         },
         "enclosure": {
           "type": "string",
-          "enum": ["brackets", "square brackets", "curly brackets", "forward strokes", "backward strokes", "double quotes", "single quotes"]
+          "enum": ["","brackets", "square brackets", "curly brackets", "forward strokes", "backward strokes", "double quotes", "single quotes"]
         }
       },
       "required": ["data_to_concat", "separator", "enclosure"],
@@ -1451,7 +1527,7 @@
         },
         "enclosure": {
           "type": "string",
-          "enum": ["brackets", "square brackets", "curly brackets", "forward strokes", "backward strokes", "double quotes", "single quotes"]
+          "enum": ["","brackets", "square brackets", "curly brackets", "forward strokes", "backward strokes", "double quotes", "single quotes"]
         }
       },
       "required": ["fields", "newField", "separator", "enclosure"],
@@ -1568,7 +1644,7 @@
       "type": "object",
       "properties": {
         "key": {
-          "type": "string"
+          "$ref": "#/definitions/valueOrPath"
         }
       },
       "required": ["key"],
@@ -1634,14 +1710,7 @@
           "enum": ["add","sub"]
         },
         "format": {
-          "type": "string",
-          "enum": [
-            "Y-m-d",
-            "m/d/Y",
-            "d.m.Y",
-            "Y-m-d H:i:s",
-            "D, M d, Y"
-          ]
+          "type": "string"
         }
       },
       "required": ["days", "operator", "format"],
@@ -1651,14 +1720,7 @@
       "type": "object",
       "properties": {
         "format": {
-          "type": "string",
-          "enum": [
-            "Y-m-d",
-            "m/d/Y",
-            "d.m.Y",
-            "Y-m-d H:i:s",
-            "D, M d, Y"
-          ]
+          "type": "string"
         }
       },
       "required": ["format"],
@@ -1668,7 +1730,7 @@
       "type": "object",
       "properties": {
         "end_date": {
-          "type": "string"
+          "$ref": "#/definitions/valueOrPath"
         },
         "period": {
           "description": "The unit for the date difference: years (y), months (m), days (d), hours (h), minutes (i), seconds (s)",
@@ -1753,33 +1815,19 @@
           ]
         },
         "quantity": {
-          "type": "object",
-          "properties": {
-            "in_item_path": {
-              "type": "string"
-            }
-          }
+          "$ref": "#/definitions/valueOrInItemPath"
         },
         "from_unit": {
-          "type": "object",
-          "properties": {
-            "in_item_path": {
-              "type": "string"
-            }
-          }
+          "$ref": "#/definitions/valueOrInItemPath"
         },
         "to_unit": {
-          "type": "object",
-          "properties": {
-            "in_item_path": {
-              "type": "string"
-            }
-          }
+          "$ref": "#/definitions/valueOrInItemPath"
         },
         "invert_factor": {
           "description": "Whether or not the factor in conversion table should be inverted or not",
           "type": "string",
-          "enum": ["1", "0"]
+          "enum": ["1", "0"],
+          "default": "0"
         },
         "output_path": {
           "description": "The field path where the conversion results will be stored",
@@ -1840,9 +1888,12 @@
       "description": "Returns a list with all duplicate objects removed to ensure objects are unique",
       "type": "object",
       "properties": {
-        "unique_key_path": {
+        "unique_key_paths": {
           "description": "Key/field to check uniqueness on",
-          "type": "string"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "rank_key_path": {
           "description": "Key/field for ranking to choose on which copy of the duplicated objects to retain",
@@ -1855,7 +1906,7 @@
           "default": "desc"
         }
       },
-      "required": ["unique_key_path", "rank_key_path", "rank_order"],
+      "required": ["unique_key_paths", "rank_key_path", "rank_order"],
       "additionalProperties": false
     },
     "duplicate_list_item": {
@@ -1883,13 +1934,9 @@
             "additionalProperties": true,
             "maxProperties": 2
           }
-        },
-        "condition": {
-          "description": "The condition that the object must meet for it to be duplicated",
-          "$ref": "#/definitions/condition"
         }
       },
-      "required": ["replacement_key", "replacement_data", "condition"],
+      "required": ["replacement_key", "replacement_data"],
       "additionalProperties": false
     },
     "get_random_string": {
@@ -1915,39 +1962,11 @@
         "operands": {
           "type": "array",
           "items": {
-            "oneOf": [
-              {
-                "title": "Get data from path",
-                "type": "object",
-                "properties": {
-                  "path": {
-                    "type": "string"
-                  }
-                }
-              },
-              {
-                "description": "Set data",
-                "type": "string"
-              }
-            ]
+            "$ref": "#/definitions/valueOrPath"
           }
         },
         "default_value": {
-          "oneOf": [
-            {
-              "title": "Get data from path",
-              "type": "object",
-              "properties": {
-                "path": {
-                  "type": "string"
-                }
-              }
-            },
-            {
-              "description": "Set data",
-              "type": "string"
-            }
-          ]
+          "$ref": "#/definitions/valueOrPath"
         },
         "modulo_handler": {
           "type": "string",
@@ -1980,15 +1999,18 @@
             "properties": {
               "non_greedy": {
                 "type": "string",
-                "enum": ["1", "0"]
+                "enum": ["1", "0"],
+                "default": "1"
               },
               "only_numbers": {
                 "type": "string",
-                "enum": ["1", "0"]
+                "enum": ["1", "0"],
+                "default": "0"
               },
               "only_letters": {
                 "type": "string",
-                "enum": ["1", "0"]
+                "enum": ["1", "0"],
+                "default": "0"
               }
             },
             "required": ["non_greedy", "only_numbers", "only_letters"],
@@ -2107,8 +2129,6 @@
                     "value": {
                       "type": [
                         "string",
-                        "integer",
-                        "boolean",
                         "array",
                         "object"
                       ],
@@ -2231,8 +2251,6 @@
                     "value": {
                       "type": [
                         "string",
-                        "integer",
-                        "boolean",
                         "array",
                         "object",
                         "null"
@@ -2245,11 +2263,12 @@
                     },
                     "valueMapping": {
                       "type": [
+                        "string",
                         "object",
-                        "null",
-                        "string"
+                        "null"
                       ],
-                      "description": "Maps values from valueFromField to new values. Used only with valueFromField."
+                      "description": "Maps values from valueFromField to new values. Used only with valueFromField.",
+                      "default": ""
                     },
                     "conditionalValue": {
                       "type": [
@@ -2264,8 +2283,6 @@
                           "value": {
                             "type": [
                               "string",
-                              "integer",
-                              "boolean",
                               "array",
                               "object",
                               "null"
@@ -2275,12 +2292,18 @@
                           "valueFromField": {
                             "type": "string",
                             "description": "The field from which to derive the value if the condition is true. Optional."
+                          },
+                          "use_data_as_path_value": {
+                            "type": "string",
+                            "enum": ["1","0"],
+                            "default": "0"
                           }
                         },
                         "required": [
                           "condition",
                           "value",
-                          "valueFromField"
+                          "valueFromField",
+                          "use_data_as_path_value"
                         ]
                       },
                       "description": "Sets the value based on a condition."

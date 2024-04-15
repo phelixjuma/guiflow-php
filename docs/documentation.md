@@ -482,4 +482,4 @@ Flattening deeply nested data structures into a simpler, one-level object is a c
 ```
 
 
-For full reference of the workflow schema, refer to this [reference](schema_doc.html).
+For full reference of the workflow schema, refer to this [reference](https://phelixjuma.github.io/guiflow-php/schema_doc.html).

@@ -1182,7 +1182,8 @@ class Utils
             }
 
             if (!empty($groupBy)) {
-                $instance->groupBy($groupBy);
+                $groupByFields = !is_array($groupBy)? [$groupBy] : $groupBy;
+                $instance->groupBy(...$groupByFields);
             }
 
             $instance->setFetchType(Builder::FETCH_TYPE_ARRAY);
