@@ -26,7 +26,7 @@ class GUIFlowTest extends TestCase
         $workflow->run($data, false);
 
         //print "\nExecution Time:\n";
-        //print_r($dataTransformer->workflowExecutor->getResults()[0]->getExecutionTime());
+        //print_r($workflow->workflowExecutor->getResults()[0]->getExecutionTime());
 
         print "\nAfter\n";
         print_r($data);

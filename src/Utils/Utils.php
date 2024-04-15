@@ -7,7 +7,6 @@ use ArrayJoin\On;
 use FuzzyWuzzy\Fuzz;
 use FuzzyWuzzy\Process;
 use PhelixJuma\GUIFlow\Actions\FunctionAction;
-use PhelixJuma\GUIFlow\Conditions\SimpleCondition;
 use PhelixJuma\GUIFlow\Workflow;
 use PhelixJuma\GUIFlow\Exceptions\UnknownOperatorException;
 
