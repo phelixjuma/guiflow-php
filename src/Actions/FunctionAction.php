@@ -122,11 +122,8 @@ class FunctionAction implements ActionInterface
 
             list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
 
-            if (method_exists($this->function[0], $function) ) {
-                $function = [$this->function[0], $function];
-            } else {
-                $function = [$this, $function];
-            }
+            // Set function as an array with the udf object
+            $function = [$this->function[0], $function];
 
             $count = sizeof($currentData);
             $wg = new Coroutine\WaitGroup();
