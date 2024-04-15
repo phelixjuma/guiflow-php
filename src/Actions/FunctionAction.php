@@ -107,16 +107,12 @@ class FunctionAction implements ActionInterface
 
             list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
 
-            if (method_exists($this->function[0], $function) ) {
-                $function = [$this->function[0], $function];
-            } else {
-                $function = [$this, $function];
-            }
-
             foreach ($currentData as &$value) {
+
                 try {
-                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($value);
+                    (new FunctionAction($path, [$this->function[0], $function], $args, $newField, $strict, $condition))->execute($value);
                 } catch (\Exception|\Throwable $e) {
+                    //print "\nError in map function: ".$e->getMessage()."\n";
                 }
             }
 
