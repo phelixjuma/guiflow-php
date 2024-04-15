@@ -26,7 +26,7 @@ class ConfigurationValidator
 
             $errors = ((new ErrorFormatter())->format($result->error()));
 
-            throw new \InvalidArgumentException(implode(', ', $errors));
+            throw new \InvalidArgumentException(json_encode($errors));
         }
     }
 
