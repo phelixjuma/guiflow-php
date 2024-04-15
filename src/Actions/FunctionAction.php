@@ -229,6 +229,8 @@ class FunctionAction implements ActionInterface
             $newValue = Randomiser::getRandomString(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'basic_arithmetic') {
             $newValue = Utils::basic_arithmetic(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'absolute_value') {
+            $newValue = Utils::absolute_value(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'length') {
             $newValue = Utils::length($paramValues[0]);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'parse_template') {

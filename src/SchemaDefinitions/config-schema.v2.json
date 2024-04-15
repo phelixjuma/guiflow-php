@@ -937,7 +937,8 @@
         },
         "strict": {
           "type": "string",
-          "description": "Specifies whether the function execution should be strict."
+          "description": "Specifies whether the function execution should be strict.",
+          "default": "1"
         },
         "condition": {
           "$ref": "#/definitions/condition",
