@@ -960,10 +960,10 @@ class Utils
                 }
                 return self::removeExtraSpaces(str_replace($search, $replacement, $subject));
             },
-            'preg_replace' => function($subject, $pattern, $replacement, $addSpacer=true, $isCaseSensitive=false) {
+            'preg_replace' => function($subject, $pattern, $replacement, $add_spacer=true, $is_sase_sensitive=false) {
 
                 $pattern = "/".self::custom_preg_escape($pattern)."/";
-                if (!$isCaseSensitive) {
+                if (!$is_sase_sensitive) {
                     $pattern .= "i";
                 }
 
@@ -972,7 +972,7 @@ class Utils
                 }
 
                 // Add a spacer to replacement
-                if ($addSpacer) {
+                if ($add_spacer) {
                     $replacement = " $replacement ";
                 }
 
