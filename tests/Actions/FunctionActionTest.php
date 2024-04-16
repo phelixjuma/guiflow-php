@@ -1315,7 +1315,7 @@ class FunctionActionTest extends TestCase
             ]
         ];
 
-        $action = new FunctionAction("products.*.name", [$this, 'append'], ["strings" => ['1KG'], "separator" => "", "useDataAsPathValue" => true, "valueKey" => ""], null, null, $condition);
+        $action = new FunctionAction("products.*.name", [$this, 'append'], ["strings" => ['1KG'], "separator" => "", "use_data_as_path_value" => true, "valueKey" => ""], null, null, $condition);
 
         $action->execute($data);
 
@@ -1358,7 +1358,7 @@ class FunctionActionTest extends TestCase
             ]
         ];
 
-        $action = new FunctionAction("products", [$this, 'append'], ["strings" => ['(PER KG)'], "separator" => "", "useDataAsPathValue" => "", "valueKey" => "name"], null, null, $condition);
+        $action = new FunctionAction("products", [$this, 'append'], ["strings" => ['(PER KG)'], "separator" => "", "use_data_as_path_value" => "", "valueKey" => "name"], null, null, $condition);
 
         $action->execute($data);
 
@@ -1466,7 +1466,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testMapSet()
+    public function testMapSet()
     {
         $data = [
             "items" => [
@@ -1503,7 +1503,7 @@ class FunctionActionTest extends TestCase
                         ]
                     ]
                 ],
-                'useDataAsPathValue' => false,
+                'use_data_as_path_value' => false,
                 "value"     => "",
                 "valueFromField"    => "factor"
             ],
@@ -1543,7 +1543,7 @@ class FunctionActionTest extends TestCase
                         ]
                     ]
                 ],
-                'useDataAsPathValue' => false,
+                'use_data_as_path_value' => false,
                 "value"     => "1",
                 "valueFromField"    => ""
             ]
@@ -1562,7 +1562,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -1884,7 +1884,7 @@ class FunctionActionTest extends TestCase
             "value" => "\d+\s*(?:G|GM|GMS|KG|KGS|PC|PCS)"
         ];
 
-        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'append', 'args' => ['stringsToAppend' => ["[",["path" => "pack"],"]"], "seperator" => "", "useDataAsPathValue" => false, 'valueKey' => "description"], 'newField' => '', 'strict' => 0 ,'condition' => $condition], '', 0, null);
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'append', 'args' => ['stringsToAppend' => ["[",["path" => "pack"],"]"], "seperator" => "", "use_data_as_path_value" => false, 'valueKey' => "description"], 'newField' => '', 'strict' => 0 ,'condition' => $condition], '', 0, null);
 
         $action->execute($data);
 

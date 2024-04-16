@@ -97,7 +97,7 @@ class SetValueAction implements ActionInterface
                 $newValue = "";
                 foreach ($this->conditionalValue as $conditionV) {
 
-                    $useDataAsPathValue = $conditionV['useDataAsPathValue'] ?? true;
+                    $useDataAsPathValue = $conditionV['use_data_as_path_value'] ?? true;
 
                     // We check if the condition is a pass
                     if (Workflow::evaluateCondition($currentValues, $conditionV['condition'], $useDataAsPathValue)) {
