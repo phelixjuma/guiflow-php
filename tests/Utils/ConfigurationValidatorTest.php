@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigurationValidatorTest extends TestCase
 {
-    public function _testValidate()
+    public function testValidate()
     {
 
         $config_json = file_get_contents(dirname(__DIR__) ."/config.json");

@@ -11,10 +11,8 @@ use Opis\JsonSchema\Validator;
 class ConfigurationValidator
 {
 
-    public static function validate($data, $schemaVersion = null): bool
+    public static function validateGeneralSchema($data, $schema): bool
     {
-
-        $schema = self::getSchema($schemaVersion);
 
         $validator = new Validator();
 
@@ -28,6 +26,14 @@ class ConfigurationValidator
 
             throw new \InvalidArgumentException(json_encode($errors));
         }
+    }
+
+    public static function validate($data, $schemaVersion = null): bool
+    {
+
+        $schema = self::getSchema($schemaVersion);
+
+        return self::validateGeneralSchema($data, $schema);
     }
 
     /**

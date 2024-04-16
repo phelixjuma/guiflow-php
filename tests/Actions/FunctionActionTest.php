@@ -2007,7 +2007,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'description', 'function' => 'strtolower', 'args' => [], 'newField' => '', 'strict' => 0 ,'condition' => null], '', 0, null);
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'products', 'function' => 'user_defined_function', 'args' => ["function_name"=> "first_array"], 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
 
         $action->execute($data);
 

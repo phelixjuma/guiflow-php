@@ -70,7 +70,7 @@
         "dependencies": [
           "search_customer"
         ],
-        "skip": "1",
+        "skip": "0",
         "params": {
           "path": "customers_list"
         }
