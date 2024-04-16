@@ -960,10 +960,10 @@ class Utils
                 }
                 return self::removeExtraSpaces(str_replace($search, $replacement, $subject));
             },
-            'preg_replace' => function($subject, $pattern, $replacement, $add_spacer=true, $is_sase_sensitive=false) {
+            'preg_replace' => function($subject, $pattern, $replacement, $add_spacer=true, $is_case_sensitive=false) {
 
                 $pattern = "/".self::custom_preg_escape($pattern)."/";
-                if (!$is_sase_sensitive) {
+                if (!$is_case_sensitive) {
                     $pattern .= "i";
                 }
 

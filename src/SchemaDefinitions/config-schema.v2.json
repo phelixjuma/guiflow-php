@@ -345,7 +345,6 @@
             "append", "prepend", "concat", "concat_multi_array_assoc",
             "custom_preg_replace", "regex_mapper_multiple",
             "remove_repeated_words", "assoc_array_sum_if",
-            "assoc_array_find",
             "get_from_object", "flatten_objects",
             "expand_lists", "flatten_and_expand",
             "rename_object_keys", "date_add_substract_days",
@@ -675,19 +674,6 @@
               },
               "then": {
                 "$ref": "#/definitions/assoc_array_sum_if"
-              }
-            },
-            {
-              "title": "assoc_array_find",
-              "if": {
-                "properties": {
-                  "function": {
-                    "const": "assoc_array_find"
-                  }
-                }
-              },
-              "then": {
-                "$ref": "#/definitions/assoc_array_find"
               }
             },
             {
@@ -1643,20 +1629,6 @@
         }
       },
       "required": ["sum_field", "condition"],
-      "additionalProperties": false
-    },
-    "assoc_array_find": {
-      "type": "object",
-      "properties": {
-        "condition": {
-          "$ref": "#/definitions/condition"
-        },
-        "return_field": {
-          "type": "string",
-          "description": "The key/field for the object data you want returned. If not set, the entire object is returned"
-        }
-      },
-      "required": ["condition", "return_field"],
       "additionalProperties": false
     },
     "get_from_object": {

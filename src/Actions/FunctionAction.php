@@ -76,7 +76,7 @@ class FunctionAction implements ActionInterface
         if (!empty($this->args) && !is_string($this->args)) {
             foreach ($this->args as $param) {
 
-                if ($this->function['1'] != 'join' && $this->function['1'] != 'map') {
+                if (!in_array($this->function['1'], ['join', 'map', 'assoc_array_find'])) {
 
                     if (is_array($param) && isset($param['path'])) {
 

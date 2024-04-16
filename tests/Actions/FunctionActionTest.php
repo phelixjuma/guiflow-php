@@ -643,32 +643,6 @@ class FunctionActionTest extends TestCase
                 'address' => 'Kilimani',
                 'region' => 'Nairobi'
             ],
-            'products' => [
-                [
-                    'original_value' => [
-                        'name' => 'Capon Chicken',
-                        'unit_of_measure' => [
-                            [
-                                'selling_quantity' => 2,
-                                'selling_unit'    => 'Pieces'
-                            ]
-                        ],
-                        'unit_price' => 200
-                    ]
-                ],
-                [
-                    'original_value' => [
-                        'name' => 'Chicken Sausages',
-                        'unit_of_measure' => [
-                            [
-                                'selling_quantity' => 3,
-                                'selling_unit'    => 'Cases'
-                            ]
-                        ],
-                        'unit_price' => 300
-                    ]
-                ],
-            ],
             "principal_code" => "WEET",
             "brands" => [
                 ["name" => "Weetabix", "acc" => "WEET"],
@@ -685,7 +659,9 @@ class FunctionActionTest extends TestCase
             'products' => []
         ];
 
-        $action = new FunctionAction("brands", [$this, 'assoc_array_find'], ['condition_field' => "acc", "condition_operator" => "==", "condition_value" => ["path" => "principal_code"], "condition_threshold" => 80, "condition_tokenize" => false, "return_key" => ""], 'brand_details');
+        $searchCondition = ["path" => " acc", "operator" => "==", "value" => ["path" => "principal_code"]];
+
+        $action = new FunctionAction("brands", [$this, 'assoc_array_find'], ['search_condition' => $searchCondition, "return_key" => ""], 'brand_details');
 
         $action->execute($data);
 
