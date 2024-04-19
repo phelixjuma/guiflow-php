@@ -198,6 +198,26 @@
           "additionalProperties": false
         },
         {
+          "title": "Join Condition",
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string",
+              "not": {
+                "enum": ["exists", "not exists"]
+              }
+            }
+          },
+          "required": [
+            "path",
+            "operator"
+          ],
+          "additionalProperties": false
+        },
+        {
           "title": "Condition for Set Function (no path)",
           "type": "object",
           "oneOf": [

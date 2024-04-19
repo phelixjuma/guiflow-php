@@ -1081,7 +1081,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testJoinFunction()
+    public function testJoinFunction()
     {
         $data = [
             [
@@ -1158,27 +1158,13 @@ class FunctionActionTest extends TestCase
             ]
         ];
 
-        $condition2 = [
-            'operator' => 'OR',
-            'conditions' => [
-                [
-                    'path' => 'customer',
-                    'operator' => '==',
-                ],
-                [
-                    'path' => 'order_number',
-                    'operator' => '==',
-                ]
-            ]
-        ];
-
         $expectedData = [];
 
         $action = new FunctionAction("", [$this, 'join'], ['join_paths' => $joinPaths, 'criteria' => $condition]);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
