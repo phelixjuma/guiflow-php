@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\GUIFlow\Tests\Actions;
 
+use PhelixJuma\GUIFlow\Actions\FunctionAction;
 use PhelixJuma\GUIFlow\Actions\SetValueAction;
 use PHPUnit\Framework\TestCase;
 
@@ -151,6 +152,54 @@ class SetValueActionTest extends TestCase
         ];
 
         $action = new SetValueAction("products.*.category", null, null, null, $conditionalValue, "products.*.section");
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testConditionalSet()
+    {
+        $data = [
+            "delivery_location" => "Kisumu Wholesalers"
+        ];
+
+        $expectedData = [];
+
+        $conditionalValue = [
+            [
+                "condition" => [
+                    "operator" => "AND",
+                    "conditions" => [
+                        [
+                            "operator" => "in list any",
+                            "value" => ["wholesale"]
+                        ]
+                    ]
+                ],
+                'use_data_as_path_value' => "1",
+                "value"     => "distribution",
+                "valueFromField"    => ""
+            ],
+            [
+                "condition" => [
+                    "operator" => "AND",
+                    "conditions" => [
+                        [
+                            "operator" => "not in list any",
+                            "value" => ["wholesale"]
+                        ]
+                    ]
+                ],
+                'use_data_as_path_value' => "1",
+                "value"     => "supermarket",
+                "valueFromField"    => ""
+            ],
+        ];
+
+        $action = new SetValueAction("delivery_location", '', '', '', $conditionalValue, "new_delivery_location");
 
         $action->execute($data);
 

@@ -21,7 +21,7 @@ class SimpleCondition implements ConditionInterface
     /**
      * @param $data
      * @return bool
-     * @throws UnknownOperatorException
+     * @throws \Exception
      */
     public function evaluate($data): bool
     {
@@ -146,11 +146,9 @@ class SimpleCondition implements ConditionInterface
                             $pattern = '/' . Utils::custom_preg_escape(Utils::full_unescape($v)) . '/i';
 
                             if (preg_match($pattern, $pathValue)) {
-                                //print "\n$pathValue matched to $pattern preped from $v\n";
                                 return true;
                             }
                             if (preg_last_error() !== PREG_NO_ERROR) {
-                                //print "Preg Error when matching $pathValue against $pattern : ".Utils::getPregError(preg_last_error());
                                 throw new \Exception("Preg Error when matching ".json_encode($pathValue)." against ".json_encode($pattern)." : ".Utils::getPregError(preg_last_error()));
                             }
                         }
@@ -165,7 +163,6 @@ class SimpleCondition implements ConditionInterface
                                 return true;
                             }
                             if (preg_last_error() !== PREG_NO_ERROR) {
-                                //print "Preg Error when matching $pathValue against $pattern : ".Utils::getPregError(preg_last_error());
                                 throw new \Exception("Preg Error when matching ".json_encode($pathValue)." against ".json_encode($pattern)." : ".Utils::getPregError(preg_last_error()));
                             }
                         }
@@ -188,7 +185,7 @@ class SimpleCondition implements ConditionInterface
                     throw new UnknownOperatorException("Unknown operator: $operator");
             }
         } catch (\Exception | \Throwable $e) {
-            throw new \Exception("Comparison error on value: ".json_encode($value)." and path value: ".json_encode($pathValue).". Error says ".$e->getMessage(). ". Line: ".$e->getLine()." on file: ".$e->getFile());
+            throw new \Exception("simple condition error on value: ".json_encode($value)." and path value: ".json_encode($pathValue).". Error says ".$e->getMessage(). ". Line: ".$e->getLine()." on file: ".$e->getFile());
         }
     }
 }

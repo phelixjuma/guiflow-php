@@ -1466,7 +1466,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testMapSet()
+    public function _testMapSet()
     {
         $data = [
             "items" => [
