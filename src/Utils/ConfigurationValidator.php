@@ -11,6 +11,27 @@ use Opis\JsonSchema\Validator;
 class ConfigurationValidator
 {
 
+    /**
+     * @param $data
+     * @param $schemaVersion
+     * @return array|true
+     */
+    public static function getValidationErrors($data, $schemaVersion='v2.0'): bool|array
+    {
+
+        $schema = self::getSchema($schemaVersion);
+
+        $validator = new Validator();
+
+        $result = $validator->validate($data, $schema);
+
+        if ($result->isValid()) {
+            return true;
+        } else {
+            return ((new ErrorFormatter())->format($result->error()));
+        }
+    }
+
     public static function validateGeneralSchema($data, $schema): bool
     {
 
