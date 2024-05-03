@@ -3,6 +3,7 @@
 namespace PhelixJuma\GUIFlow\Utils;
 
 use FuzzyWuzzy\Fuzz;
+use PhelixJuma\GUIFlow\Conditions\SimpleCondition;
 
 class Filter
 {
@@ -59,6 +60,7 @@ class Filter
      * @param $termExclusionPattern
      * @param $valueExclusionPattern
      * @return bool|int
+     * @throws \Exception
      */
     private static function matchValueAgainstFilter($value, $term, $mode, int $similarityThreshold=self::DEFAULT_THRESHOLD, $termExclusionPattern = null, $valueExclusionPattern=null): bool|int
     {
@@ -93,7 +95,7 @@ class Filter
             self::STARTS_WITH => str_starts_with($value, $term),
             self::ENDS_WITH => str_ends_with($value, $term),
             self::SIMILAR_TO => $fuzz->tokenSetRatio($value, $term) >= $similarityThreshold,
-            default => str_contains($value, $term),
+            default => SimpleCondition::compare($term, $mode, $value, $similarityThreshold)
         };
     }
 
