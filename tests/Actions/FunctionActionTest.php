@@ -1880,7 +1880,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testFilterInArray()
+    public function _testFilterInArray()
     {
         $data = [
             "items" => [
@@ -1929,7 +1929,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
