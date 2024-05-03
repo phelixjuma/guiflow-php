@@ -294,7 +294,8 @@
               "type": "string",
               "enum": [
                 "==", "!=", ">", ">=", "<", "<=", "in", "not in", "regex", "true", "false", "empty", "not empty",
-                "startswith", "endswith", "similar_to", "contains"
+                "startswith", "endswith", "similar_to", "gt", "gte", "lt", "lte", "contains","not contains", "matches", "not matches",
+                "no in", "in list all", "not in list all", "in list any", "not in list any", "like"
               ]
             },
             "key": {
