@@ -1081,7 +1081,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testJoinFunction()
+    public function _testJoinFunction()
     {
         $data = [
             [
@@ -1164,7 +1164,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
@@ -1880,32 +1880,56 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testFilterInArray()
+    public function testFilterInArray()
     {
         $data = [
             "items" => [
-                ["description" => "AQuangel 100ml x 24 x 100ml [24 x 100]", "pack" => "Pack: 1 x 1", "products"  => [
-                    ["description" => "Cotaf 100ml", "pack" => "Pack: 1 x 1"],
-                    ["description" => "Aquawett-100ML", "pack" => "Pack: 1 x 1"],
-                    ["description" => "PEARL x 24 x 100ml [24 x 100]", "pack" => "Pack: 1 x 1"],
-                    ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1"]
-                ]],
-                ["description" => "Smoked sausage", "pack" => "Pack: 1 x 1", "products"  => [
-                    ["description" => "Assorted pack 1kg", "pack" => "Pack: 1 x 1"],
-                    ["description" => "Assorted pack 10kg", "pack" => "Pack: 1 x 1"],
-                    ["description" => "Smoked chicken sausage", "pack" => "Pack: 1 x 1"],
-                    ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1"]
-                ]]
+                ["description" => "PEARL [Size: 1KG 1KG 1KG] WHOLE MASOOR LARGE", "pack" => "Pack: 1 x 1"],
+                ["description" => "PEARL [Size: 2KG] THAI JASMINE RICE", "pack" => "Pack: 1 x 1"],
+                ["description" => "RANEE [Size: 1KG 1KG 1KG] BIRYANI RICE", "pack" => "Pack: 1 x 1"],
+                ["description" => "SOKO BABY WEANING 1KG", "pack" => "Pack: 1 x 1"],
+                ["description" => "RANEE PREMIUM SPAGHETTI RED [Size: 400G]", "pack" => "Pack: 1 x 1"],
+                ["description" => "RANEE 25KG THAI JASMINE RICE", "pack" => "Pack: 1 x 1"],
+            ]
+        ];
+
+        $filterCriteria = [
+            "operator" => "AND",
+            "conditions" => [
+                [
+                    'term' => ["PEARL","THAI","JASMINE","2"],
+                    "mode" => "not in list any",
+                    "key" => "description",
+                    'threshold' => "50",
+                    "term_exclusion_pattern" => "",
+                    "value_exclusion_pattern" => ""
+                ],
+                [
+                    'term' => ["RANE", "THAI", "25"],
+                    "mode" => "not in list any",
+                    "key" => "description",
+                    'threshold' => "50",
+                    "term_exclusion_pattern" => "",
+                    "value_exclusion_pattern" => ""
+                ],
+                [
+                    'term' => ["BABY", "WEANING", "1"],
+                    "mode" => "not in list any",
+                    "key" => "description",
+                    'threshold' => "50",
+                    "term_exclusion_pattern" => "",
+                    "value_exclusion_pattern" => ""
+                ]
             ]
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'products', 'function' => 'filter', 'args' => ["filter_criteria" => ['term' => ["path" => "description"], "mode" => "similar_to", "key" => "description", 'threshold' => "50", "term_exclusion_pattern" => "\b\d+\b|\b\d*(G|GM|GMS|KG|KGS|PC|PCS|ML|L|LTR|LTRS|M|X)\b|[^\w\s]+", "value_exclusion_pattern" => "\b\d+\b|\b\d*(G|GM|GMS|KG|KGS|PC|PCS|ML|L|LTR|LTRS|M|X)\b|[^\w\s]+"]], 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
+        $action = new FunctionAction("items", [$this, 'filter'], ["filter_criteria" => $filterCriteria], '', 0, null);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

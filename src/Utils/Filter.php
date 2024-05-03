@@ -95,7 +95,7 @@ class Filter
             self::STARTS_WITH => str_starts_with($value, $term),
             self::ENDS_WITH => str_ends_with($value, $term),
             self::SIMILAR_TO => $fuzz->tokenSetRatio($value, $term) >= $similarityThreshold,
-            default => SimpleCondition::compare($term, $mode, $value, $similarityThreshold)
+            default => SimpleCondition::compare($value, $mode, $term, $similarityThreshold)
         };
     }
 
