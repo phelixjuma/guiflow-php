@@ -1964,6 +1964,28 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
+    public function testFuzzyExtractTopN()
+    {
+        $data = [
+            "customer_name" => "CIIRA",
+            "customers_list" => [
+                ["description" => "Ciira Agrovet"],
+                ["description" => "Kamkunji Agrovet"],
+                ["description" => "Kamkunji Agrovet"],
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("", [$this, 'fuzzy_extract_n'], ["query" => ["path" => "customer_name"], "choices" => ["path" => "customers_list"],"searchKey" => "description", "n" => "2"], 'shortlisted_customers',  0 , null);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
     public function _testUDFInMap()
     {
         $data = [

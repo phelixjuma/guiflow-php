@@ -855,7 +855,11 @@ class Utils
 
             // We add similarity score
             foreach ($choices as $key => &$choice) {
-                $choice['similarity'] = $fuzz->$fuzzyMethod($query, $choice[$searchKey]);
+                if (!empty($query) && !empty($choice[$searchKey])) {
+                    $choice['similarity'] = $fuzz->$fuzzyMethod($query, $choice[$searchKey]);
+                } else {
+                    $choice['similarity'] = 0;
+                }
             }
 
             // We sort in descending order
