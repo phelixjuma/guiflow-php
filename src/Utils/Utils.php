@@ -1299,9 +1299,9 @@ class Utils
                 //print_r($topMatch);
                 // Set the nearest stem
                 $value['nearest_stem'] = "";
+                $value['nearest_stem_similarity'] = !empty($topMatch) ? $topMatch[0]['similarity'] : 0;
                 if (!empty($topMatch) && $topMatch[0]['similarity'] >= $similarityThreshold) {
                     $value['nearest_stem'] = $topMatch[0][$corpusStemKey];
-                    $value['nearest_stem_similarity'] = $topMatch[0]['similarity'];
                 }
 
                 // We perform spell correction

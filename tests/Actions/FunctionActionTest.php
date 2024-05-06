@@ -980,7 +980,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("items", [$this, "pattern_based_stem_spell_corrections"], ["search_key" => "description", "corpus_list" => ["path" => "products"], "corpus_key" => "description", "search_stemming_patterns" => $stemmingPatterns, "corpus_stemming_patterns" => $stemmingPatterns, "similarity_threshold" => 0], 'items');
+        $action = new FunctionAction("items", [$this, "pattern_based_stem_spell_corrections"], ["search_key" => "description", "corpus_list" => ["path" => "products"], "corpus_key" => "description", "search_stemming_patterns" => $stemmingPatterns, "corpus_stemming_patterns" => $stemmingPatterns, "similarity_threshold" => 80], 'items');
 
         $action->execute($data);
 
