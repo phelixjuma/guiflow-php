@@ -228,6 +228,8 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::length($paramValues[0]);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'parse_template') {
             $newValue = TemplateParserService::parseMessageFromTemplate(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'pattern_based_stem_spell_corrections') {
+            $newValue = Utils::pattern_based_stem_spell_corrections(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'user_defined_function') {
             // function name is at index 1 (index 0 is the data).
             $functionName = $paramValues[1];

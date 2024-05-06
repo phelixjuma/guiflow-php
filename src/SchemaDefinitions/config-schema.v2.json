@@ -2048,6 +2048,8 @@
     }
   },
   "items": {
+    "title": "Conditional Rule",
+    "description": "A rule encapsulates a set of actions to perform when the rule's condition is true",
     "type": "object",
     "properties": {
       "rule": {

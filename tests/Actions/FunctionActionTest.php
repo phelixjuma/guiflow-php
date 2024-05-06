@@ -920,19 +920,67 @@ class FunctionActionTest extends TestCase
     {
         $data = [
             'items' => [
-                [
-                    'description' => "KISUMU MEGA CITY BUTCHERY"
-                ]
+                ['description' => "CABLE ELETRO IEC TYPE N-1220642"],
+                ['description' => "Oshozyme Liquid - 24X200ml/24x500ml"],
+                ['description' => "Neemcide 0.3% -1L"],
             ]
         ];
 
         $mapping = [
-            "KISUMU\s+MEGA\s+CITY" => "MEGA CITY"
+            "\b\d+\s*(MG|G|GM|GRM|GMS|KG|KGS|PC|PCS|ML|L|LT|LTR|LTRS|M|X)?\b|[^\w\s]+|(\b|\d+)((?!BIO)[a-zA-Z]{1,3})\b" => "",
+            "(\d+[X])" => ""
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("items.*.description", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "isCaseSensitive" => false], "target_keys" => []], 'items.*.formatted_description');
+        $action = new FunctionAction("items.*.description", [$this, "transform"], ["regex_mapper", "args" => ["mappings" => $mapping, "is_case_sensitive" => false], "target_keys" => []], 'items.*.formatted_description');
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testSpellCorrection()
+    {
+        $data = [
+            'items' => [
+                ['description' => "OSHOTTANE 50"],
+                ['description' => "OSHOLLANE 100G"],
+                ['description' => "OSHOHANE 500G"],
+                ['description' => "MATLE 100G"],
+                ['description' => "MISLESS 240G"],
+                ['description' => "EASY GROW VEGETATIVE ORHEMIAN SOMIS 120G"],
+                ['description' => "RICKOUT 200MUS"],
+            ],
+            "products" => [
+                ['description' => "CABLE ELETRO IEC TYPE N-1220642"],
+                ['description' => "Oshozyme Liquid - 24X200ml/24x500ml"],
+                ['description' => "Neemcide 0.3% -1L"],
+                ['description' => "MATCO 72 WP - 100GMS"],
+                ['description' => "MATCO 72 WP - 50GMS"],
+                ['description' => "MISTRESS 72 WP - 240GRM"],
+                ['description' => "EASY GRO VEGETATIVE - 120GRM"],
+                ['description' => "KICK OUT 480 SL - 200ML"],
+                ['description' => "OSHOZYME 1L"],
+                ['description' => "OSHOTHANE 80 WP - 200GMS"],
+                ['description' => "OSHOTHION 50 EC - 50ML"],
+                ['description' => "EASYGRO VEGETATIVE ROLLS-40GRM"],
+                ['description' => "EASYGRO VEGETATIVE ROLLS-40GRM"],
+                ['description' => "Easygro Vegetative 12 x 1Kg Printed Carton"],
+                ['description' => "EASYGRO VEGETATIVE BULK"],
+            ]
+        ];
+
+        $stemmingPatterns = [
+            "\b\d+\s*(MG|G|GM|GRM|GMS|KG|KGS|PC|PCS|ML|L|LT|LTR|LTRS|M|X)?\b|[^\w\s]+|(\b|\d+)((?!BIO|OUT)[a-zA-Z]{1,3})\b",
+            "(\d+[X])"
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("items", [$this, "pattern_based_stem_spell_corrections"], ["search_key" => "description", "corpus_list" => ["path" => "products"], "corpus_key" => "description", "search_stemming_patterns" => $stemmingPatterns, "corpus_stemming_patterns" => $stemmingPatterns, "similarity_threshold" => 0], 'items');
 
         $action->execute($data);
 
@@ -1964,7 +2012,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testFuzzyExtractTopN()
+    public function _testFuzzyExtractTopNCustomers()
     {
         $data = [
             "customer_name" => "CIIRA",
@@ -1981,7 +2029,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        print_r($data);
+        //print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

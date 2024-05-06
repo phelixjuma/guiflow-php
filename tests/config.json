@@ -1,111 +1,188 @@
 [
   {
-    "rule": "Get customers list",
-    "stage": "get_customers_list",
-    "description": "Gets list of customers from external source",
+    "rule": "Add random no to PO Number",
+    "stage": "add_po_code",
+    "description": "",
     "dependencies": [],
-    "skip": "0",
-    "condition": "always",
-    "actions": [
-      {
-        "action": "function",
-        "description": "Get the list of customers from external source",
-        "stage": "get_customers_list",
-        "dependencies": [],
-        "skip": "0",
-        "params": {
-          "path": "customers_list",
-          "function": "user_defined_function",
-          "args": {
-            "function_name": "get_master_data",
-            "type": "customers"
-          },
-          "newField": "",
-          "strict": "",
-          "condition": ""
-        }
-      }
-    ]
-  },
-  {
-    "rule": "Match customer",
-    "stage": "match_customers",
-    "description": "Matches customer from external data using customer name",
-    "dependencies": [
-      "get_customers_list"
-    ],
-    "skip": "0",
+    "skip": "1",
     "condition": {
-      "path": "customers_list",
+      "path": "purchase_order_number",
       "operator": "exists"
     },
     "actions": [
       {
         "action": "function",
+        "stage": "get_po_code",
         "description": "",
-        "stage": "search_customer",
         "dependencies": [],
         "skip": "0",
         "params": {
-          "path": "customer_name",
-          "function": "user_defined_function",
+          "path": "",
+          "function": "get_random_string",
           "args": {
-            "function_name": "semantic_search",
-            "corpus": {
-              "path": "customers_list"
-            },
-            "corpus_key": "BPNAME",
-            "master_data_type": "customers",
-            "similarity_threshold": "80"
+            "length": "3",
+            "alphabet": "0123456789"
           },
-          "newField": "",
-          "strict": "",
+          "newField": "po_code",
+          "strict": "1",
           "condition": ""
         }
       },
       {
-        "action": "delete",
-        "description": "Delete customers list",
-        "stage": "delete_customer_list",
-        "dependencies": [
-          "search_customer"
-        ],
+        "action": "function",
+        "stage": "po_number_append_po_code",
+        "description": "",
+        "dependencies": ["get_po_code"],
         "skip": "0",
         "params": {
-          "path": "customers_list"
+          "path": "",
+          "function": "concat",
+          "args": {
+            "data_to_concat": [
+              {
+                "path": "purchase_order_number"
+              },
+              {
+                "path": "po_code"
+              }
+            ],
+            "separator": "",
+            "enclosure": ""
+          },
+          "newField": "purchase_order_number",
+          "strict": "1",
+          "condition": ""
         }
       }
     ]
   },
   {
-    "rule": "Process Items",
-    "stage": "process_items",
+    "rule": "Set date as purchase order number, if empty",
+    "stage": "set_empty_po_number",
     "description": "",
     "dependencies": [],
+    "skip": "0",
+    "condition": {
+      "path": "purchase_order_number",
+      "operator": "not exists"
+    },
+    "actions": [
+      {
+        "action": "function",
+        "stage": "set_date_as_po_number",
+        "description": "",
+        "dependencies": [],
+        "skip": "0",
+        "params": {
+          "path": "order_date",
+          "function": "date_format",
+          "args": {
+            "format": "d/m/y"
+          },
+          "newField": "purchase_order_number",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "action": "function",
+        "stage": "set_po_number_from_date_and_customer_code",
+        "description": "",
+        "dependencies": ["set_date_as_po_number"],
+        "skip": "0",
+        "params": {
+          "path": "",
+          "function": "concat",
+          "args": {
+            "data_to_concat": [
+              {
+                "path": "customer_name.meta_data.id"
+              },
+              "-",
+              {
+                "path": "purchase_order_number"
+              }
+            ],
+            "separator": "",
+            "enclosure": ""
+          },
+          "newField": "purchase_order_number",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Map data to ERP schema",
+    "stage": "schema_conversion",
+    "description": "",
+    "dependencies": ["set_po_number_from_date_and_customer_code"],
     "skip": "0",
     "condition": "always",
     "actions": [
       {
         "action": "function",
-        "description": "Get number of cases",
-        "stage": "get_item_number_of_cases",
+        "stage": "schema_conversion",
+        "description": "",
         "dependencies": [],
         "skip": "0",
         "params": {
-          "path": "items.*.original_value.unit_of_measure",
-          "function": "assoc_array_find",
+          "path": "",
+          "function": "model_mapping",
           "args": {
-            "condition": {
-              "path": "selling_unit",
-              "operator": "similar_to",
-              "value": "Cases - CS",
-              "similarity_threshold": "80",
-              "tokenize_similarity": "0"
+            "model_mapping": {
+              "orderDate": "order_date",
+              "requestedDeliveryDate": "delivery_date",
+              "customerNumber": "customer_name.meta_data.id",
+              "customerDimensionCode":"customer_name.meta_data.other_details.Global_Dimension_2_Code",
+              "customerBlockStatus": "customer_name.meta_data.other_details.Blocked",
+              "externalDocumentNumber": "purchase_order_number",
+              "shipToName": "customer_name.meta_data.value",
+              "shipToContact": "contact_person.meta_data.value",
+              "sellToAddressLine1": "delivery_location.meta_data.value",
+              "items.*.lineObjectNumber": "items.*.description.meta_data.id",
+              "items.*.quantity": "items.*.converted_units.converted_value",
+              "items.*.unitOfMeasureCode": "items.*.description.meta_data.other_details.baseUnitOfMeasureCode"
             },
-            "return_field": "selling_quantity"
+            "inverted": "0"
           },
-          "newField": "items.*.original_value.number_of_cases",
-          "strict": "",
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "action": "function",
+        "stage": "format_order_date",
+        "dependencies": ["schema_conversion"],
+        "skip": "0",
+        "description": "format order date",
+        "params": {
+          "path": "orderDate",
+          "function": "date_format",
+          "args": {
+            "format": "Y-m-d"
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "action": "function",
+        "stage": "format_delivery_date",
+        "dependencies": ["schema_conversion"],
+        "skip": "0",
+        "description": "format delivery date",
+        "params": {
+          "path": "requestedDeliveryDate",
+          "function": "date_format",
+          "args": {
+            "format": "Y-m-d"
+          },
+          "newField": "",
+          "strict": "1",
           "condition": ""
         }
       }

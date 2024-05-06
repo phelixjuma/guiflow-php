@@ -1241,4 +1241,79 @@ class Utils
         return false;
     }
 
+    /**
+     * @param $searchList
+     * @param $searchKey
+     * @param $corpusList
+     * @param $corpusKey
+     * @param $searchStemmingPatterns
+     * @param $corpusStemmingPatterns
+     * @param $similarityThreshold
+     * @return mixed
+     */
+    public static function pattern_based_stem_spell_corrections($searchList, $searchKey, $corpusList, $corpusKey, $searchStemmingPatterns, $corpusStemmingPatterns, $similarityThreshold=90) {
+
+        // We stem the corpus list
+        array_walk($corpusList, function (&$value, $key) use($corpusKey, $corpusStemmingPatterns) {
+            if (!empty($value[$corpusKey])) {
+
+                $stemKey = $corpusKey."_stem";
+                $value[$stemKey] = $value[$corpusKey];
+
+                foreach ($corpusStemmingPatterns as $stemmingPattern) {
+                    // pattern
+                    $pattern = '/' . self::custom_preg_escape(self::full_unescape($stemmingPattern)) . '/i';
+                    // set the stem key
+                    $value[$stemKey] = preg_replace($pattern, "", $value[$stemKey]);
+
+                    if (preg_last_error() !== PREG_NO_ERROR) {
+                        //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
+                    }
+                }
+            }
+        });
+
+        // We stem the search list
+        array_walk($searchList, function (&$value, $key) use($searchKey, $searchStemmingPatterns, $corpusList, $corpusKey ,$similarityThreshold) {
+
+            if (!empty($value[$searchKey])) {
+
+                $stemKey = $searchKey."_stem";
+                $value[$stemKey] = $value[$searchKey];
+
+                foreach ($searchStemmingPatterns as $stemmingPattern) {
+                    // pattern
+                    $pattern = '/' . self::custom_preg_escape(self::full_unescape($stemmingPattern)) . '/i';
+                    // set the stem key
+                    $value[$stemKey] = preg_replace($pattern, "", $value[$stemKey]);
+
+                    if (preg_last_error() !== PREG_NO_ERROR) {
+                        //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
+                    }
+                }
+
+                // We get the corpus stem key
+                $corpusStemKey = $corpusKey."_stem";
+                // We get the top match
+                $topMatch = self::fuzzy_extract_n(null, $value[$stemKey], $corpusList, $corpusStemKey, 1);
+                //print_r($topMatch);
+                // Set the nearest stem
+                $value['nearest_stem'] = "";
+                if (!empty($topMatch) && $topMatch[0]['similarity'] >= $similarityThreshold) {
+                    $value['nearest_stem'] = $topMatch[0][$corpusStemKey];
+                    $value['nearest_stem_similarity'] = $topMatch[0]['similarity'];
+                }
+
+                // We perform spell correction
+                if (!empty($value['nearest_stem'])) {
+                    $value[$searchKey] = self::removeExtraSpaces(preg_replace("/{$value[$stemKey]}/i", $value['nearest_stem'], $value[$searchKey]));
+                }
+
+            }
+        });
+
+        return $searchList;
+
+    }
+
 }
