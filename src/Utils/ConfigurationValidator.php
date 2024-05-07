@@ -5,7 +5,6 @@ namespace PhelixJuma\GUIFlow\Utils;
 namespace PhelixJuma\GUIFlow\Utils;
 
 use Opis\JsonSchema\Errors\ErrorFormatter;
-use Opis\JsonSchema\ValidationResult;
 use Opis\JsonSchema\Validator;
 
 class ConfigurationValidator
@@ -16,7 +15,7 @@ class ConfigurationValidator
      * @param $schemaVersion
      * @return array|true
      */
-    public static function getValidationErrors($data, $schemaVersion='v2.0'): bool|array
+    public static function getValidationErrors($data, $schemaVersion='v3'): bool|array
     {
 
         $schema = self::getSchema($schemaVersion);
