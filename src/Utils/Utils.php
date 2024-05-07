@@ -1264,7 +1264,7 @@ class Utils
                     // pattern
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($stemmingPattern)) . '/i';
                     // set the stem key
-                    $value[$stemKey] = preg_replace($pattern, "", $value[$stemKey]);
+                    $value[$stemKey] = self::removeExtraSpaces(preg_replace($pattern, "", $value[$stemKey]));
 
                     if (preg_last_error() !== PREG_NO_ERROR) {
                         //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
@@ -1285,7 +1285,7 @@ class Utils
                     // pattern
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($stemmingPattern)) . '/i';
                     // set the stem key
-                    $value['spell_check_meta_data'][$stemKey] = preg_replace($pattern, "", $value['spell_check_meta_data'][$stemKey]);
+                    $value['spell_check_meta_data'][$stemKey] = self::removeExtraSpaces(preg_replace($pattern, "", $value['spell_check_meta_data'][$stemKey]));
 
                     if (preg_last_error() !== PREG_NO_ERROR) {
                         //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
