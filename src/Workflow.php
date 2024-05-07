@@ -45,7 +45,7 @@ class Workflow
         $this->functionsClass = $functionsClass;
 
         // Validate the configuration against the schema
-        ConfigurationValidator::validate($this->config, 'v2');
+        ConfigurationValidator::validate($this->config, 'v3');
     }
 
     /**

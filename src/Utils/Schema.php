@@ -46,7 +46,7 @@ class Schema
      * @param $version
      * @return array
      */
-    public static function getGranularSchemas($version="v2") {
+    public static function getGranularSchemas($version="v3") {
 
         $jsonSchema = ConfigurationValidator::getSchema($version);
 
