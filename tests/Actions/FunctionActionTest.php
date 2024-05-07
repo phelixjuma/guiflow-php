@@ -953,6 +953,7 @@ class FunctionActionTest extends TestCase
                 ['description' => "MISLESS 240G"],
                 ['description' => "EASY GROW VEGETATIVE ORHEMIAN SOMIS 120G"],
                 ['description' => "RICKOUT 200MUS"],
+                ['description' => "Orhemian 50ML"],
             ],
             "products" => [
                 ['description' => "CABLE ELETRO IEC TYPE N-1220642"],
@@ -970,6 +971,7 @@ class FunctionActionTest extends TestCase
                 ['description' => "EASYGRO VEGETATIVE ROLLS-40GRM"],
                 ['description' => "Easygro Vegetative 12 x 1Kg Printed Carton"],
                 ['description' => "EASYGRO VEGETATIVE BULK"],
+                ['description' => "FORMALIN - Kg"],
             ]
         ];
 
@@ -980,7 +982,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("items", [$this, "pattern_based_stem_spell_corrections"], ["search_key" => "description", "corpus_list" => ["path" => "products"], "corpus_key" => "description", "search_stemming_patterns" => $stemmingPatterns, "corpus_stemming_patterns" => $stemmingPatterns, "similarity_threshold" => 80], 'items');
+        $action = new FunctionAction("items", [$this, "pattern_based_stem_spell_corrections"], ["search_key" => "description", "corpus_list" => ["path" => "products"], "corpus_key" => "description", "search_stemming_patterns" => $stemmingPatterns, "corpus_stemming_patterns" => $stemmingPatterns, "similarity_threshold" => 70], 'items');
 
         $action->execute($data);
 

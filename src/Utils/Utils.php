@@ -1279,13 +1279,13 @@ class Utils
             if (!empty($value[$searchKey])) {
 
                 $stemKey = $searchKey."_stem";
-                $value[$stemKey] = $value[$searchKey];
+                $value['spell_check_meta_data'][$stemKey] = $value[$searchKey];
 
                 foreach ($searchStemmingPatterns as $stemmingPattern) {
                     // pattern
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($stemmingPattern)) . '/i';
                     // set the stem key
-                    $value[$stemKey] = preg_replace($pattern, "", $value[$stemKey]);
+                    $value['spell_check_meta_data'][$stemKey] = preg_replace($pattern, "", $value['spell_check_meta_data'][$stemKey]);
 
                     if (preg_last_error() !== PREG_NO_ERROR) {
                         //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
@@ -1295,18 +1295,18 @@ class Utils
                 // We get the corpus stem key
                 $corpusStemKey = $corpusKey."_stem";
                 // We get the top match
-                $topMatch = self::fuzzy_extract_n(null, $value[$stemKey], $corpusList, $corpusStemKey, 1);
-                //print_r($topMatch);
+                $topMatch = self::fuzzy_extract_n(null, $value['spell_check_meta_data'][$stemKey], $corpusList, $corpusStemKey, 1);
+
                 // Set the nearest stem
-                $value['nearest_stem'] = "";
-                $value['nearest_stem_similarity'] = !empty($topMatch) ? $topMatch[0]['similarity'] : 0;
+                $value['spell_check_meta_data']['nearest_stem'] = "";
+                $value['spell_check_meta_data']['nearest_stem_similarity'] = !empty($topMatch) ? $topMatch[0]['similarity'] : 0;
                 if (!empty($topMatch) && $topMatch[0]['similarity'] >= $similarityThreshold) {
-                    $value['nearest_stem'] = $topMatch[0][$corpusStemKey];
+                    $value['spell_check_meta_data']['nearest_stem'] = $topMatch[0][$corpusStemKey];
                 }
 
                 // We perform spell correction
-                if (!empty($value['nearest_stem'])) {
-                    $value[$searchKey] = self::removeExtraSpaces(preg_replace("/{$value[$stemKey]}/i", $value['nearest_stem'], $value[$searchKey]));
+                if (!empty($value['spell_check_meta_data']['nearest_stem'])) {
+                    $value[$searchKey] = self::removeExtraSpaces(preg_replace("/{$value['spell_check_meta_data'][$stemKey]}/i", $value['spell_check_meta_data']['nearest_stem'], $value[$searchKey]));
                 }
 
             }
