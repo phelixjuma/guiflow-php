@@ -3043,6 +3043,9 @@
           "$ref": "#/definitions/actionBase"
         },
         {
+          "$ref": "#/definitions/setAction"
+        },
+        {
           "properties": {
             "params": {
               "type": "object",

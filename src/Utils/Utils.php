@@ -429,7 +429,7 @@ class Utils
      * @param $format
      * @return array
      */
-    public static function date_add_substract_days($data, $days, $operator, $format="Y-m-d") {
+    public static function date_add_subtract_days($data, $days, $operator, $format="Y-m-d") {
 
         $method = $operator == 'add' ? 'add' : 'sub';
 
