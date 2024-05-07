@@ -1012,8 +1012,84 @@
             },
             "args": {
               "type": "object",
-              "properties": {},
-              "required": [],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "The data path where the value is to be set."
+                },
+                "value": {
+                  "type": [
+                    "string",
+                    "array",
+                    "object",
+                    "null"
+                  ],
+                  "description": "The value to set. Optional if using valueFromField."
+                },
+                "valueFromField": {
+                  "type": "string",
+                  "description": "The JSON path from which to copy a value. Optional if using value."
+                },
+                "valueMapping": {
+                  "type": [
+                    "string",
+                    "object",
+                    "null"
+                  ],
+                  "description": "Maps values from valueFromField to new values. Used only with valueFromField.",
+                  "default": ""
+                },
+                "conditionalValue": {
+                  "type": [
+                    "array"
+                  ],
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "$ref": "#/definitions/condition"
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "array",
+                          "object",
+                          "null"
+                        ],
+                        "description": "The value to set if the condition is true."
+                      },
+                      "valueFromField": {
+                        "type": "string",
+                        "description": "The field from which to derive the value if the condition is true. Optional."
+                      },
+                      "use_data_as_path_value": {
+                        "type": "string",
+                        "enum": ["1","0"],
+                        "default": "0"
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "value",
+                      "valueFromField",
+                      "use_data_as_path_value"
+                    ]
+                  },
+                  "description": "Sets the value based on a condition."
+                },
+                "newField": {
+                  "type": "string",
+                  "description": "The new field to create or update with the set value."
+                }
+              },
+              "required": [
+                "path",
+                "value",
+                "valueFromField",
+                "valueMapping",
+                "conditionalValue",
+                "newField"
+              ],
               "additionalProperties": false
             }
           },
@@ -2613,7 +2689,8 @@
                   "type": "string",
                   "enum": [
                     "ceil",
-                    "floor"
+                    "floor",
+                    "round"
                   ]
                 },
                 "decimal_places": {
@@ -2825,6 +2902,30 @@
               "properties": {},
               "required": [],
               "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "mapFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "map", "map_parallel"
+              ]
+            },
+            "args": {
+              "$ref": "#/definitions/mapFunctionsList"
             }
           },
           "required": [
@@ -3850,7 +3951,7 @@
       "unevaluatedProperties": false
     },
     "Action_Function_PatternBasedStemSpellCorrections": {
-      "title": "Platform Functions",
+      "title": "Pattern Based Stem Spell Corrections",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -3880,28 +3981,7 @@
         {
           "properties": {
             "params": {
-              "allOf": [
-                {
-                  "$ref": "#/definitions/actionFunctionSharedParams"
-                },
-                {
-                  "properties": {
-                    "function": {
-                      "enum": [
-                        "map", "map_parallel"
-                      ]
-                    },
-                    "args": {
-                      "$ref": "#/definitions/mapFunctionsList"
-                    }
-                  },
-                  "required": [
-                    "function",
-                    "args"
-                  ]
-                }
-              ],
-              "unevaluatedProperties": false
+              "$ref": "#/definitions/mapFunctionArgs"
             }
           }
         }
@@ -4007,7 +4087,7 @@
           "$ref": "#/definitions/Action_Function_ConvertUnit"
         },
         {
-          "$ref": "#/definitions/Action_Function_ConcatMultiArrayAssoc"
+          "$ref": "#/definitions/Action_Function_ConvertUnitMulti"
         },
         {
           "$ref": "#/definitions/Action_Function_GetMetricConversionTable"
@@ -4214,6 +4294,10 @@
         {
           "title": "Platform Functions",
           "$ref": "#/definitions/platformFunctionsFunctionArgs"
+        },
+        {
+          "title": "Map",
+          "$ref": "#/definitions/mapFunctionArgs"
         }
       ]
     },

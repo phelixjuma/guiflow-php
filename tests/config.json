@@ -1,151 +1,642 @@
 [
   {
-    "rule": "Add random no to PO Number",
-    "stage": "add_po_code",
+    "rule": "Get sender details",
     "description": "",
+    "stage": "get_sender_details",
     "dependencies": [],
-    "skip": "1",
-    "condition": {
-      "path": "purchase_order_number",
-      "operator": "exists"
-    },
-    "actions": [
-      {
-        "action": "function",
-        "stage": "get_po_code",
-        "description": "",
-        "dependencies": [],
-        "skip": "0",
-        "params": {
-          "path": "",
-          "function": "get_random_string",
-          "args": {
-            "length": "3",
-            "alphabet": "0123456789"
-          },
-          "newField": "po_code",
-          "strict": "1",
-          "condition": ""
-        }
-      },
-      {
-        "action": "function",
-        "stage": "po_number_append_po_code",
-        "description": "",
-        "dependencies": ["get_po_code"],
-        "skip": "0",
-        "params": {
-          "path": "",
-          "function": "concat",
-          "args": {
-            "data_to_concat": [
-              {
-                "path": "purchase_order_number"
-              },
-              {
-                "path": "po_code"
-              }
-            ],
-            "separator": "",
-            "enclosure": ""
-          },
-          "newField": "purchase_order_number",
-          "strict": "1",
-          "condition": ""
-        }
-      }
-    ]
-  },
-  {
-    "rule": "Set date as purchase order number, if empty",
-    "stage": "set_empty_po_number",
-    "description": "",
-    "dependencies": [],
-    "skip": "0",
-    "condition": {
-      "path": "purchase_order_number",
-      "operator": "not exists"
-    },
-    "actions": [
-      {
-        "action": "function",
-        "stage": "set_date_as_po_number",
-        "description": "",
-        "dependencies": [],
-        "skip": "0",
-        "params": {
-          "path": "order_date",
-          "function": "date_format",
-          "args": {
-            "format": "d/m/y"
-          },
-          "newField": "purchase_order_number",
-          "strict": "1",
-          "condition": ""
-        }
-      },
-      {
-        "action": "function",
-        "stage": "set_po_number_from_date_and_customer_code",
-        "description": "",
-        "dependencies": ["set_date_as_po_number"],
-        "skip": "0",
-        "params": {
-          "path": "",
-          "function": "concat",
-          "args": {
-            "data_to_concat": [
-              {
-                "path": "customer_name.meta_data.id"
-              },
-              "-",
-              {
-                "path": "purchase_order_number"
-              }
-            ],
-            "separator": "",
-            "enclosure": ""
-          },
-          "newField": "purchase_order_number",
-          "strict": "1",
-          "condition": ""
-        }
-      }
-    ]
-  },
-  {
-    "rule": "Map data to ERP schema",
-    "stage": "schema_conversion",
-    "description": "",
-    "dependencies": ["set_po_number_from_date_and_customer_code"],
     "skip": "0",
     "condition": "always",
     "actions": [
       {
         "action": "function",
-        "stage": "schema_conversion",
         "description": "",
+        "stage": "get_sender_details",
         "dependencies": [],
         "skip": "0",
         "params": {
-          "path": "",
-          "function": "model_mapping",
+          "path": "sender_details",
+          "function": "user_defined_function",
           "args": {
-            "model_mapping": {
-              "orderDate": "order_date",
-              "requestedDeliveryDate": "delivery_date",
-              "customerNumber": "customer_name.meta_data.id",
-              "customerDimensionCode":"customer_name.meta_data.other_details.Global_Dimension_2_Code",
-              "customerBlockStatus": "customer_name.meta_data.other_details.Blocked",
-              "externalDocumentNumber": "purchase_order_number",
-              "shipToName": "customer_name.meta_data.value",
-              "shipToContact": "contact_person.meta_data.value",
-              "sellToAddressLine1": "delivery_location.meta_data.value",
-              "items.*.lineObjectNumber": "items.*.description.meta_data.id",
-              "items.*.quantity": "items.*.converted_units.converted_value",
-              "items.*.unitOfMeasureCode": "items.*.description.meta_data.other_details.baseUnitOfMeasureCode"
+            "function_name": "get_sender_details"
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Get extraction details",
+    "description": "",
+    "stage": "get_extraction_details",
+    "dependencies": [],
+    "skip": "0",
+    "condition": "always",
+    "actions": [
+      {
+        "action": "function",
+        "description": "",
+        "stage": "get_extraction_details",
+        "dependencies": [],
+        "skip": "0",
+        "params": {
+          "path": "extraction_data",
+          "function": "user_defined_function",
+          "args": {
+            "function_name": "get_extraction_data",
+            "fields": [
+              "document.link",
+              "document_text"
+            ]
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Set default value for online sales and van sales status",
+    "description": "",
+    "stage": "default_online_and_van_sales_order",
+    "dependencies": [],
+    "skip": "0",
+    "condition": "always",
+    "actions": [
+      {
+        "description": "",
+        "stage": "default_online_sales_order",
+        "dependencies": [],
+        "skip": "0",
+        "action": "set",
+        "params": {
+          "path": "is_online_shop_order",
+          "value": "No",
+          "valueFromField": "",
+          "valueMapping": "",
+          "conditionalValue": [],
+          "newField": ""
+        }
+      },
+      {
+        "description": "",
+        "stage": "default_van_sales_order",
+        "dependencies": [],
+        "skip": "0",
+        "action": "set",
+        "params": {
+          "path": "is_van_sales",
+          "value": "No",
+          "valueFromField": "",
+          "valueMapping": "",
+          "conditionalValue": [],
+          "newField": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Set if order from online sales",
+    "description": "",
+    "stage": "set_is_online_sales_order",
+    "dependencies": [
+      "get_extraction_details",
+      "default_online_sales_order"
+    ],
+    "skip": "0",
+    "condition": {
+      "operator": "matches",
+      "path": "extraction_data.document_text",
+      "value": "Osho Chemical Industries Online Shop"
+    },
+    "actions": [
+      {
+        "description": "",
+        "stage": "set_is_online_sales_order",
+        "dependencies": [],
+        "skip": "0",
+        "action": "set",
+        "params": {
+          "path": "is_online_shop_order",
+          "value": "Yes",
+          "valueFromField": "",
+          "valueMapping": "",
+          "conditionalValue": [],
+          "newField": ""
+        }
+      },
+      {
+        "description": "",
+        "stage": "set_online_sales_customer",
+        "dependencies": [],
+        "skip": "0",
+        "action": "set",
+        "params": {
+          "path": "customer_name",
+          "value": "CASH SALE A/C - ONLINE SALES",
+          "valueFromField": "",
+          "valueMapping": "",
+          "conditionalValue": [],
+          "newField": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Set if order from van sales",
+    "description": "",
+    "stage": "set_is_van_sales_order",
+    "dependencies": [
+      "get_extraction_details",
+      "default_van_sales_order"
+    ],
+    "skip": "0",
+    "condition": {
+      "operator": "matches",
+      "path": "extraction_data.document_text",
+      "value": "Van sale"
+    },
+    "actions": [
+      {
+        "description": "",
+        "stage": "set_is_van_sales_order",
+        "dependencies": [],
+        "skip": "0",
+        "action": "set",
+        "params": {
+          "path": "is_van_sales",
+          "value": "Yes",
+          "valueFromField": "",
+          "valueMapping": "",
+          "conditionalValue": [],
+          "newField": ""
+        }
+      },
+      {
+        "description": "",
+        "stage": "set_van_sales_customer",
+        "dependencies": [],
+        "skip": "0",
+        "action": "set",
+        "params": {
+          "path": "customer_name",
+          "value": "CASH SALE A/C - NORTHERN VET SALES -01",
+          "valueFromField": "",
+          "valueMapping": "",
+          "conditionalValue": [],
+          "newField": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "If customer name is empty, set ordered by name as the customer name",
+    "description": "",
+    "stage": "set_customer_name_from_ordered_by_name",
+    "dependencies": [],
+    "skip": "0",
+    "condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "path": "customer_name",
+          "operator": "not exists"
+        }
+      ]
+    },
+    "actions": [
+      {
+        "description": "",
+        "stage": "set_customer_name_from_ordered_by_name",
+        "dependencies": [],
+        "skip": "0",
+        "action": "set",
+        "params": {
+          "path": "customer_name",
+          "value": "",
+          "valueFromField": "ordered_by_name",
+          "valueMapping": "",
+          "conditionalValue": [],
+          "newField": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Use today's date as order date",
+    "description": "",
+    "stage": "set_order_date",
+    "dependencies": [],
+    "skip": "0",
+    "condition": "always",
+    "actions": [
+      {
+        "description": "",
+        "stage": "set_order_date",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "order_date",
+          "function": "transform",
+          "args": {
+            "transformer": "string_to_date_time",
+            "transformer_args": {
+              "format": "Y-m-d H:i:s",
+              "pre_modifier": "Today",
+              "post_modifier": ""
             },
-            "inverted": "0"
+            "transformer_target_keys": []
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Get customers list",
+    "description": "",
+    "stage": "get_customers_list",
+    "dependencies": [],
+    "skip": "0",
+    "condition": "always",
+    "actions": [
+      {
+        "description": "",
+        "stage": "get_customers_list",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "customers_list",
+          "function": "user_defined_function",
+          "args": {
+            "function_name": "get_master_data",
+            "type": "customers"
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Transforms customers",
+    "description": "",
+    "stage": "transform_customers",
+    "dependencies": [],
+    "skip": "0",
+    "condition": {
+      "path": "customers_list",
+      "operator": "exists"
+    },
+    "actions": [
+      {
+        "description": "Do name transformations for customers list",
+        "stage": "customers_list_name_transformation",
+        "dependencies": [
+          "get_customers_list"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "customers_list.*.Name",
+          "function": "transform",
+          "args": {
+            "transformer": "regex_mapper",
+            "transformer_args": {
+              "mappings": {
+                "\\b(MAJIDAL)\\b": "MAJID AL",
+                "(?<=\\S)[-_]|[-_](?=\\S)": "[space]-[space]",
+                "(\\S)&(\\S)": "$1 & $2",
+                "\\b(H/W)\\b": "Hardware",
+                "\\b(W/SALE)\\b": "WHOLESALE",
+                "\\b(KSM)\\b": "KISUMU",
+                "\\b(MSA)\\b": "Mombasa",
+                "\\b(NBI|NRB)\\b": "Nairobi",
+                "\\bELDO\\b": "ELDORET",
+                "\\b(RD)\\b": "Road",
+                "\\b(H/WAY|HWY)\\b": "Highway",
+                "\\b(OPP)\\b": "Opposite"
+              },
+              "is_case_sensitive": "0"
+            },
+            "transformer_target_keys": []
+          },
+          "newField": "",
+          "strict": "",
+          "condition": ""
+        }
+      },
+      {
+        "description": "",
+        "stage": "customer_name_transformation",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "customer_name",
+          "function": "transform",
+          "args": {
+            "transformer": "regex_mapper",
+            "transformer_args": {
+              "mappings": {
+                "(?<=\\S)[-_]|[-_](?=\\S)": "[space]-[space]",
+                "(\\S)&(\\S)": "$1 & $2",
+                "\\b(H/W)\\b": "Hardware",
+                "\\b(W/SALE)\\b": "WHOLESALE",
+                "\\sP\\.?O\\sBOX.*$": "",
+                "\\b(KSM)\\b": "KISUMU",
+                "\\b(MSA)\\b": "Mombasa",
+                "\\b(NBI|NRB)\\b": "Nairobi",
+                "\\bELDO\\b": "ELDORET",
+                "\\b(RD)\\b": "Road",
+                "\\b(H/WAY|HWY)\\b": "Highway",
+                "\\b(OPP)\\b": "Opposite",
+                "\\b(Quickmart)\\b": "Quick Mart",
+                "\\b(EASTMATT)\\b": "EASTLEIGH MATTRESSES LIMITED",
+                "\\b(NBI)\\b": "NAIROBI",
+                "\\b((?:SM|HM)\\s+KEN\\s+[A-Z]{3})\\b": "MAJID",
+                "\\b(CARREFOUR(\\s+MARKET)?)\\b": "MAJID AL FUTTAIM HYPERMARKETS",
+                "\\bSML\\b": "Summer Millers Ltd",
+                "\\b(^(?!.*SPROUTS)MT KENYA)\\b": "MT KENYA WHOLESELLER TRADERS",
+                "(?!.*BUSIA)KAVIFARM AGROVET": "KAVIFARM AGROVET BUSIA",
+                "(CIIRA)\\s*(PARTNER FOR GROWTH)": "$1 Agrovet $2"
+              },
+              "is_case_sensitive": "0"
+            },
+            "transformer_target_keys": []
+          },
+          "newField": "",
+          "strict": "",
+          "condition": ""
+        }
+      },
+      {
+        "description": "",
+        "stage": "delivery_location_transformation",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "delivery_location",
+          "function": "transform",
+          "args": {
+            "transformer": "regex_mapper",
+            "transformer_args": {
+              "mappings": {
+                "(?<=\\S)[-_]|[-_](?=\\S)": "[space]-[space]",
+                "(\\S)&(\\S)": "$1 & $2",
+                "\\b(H/W)\\b": "Hardware",
+                "\\b(W/SALE)\\b": "WHOLESALE",
+                "\\sP\\.?O\\sBOX.*$": "",
+                "\\b(KSM)\\b": "KISUMU",
+                "\\b(MSA)\\b": "Mombasa",
+                "\\b(NBI|NRB)\\b": "NAIROBI",
+                "\\bELDO\\b": "ELDORET",
+                "\\b(RD)\\b": "Road",
+                "\\b(H/WAY|HWY)\\b": "Highway",
+                "\\b(OPP)\\b": "Opposite",
+                "\\b((?:SM|HM)\\s+KEN\\s+[A-Z]{3})\\b": "MAJID",
+                "\\b(CARREFOUR(\\s+MARKET)?)\\b": "MAJID AL FUTTAIM HYPERMARKETS"
+              },
+              "is_case_sensitive": "0"
+            },
+            "transformer_target_keys": []
+          },
+          "newField": "",
+          "strict": "",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Make customer name upper case to match the search list",
+        "stage": "uppercase_order_customer_name",
+        "dependencies": [
+          "set_online_sales_customer",
+          "set_van_sales_customer",
+          "set_customer_name_from_ordered_by_name",
+          "customer_name_transformation"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "customer_name",
+          "function": "strtoupper",
+          "args": {},
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Make delivery location to upper case to match the search list",
+        "stage": "uppercase_delivery_location",
+        "dependencies": [
+          "delivery_location_transformation"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "delivery_location",
+          "function": "strtoupper",
+          "args": {},
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Filter customers",
+    "description": "",
+    "stage": "get_customers_list",
+    "dependencies": [],
+    "skip": "0",
+    "condition": {
+      "path": "customers_list",
+      "operator": "exists"
+    },
+    "actions": [
+      {
+        "description": "Extract the top 20 matching customers using fuzzy match",
+        "stage": "extract_top_similar_customers",
+        "dependencies": [
+          "customers_list_name_transformation",
+          "customer_name_transformation"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "",
+          "function": "fuzzy_extract_n",
+          "args": {
+            "query": {
+              "path": "customer_name"
+            },
+            "choices": {
+              "path": "customers_list"
+            },
+            "search_key": "Name",
+            "n": "20",
+            "order": "desc",
+            "fuzzy_method": "tokenSetRatio"
+          },
+          "newField": "customers_list",
+          "strict": "0",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Concat customer name to delivery location",
+    "description": "",
+    "stage": "add_delivery_location_to_customer_name",
+    "dependencies": [
+      "set_van_sales_customer",
+      "set_online_sales_customer",
+      "extract_top_similar_customers"
+    ],
+    "skip": "0",
+    "condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "path": "customer_name",
+          "operator": "exists"
+        },
+        {
+          "path": "delivery_location",
+          "operator": "exists"
+        },
+        {
+          "path": "customer_name",
+          "operator": "!=",
+          "value": {
+            "path": "delivery_location"
+          }
+        },
+        {
+          "path": "is_van_sales",
+          "operator": "==",
+          "value": "No"
+        },
+        {
+          "path": "is_online_shop_order",
+          "operator": "==",
+          "value": "No"
+        }
+      ]
+    },
+    "actions": [
+      {
+        "action": "function",
+        "stage": "add_delivery_location_to_customer_name",
+        "description": "",
+        "dependencies": [
+          "uppercase_delivery_location",
+          "uppercase_order_customer_name"
+        ],
+        "skip": "0",
+        "params": {
+          "path": "",
+          "function": "concat",
+          "args": {
+            "data_to_concat": [
+              {
+                "path": "customer_name"
+              },
+              {
+                "path": "delivery_location"
+              }
+            ],
+            "separator": "",
+            "enclosure": "brackets"
+          },
+          "newField": "customer_name",
+          "strict": "",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Match customer",
+    "description": "",
+    "stage": "match_customer",
+    "dependencies": [
+      "extract_top_similar_customers",
+      "add_delivery_location_to_customer_name"
+    ],
+    "skip": "0",
+    "condition": {
+      "path": "customers_list",
+      "operator": "exists"
+    },
+    "actions": [
+      {
+        "description": "",
+        "stage": "match_customer",
+        "dependencies": [
+          "uppercase_order_customer_name",
+          "customers_list_name_transformation"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "customer_name",
+          "function": "user_defined_function",
+          "args": {
+            "function_name": "semantic_search",
+            "corpus": {
+              "path": "customers_list"
+            },
+            "corpus_search_key": "Name",
+            "corpus_id_key": "No",
+            "master_data_type": "customers",
+            "similarity_threshold": "0",
+            "stop_words": [
+              "limited",
+              "ltd",
+              "P.O BOX",
+              "Nairobi"
+            ],
+            "model": "adaV3"
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Get all products list",
+    "description": "",
+    "stage": "get_all_products_list",
+    "dependencies": [],
+    "skip": "0",
+    "condition": "always",
+    "actions": [
+      {
+        "description": "",
+        "stage": "get_all_products_list",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "all_products_list",
+          "function": "user_defined_function",
+          "args": {
+            "function_name": "get_master_data",
+            "type": "all products"
           },
           "newField": "",
           "strict": "1",
@@ -153,16 +644,274 @@
         }
       },
       {
-        "action": "function",
-        "stage": "format_order_date",
-        "dependencies": ["schema_conversion"],
+        "description": "Filter out blocked products, products from RMPAC/PROMO categories as well as the listed bulk items",
+        "stage": "get_cleaned_products_list",
+        "dependencies": [
+          "get_all_products_list"
+        ],
         "skip": "0",
-        "description": "format order date",
+        "action": "function",
         "params": {
-          "path": "orderDate",
-          "function": "date_format",
+          "path": "all_products_list",
+          "function": "filter",
           "args": {
-            "format": "Y-m-d"
+            "filter_criteria": {
+              "operator": "AND",
+              "conditions": [
+                {
+                  "term": "1",
+                  "mode": "!=",
+                  "key": "blocked",
+                  "similarity_threshold": "",
+                  "term_exclusion_pattern": "",
+                  "value_exclusion_pattern": ""
+                },
+                {
+                  "term": [
+                    "RMPAC",
+                    "PROMO",
+                    "PUBH_RM",
+                    "LAB"
+                  ],
+                  "mode": "not in",
+                  "key": "itemCategoryCode",
+                  "similarity_threshold": "",
+                  "term_exclusion_pattern": "",
+                  "value_exclusion_pattern": ""
+                },
+                {
+                  "key": "number",
+                  "mode": "not in",
+                  "term": [
+                    "ABI0056",
+                    "ABI0070",
+                    "ABIO0090",
+                    "ABIO0100",
+                    "AF0L0225",
+                    "AFER0003",
+                    "AFER0014",
+                    "AFER0020",
+                    "AFER0028",
+                    "AFER0054",
+                    "AFER0064",
+                    "AFOL0008",
+                    "AFOL0091",
+                    "AFOL0109",
+                    "AFOL0126",
+                    "AFOL0143",
+                    "AFOL0144",
+                    "AFOL0145",
+                    "AFOL0146",
+                    "AFOL0147",
+                    "AFOL0148",
+                    "AFOL0154",
+                    "AFOL0170",
+                    "AFOL0177",
+                    "AFOL0179",
+                    "AFOL0180",
+                    "AFOL0194",
+                    "AFOL0222",
+                    "AFOL0223",
+                    "AFUN0003",
+                    "AFUN0018",
+                    "AFUN0075",
+                    "AFUN0077",
+                    "AFUN0084",
+                    "AFUN0086",
+                    "AFUN0092",
+                    "AFUN0094",
+                    "AFUN0108",
+                    "AFUN0124",
+                    "AFUN0129",
+                    "AFUN0131",
+                    "AFUN0137",
+                    "AFUN0155",
+                    "AFUN0167",
+                    "AFUN0174",
+                    "AFUN0175",
+                    "AFUN0181",
+                    "AFUN0182",
+                    "AHER0003",
+                    "AHER0019",
+                    "AHER0026",
+                    "AHER0036",
+                    "AHER0044",
+                    "AHER0049",
+                    "AHER0050",
+                    "AHER0051",
+                    "AHER0056",
+                    "AHER0057",
+                    "AHER0062",
+                    "AHER0066",
+                    "AHER0067",
+                    "AINS0002",
+                    "AINS0019",
+                    "AINS0031",
+                    "AINS0040",
+                    "AINS0074",
+                    "AINS0078",
+                    "AINS0126",
+                    "AINS0134",
+                    "AINS0141",
+                    "AINS0142",
+                    "AINS0145",
+                    "AINS0150",
+                    "AINS0151",
+                    "AINS0153",
+                    "AINS0154",
+                    "AINS0155",
+                    "AINS0169",
+                    "AINS0171",
+                    "AINS0173",
+                    "AINS0199",
+                    "AINS0225",
+                    "AINS0233",
+                    "AINS0263",
+                    "AINS0264",
+                    "AINS0266",
+                    "AINS0282",
+                    "AINS0300",
+                    "AINS0301",
+                    "AINS0302",
+                    "AINS0325",
+                    "AINS0362",
+                    "AINS0363",
+                    "AINS0364",
+                    "AINS0365",
+                    "AINS0369",
+                    "AINS0370",
+                    "AINS0371",
+                    "AINS0375",
+                    "AINS0376",
+                    "AINS0377",
+                    "AINS0378",
+                    "AINS0389",
+                    "AINS0390",
+                    "AINS0391",
+                    "AINS0400",
+                    "AINS0410",
+                    "AINS0412",
+                    "AINS0413",
+                    "AINS0418",
+                    "AINS0427",
+                    "AINS0428",
+                    "AINS0436",
+                    "AINS0437",
+                    "AINS0443",
+                    "AINS0456",
+                    "IFOO0062",
+                    "IFOO0083",
+                    "IFOO0100",
+                    "IFOO0103",
+                    "IIND0006",
+                    "IIND0009",
+                    "IIND0071",
+                    "IIND0075",
+                    "IIND0077",
+                    "IIND0101",
+                    "IIND0126",
+                    "IIND0134",
+                    "IIND0148",
+                    "IIND0160",
+                    "IIND0172",
+                    "IIND0188",
+                    "IIND0220",
+                    "IIND0228",
+                    "IIND0231",
+                    "ILEA0045",
+                    "IOXI0007",
+                    "IOXI0029",
+                    "IOXI0041",
+                    "IOXI0048",
+                    "IOXI0049",
+                    "IOXI0050",
+                    "IOXI0051",
+                    "IPHA0001",
+                    "ISOL0025",
+                    "ISOL0081",
+                    "ISOL0082",
+                    "ISOL0083",
+                    "ISOL0084",
+                    "PUBH0065",
+                    "PUBH0087",
+                    "PUBH0088",
+                    "PUBH0090",
+                    "PUBH0095",
+                    "PUBH0096",
+                    "PUBH0098",
+                    "PUBH0099",
+                    "PUBH0121",
+                    "PUBH0125",
+                    "PUBH0132",
+                    "PUBH0137",
+                    "PURM0015",
+                    "PURM0043",
+                    "PURM0075",
+                    "RM00036",
+                    "VANB0005",
+                    "VDEW0028",
+                    "VDEW0029",
+                    "VDEW0049",
+                    "VDEW0050",
+                    "VDEW0057",
+                    "VDEW0058",
+                    "VEPP0012",
+                    "VEPP0017",
+                    "VEPP0043",
+                    "VFSU0034",
+                    "VFSU0052",
+                    "VFSU0070",
+                    "VFSU0071",
+                    "VFSU0074",
+                    "VFSU0090",
+                    "VFSU0099",
+                    "VFSU0100",
+                    "VFSU0101",
+                    "VMES0011",
+                    "VMES0013",
+                    "VOTH0004",
+                    "VOTH0005",
+                    "VOTH0020"
+                  ],
+                  "similarity_threshold": "",
+                  "term_exclusion_pattern": "",
+                  "value_exclusion_pattern": ""
+                }
+              ]
+            }
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Get historically ordered products for the customer",
+    "description": "",
+    "stage": "get_historical_products_list",
+    "dependencies": [
+      "match_customer"
+    ],
+    "skip": "1",
+    "condition": {
+      "path": "customer_name.meta_data.id",
+      "operator": "exists"
+    },
+    "actions": [
+      {
+        "description": "",
+        "stage": "get_historical_products_list",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "products_list",
+          "function": "user_defined_function",
+          "args": {
+            "function_name": "get_master_data",
+            "type": "customer products"
           },
           "newField": "",
           "strict": "1",
@@ -170,20 +919,1313 @@
         }
       },
       {
-        "action": "function",
-        "stage": "format_delivery_date",
-        "dependencies": ["schema_conversion"],
+        "description": "Filter only products for the customer",
+        "stage": "get_customer_products_list",
+        "dependencies": [
+          "get_historical_products_list"
+        ],
         "skip": "0",
-        "description": "format delivery date",
+        "action": "function",
         "params": {
-          "path": "requestedDeliveryDate",
-          "function": "date_format",
+          "path": "products_list",
+          "function": "filter",
           "args": {
-            "format": "Y-m-d"
+            "filter_criteria": {
+              "term": {
+                "path": "customer_name.meta_data.id"
+              },
+              "mode": "==",
+              "key": "sellToCustomerNumber",
+              "similarity_threshold": "",
+              "term_exclusion_pattern": "",
+              "value_exclusion_pattern": ""
+            }
           },
           "newField": "",
           "strict": "1",
           "condition": ""
+        }
+      },
+      {
+        "description": "",
+        "stage": "merge_customer_to_all_products",
+        "dependencies": [
+          "get_customer_products_list",
+          "get_cleaned_products_list"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "",
+          "function": "merge",
+          "args": {
+            "left": {
+              "path": "products_list"
+            },
+            "right": {
+              "path": "all_products_list"
+            },
+            "join": {
+              "type": "inner",
+              "on": "left.number = right.number"
+            },
+            "fields": [
+              "right.number",
+              "right.displayName",
+              "right.itemCategoryCode",
+              "right.blocked",
+              "right.baseUnitOfMeasureCode",
+              "right.PackSize",
+              "right.PcsPerCarton"
+            ],
+            "group_by": []
+          },
+          "newField": "products_list",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "If no historical products, we use the all products list",
+    "description": "",
+    "stage": "set_all_to_customer_products",
+    "dependencies": [
+      "merge_customer_to_all_products"
+    ],
+    "skip": "0",
+    "condition": {
+      "path": "products_list",
+      "operator": "not exists"
+    },
+    "actions": [
+      {
+        "description": "",
+        "stage": "set_all_to_customer_products",
+        "dependencies": [],
+        "skip": "0",
+        "action": "set",
+        "params": {
+          "path": "products_list",
+          "value": "",
+          "valueFromField": "all_products_list",
+          "valueMapping": "",
+          "conditionalValue": [],
+          "newField": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Make quantity absolute and set uom to standard values",
+    "description": "",
+    "stage": "items_quantity_transformation",
+    "dependencies": [],
+    "skip": "0",
+    "condition": "always",
+    "actions": [
+      {
+        "description": "",
+        "stage": "make_quantity_absolute",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items.*.unit_of_measure.*.selling_quantity",
+          "function": "absolute_value",
+          "args": {},
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Standardize selling units",
+        "stage": "standardize_selling_units",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items",
+          "function": "map",
+          "args": {
+            "path": "",
+            "function": "set",
+            "args": {
+              "path": "unit_of_measure.*.selling_unit",
+              "value": "",
+              "valueFromField": "",
+              "valueMapping": "",
+              "conditionalValue": [
+                {
+                  "condition": {
+                    "operator": "matches",
+                    "value": "Kilogram|KG"
+                  },
+                  "value": "kg",
+                  "valueFromField": "",
+                  "use_data_as_path_value": "1"
+                },
+                {
+                  "condition": {
+                    "operator": "matches",
+                    "value": "Liter|Litre|Ltr|Lts|\\bL\\b"
+                  },
+                  "value": "l",
+                  "valueFromField": "",
+                  "use_data_as_path_value": "1"
+                },
+                {
+                  "condition": {
+                    "operator": "matches",
+                    "value": "Millilitre|Milliliter|ML"
+                  },
+                  "value": "ml",
+                  "valueFromField": "",
+                  "use_data_as_path_value": "1"
+                },
+                {
+                  "condition": {
+                    "operator": "matches",
+                    "value": "Gram|GM|GRM|\\bG\\b"
+                  },
+                  "value": "g",
+                  "valueFromField": "",
+                  "use_data_as_path_value": "1"
+                }
+              ],
+              "newField": ""
+            },
+            "newField": "",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Configure details about product list pack sizes",
+    "description": "",
+    "stage": "product_transformations",
+    "dependencies": [
+      "set_all_to_customer_products"
+    ],
+    "skip": "0",
+    "condition": "always",
+    "actions": [
+      {
+        "description": "Augment product descriptions for better matching",
+        "stage": "products_description_transformation",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "products_list.*.displayName",
+          "function": "transform",
+          "args": {
+            "transformer": "regex_mapper",
+            "transformer_args": {
+              "mappings": {
+                "\\b(EASYGRO)\\b": "EASY GRO",
+                "FLOWER & FRUIT": "FLOWER & FRUIT (FF)",
+                "\\b(MATCO\\b)(?!.*\\b72 WP\\b)": "$1 72 WP"
+              },
+              "is_case_sensitive": "0"
+            },
+            "transformer_target_keys": []
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Get the pack unit of measure",
+        "stage": "get_pack_unit_of_measure",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "products_list",
+          "function": "map",
+          "args": {
+            "path": "PackSize",
+            "function": "regex_extract",
+            "args": {
+              "pattern": "\\b\\d+\\s*(KG|GM|GRM|ML|G|L|Ltr|PC|PCS)\\b",
+              "capture_group_number": "1",
+              "is_case_sensitive": "0",
+              "return_subject_on_null": "1"
+            },
+            "newField": "pack_unit_of_measure",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Get the pack unit size",
+        "stage": "get_pack_unit_size",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "products_list",
+          "function": "map",
+          "args": {
+            "path": "PackSize",
+            "function": "regex_extract",
+            "args": {
+              "pattern": "^(?:(?=.*\\bx\\b).*?)?(\\d+(\\.\\d+)?)\\s*(KG|GM|GRM|ML|G|L|Ltr|PC|PCS)\\b",
+              "capture_group_number": "1",
+              "is_case_sensitive": "0",
+              "return_subject_on_null": "1"
+            },
+            "newField": "pack_unit_size",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Get the metric conversion table",
+        "stage": "get_metric_conversion_table",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "metric_conversion_table",
+          "function": "get_metric_conversion_table",
+          "args": {},
+          "newField": "",
+          "strict": "0",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Map pack unit of measure to a standard value",
+        "stage": "standardize_pack_unit_of_measure",
+        "dependencies": [
+          "get_pack_unit_of_measure"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "products_list",
+          "function": "map",
+          "args": {
+            "path": "",
+            "function": "set",
+            "args": {
+              "path": "pack_unit_of_measure",
+              "value": "",
+              "valueFromField": "",
+              "valueMapping": "",
+              "conditionalValue": [
+                {
+                  "condition": {
+                    "operator": "matches",
+                    "value": "Kilogram|KG"
+                  },
+                  "value": "kg",
+                  "valueFromField": "",
+                  "use_data_as_path_value": "1"
+                },
+                {
+                  "condition": {
+                    "operator": "matches",
+                    "value": "Liter|Litre|Ltr|Lts|\\bL\\b"
+                  },
+                  "value": "l",
+                  "valueFromField": "",
+                  "use_data_as_path_value": "1"
+                },
+                {
+                  "condition": {
+                    "operator": "matches",
+                    "value": "Millilitre|Milliliter|ML"
+                  },
+                  "value": "ml",
+                  "valueFromField": "",
+                  "use_data_as_path_value": "1"
+                },
+                {
+                  "condition": {
+                    "operator": "matches",
+                    "value": "Gram|GM|GRM|\\bG\\b"
+                  },
+                  "value": "g",
+                  "valueFromField": "",
+                  "use_data_as_path_value": "1"
+                }
+              ],
+              "newField": ""
+            },
+            "newField": "",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Get inverse pack unit size",
+        "stage": "get_inverse_pack_unit_size",
+        "dependencies": [
+          "get_pack_unit_size"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "products_list",
+          "function": "map",
+          "args": {
+            "path": "",
+            "function": "basic_arithmetic",
+            "args": {
+              "operator": "divide",
+              "operands": [
+                "1",
+                {
+                  "path": "pack_unit_size"
+                }
+              ],
+              "default_value": {
+                "path": "pack_unit_size"
+              },
+              "modulo_handler": "round",
+              "decimal_places": "3"
+            },
+            "newField": "inverse_pack_unit_size",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Get inverse PcsPerCarton",
+        "stage": "get_inverse_pack_pieces_per_carton",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "products_list",
+          "function": "map",
+          "args": {
+            "path": "",
+            "function": "basic_arithmetic",
+            "args": {
+              "operator": "divide",
+              "operands": [
+                "1",
+                {
+                  "path": "PcsPerCarton"
+                }
+              ],
+              "default_value": {
+                "path": "PcsPerCarton"
+              },
+              "modulo_handler": "round",
+              "decimal_places": "3"
+            },
+            "newField": "inverse_pcs_per_carton",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "For Majid, where there's an error with vertical line being picked as 1 in quantity, we remove the 1",
+    "description": "",
+    "stage": "majid_correct_quantity",
+    "dependencies": [],
+    "skip": "0",
+    "condition": {
+      "path": "customer_name.meta_data.value",
+      "operator": "in list any",
+      "value": [
+        "MAJID"
+      ]
+    },
+    "actions": [
+      {
+        "description": "Remove the last '1' from quantity if it has 2+ digits",
+        "stage": "majid_correct_quantity",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items",
+          "function": "map",
+          "args": {
+            "path": "unit_of_measure.0.selling_quantity",
+            "function": "regex_extract",
+            "args": {
+              "pattern": "^(\\d{1,})(?:1)$",
+              "capture_group_number": "1",
+              "is_case_sensitive": "0",
+              "return_subject_on_null": "1"
+            },
+            "newField": "",
+            "strict": "",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Prepare items and products for matching",
+    "description": "",
+    "stage": "prepare_items_products_for_matching",
+    "dependencies": [
+      "set_all_to_customer_products",
+      "standardize_pack_unit_of_measure",
+      "get_inverse_pack_unit_size",
+      "get_inverse_pack_pieces_per_carton",
+      "majid_correct_quantity"
+    ],
+    "skip": "0",
+    "condition": {
+      "path": "products_list",
+      "operator": "exists"
+    },
+    "actions": [
+      {
+        "description": "Make item descriptions uppercase",
+        "stage": "uppercase_item_descriptions",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items",
+          "function": "map",
+          "args": {
+            "path": "description",
+            "function": "strtoupper",
+            "args": {},
+            "newField": "description",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Make product names uppercase",
+        "stage": "uppercase_product_names",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "products_list",
+          "function": "map",
+          "args": {
+            "path": "displayName",
+            "function": "strtoupper",
+            "args": {},
+            "newField": "displayName",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "stage": "item_description_correct_misspellings",
+        "description": "We correct spelling mistakes in item descriptions",
+        "dependencies": [
+          "uppercase_product_names",
+          "uppercase_item_descriptions"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items",
+          "newField": "",
+          "strict": "1",
+          "condition": "",
+          "function": "pattern_based_stem_spell_corrections",
+          "args": {
+            "search_key": "description",
+            "corpus_list": {
+              "path": "products_list"
+            },
+            "corpus_key": "displayName",
+            "search_stemming_patterns": [
+              "\\b\\d+\\s*(MG|G|GM|GRM|GMS|KG|KGS|PC|PCS|ML|L|LT|LTR|LTRS|M|X)?\\b|[^\\w\\s]+|(\\b|\\d+)((?!BIO|OUT)[a-zA-Z]{1,3})\\b",
+              "(\\d+[X])"
+            ],
+            "corpus_stemming_patterns": [
+              "\\b\\d+\\s*(MG|G|GM|GRM|GMS|KG|KGS|PC|PCS|ML|L|LT|LTR|LTRS|M|X)?\\b|[^\\w\\s]+|(\\b|\\d+)((?!BIO|OUT)[a-zA-Z]{1,3})\\b",
+              "(\\d+[X])"
+            ],
+            "similarity_threshold": "50"
+          }
+        }
+      },
+      {
+        "description": "We add the products to each item",
+        "stage": "item_add_products_list",
+        "dependencies": [
+          "item_description_correct_misspellings"
+        ],
+        "skip": "0",
+        "action": "set",
+        "params": {
+          "path": "items.*.products_list",
+          "value": "",
+          "valueFromField": "products_list",
+          "valueMapping": "",
+          "conditionalValue": [],
+          "newField": ""
+        }
+      },
+      {
+        "description": "Remove numbers and uoms from description",
+        "stage": "prepare_item_filter_descriptions",
+        "dependencies": [
+          "item_description_correct_misspellings"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items.*.description",
+          "function": "transform",
+          "args": {
+            "transformer": "regex_mapper",
+            "transformer_args": {
+              "mappings": {
+                "\\b\\d+\\s*(MG|G|GM|GRM|GMS|KG|KGS|PC|PCS|ML|L|LT|LTR|LTRS|M|X)?\\b|[^\\w\\s]+|(\\b|\\d+)((?!BIO)[a-zA-Z]{1,3})\\b": "",
+                "(\\d+[X])": ""
+              },
+              "is_case_sensitive": "0"
+            },
+            "transformer_target_keys": []
+          },
+          "newField": "items.*.filterDescription",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Remove numbers and uoms from display name in each product",
+        "stage": "prepare_item_product_filter_name",
+        "dependencies": [
+          "item_add_products_list"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items.*.products_list.*.displayName",
+          "function": "transform",
+          "args": {
+            "transformer": "regex_mapper",
+            "transformer_args": {
+              "mappings": {
+                "\\b\\d+\\s*(MG|G|GM|GRM|GMS|KG|KGS|PC|PCS|ML|L|LT|LTR|LTRS|M|X)?\\b|[^\\w\\s]+|(\\b|\\d+)((?!BIO)[a-zA-Z]{1,3})\\b": "",
+                "(\\d+[X])": ""
+              },
+              "is_case_sensitive": "0"
+            },
+            "transformer_target_keys": []
+          },
+          "newField": "items.*.products_list.*.filterDescription",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Extract the top 20 matching products using fuzzy match",
+        "stage": "extract_top_similar_item_products",
+        "dependencies": [
+          "prepare_item_filter_descriptions",
+          "prepare_item_product_filter_name"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items",
+          "function": "map",
+          "args": {
+            "path": "products_list",
+            "function": "fuzzy_extract_n",
+            "args": {
+              "query": {
+                "path": "filterDescription"
+              },
+              "choices": {
+                "path": "products_list"
+              },
+              "search_key": "filterDescription",
+              "n": "20",
+              "order": "desc",
+              "fuzzy_method": "tokenSetRatio"
+            },
+            "newField": "products_list",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Correct common OCR Mistakes",
+        "stage": "correct_ocr_mistakes",
+        "dependencies": [
+          "uppercase_item_descriptions"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items.*.description",
+          "function": "regex_mapper_multiple",
+          "args": {
+            "mappers": [
+              {
+                "description": "Check for common misspelt units of measurements that are immediately follow a number. For example 100CJ -> 100g (CJ being misread small g).",
+                "order": "1",
+                "data": {
+                  "pattern": "\\b(\\d+\\s*(?:CJ))\\b",
+                  "modifiers": "i",
+                  "replacements": [
+                    {
+                      "pattern": "CJ",
+                      "replacement": "G"
+                    }
+                  ]
+                }
+              },
+              {
+                "description": "Check for common misspellings of ML as MI. Pattern checks phrases ending in MI",
+                "order": "2",
+                "data": {
+                  "pattern": "\\b(\\w*\\s*(?:MI|M\\'))(?=\\s|$)",
+                  "modifiers": "i",
+                  "replacements": [
+                    {
+                      "pattern": "M(I|\\')",
+                      "replacement": "ML"
+                    }
+                  ]
+                }
+              },
+              {
+                "description": "Correct for misspelt PCS. Typically follows the pattern of pes as is the case in 'lopes', '10pes' et al",
+                "order": "3",
+                "data": {
+                  "pattern": "\\b((?:lo+|\\d+\\s*)pes)\\b",
+                  "modifiers": "i",
+                  "replacements": [
+                    {
+                      "pattern": "PES",
+                      "replacement": "PCS"
+                    }
+                  ]
+                }
+              },
+              {
+                "description": "Check for common misspelt numbers that are immediately followed by common units of measure. For instance, I -> 1, S -> 5, O -> 0 et al as is in cases like SOG -> 50G or loog -> 100g",
+                "order": "4",
+                "data": {
+                  "pattern": "(?<=^|\\s)([ISOBZL]+)(?=\\s*(?:L|LTR|LT|LTS|Liters|Liter|Litre|Litres|ML|MLS|KG|G|GM|GMS|GRM|GRMS|CM|MM|PC|PCS)\\b|\\s|$)",
+                  "modifiers": "i",
+                  "replacements": [
+                    {
+                      "pattern": "I|L",
+                      "replacement": "1"
+                    },
+                    {
+                      "pattern": "S",
+                      "replacement": "5"
+                    },
+                    {
+                      "pattern": "O",
+                      "replacement": "0"
+                    },
+                    {
+                      "pattern": "B",
+                      "replacement": "8"
+                    },
+                    {
+                      "pattern": "Z",
+                      "replacement": "2"
+                    }
+                  ]
+                }
+              }
+            ],
+            "sort_by_order": "1"
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Clean item descriptions",
+        "stage": "clean_item_descriptions",
+        "dependencies": [
+          "correct_ocr_mistakes"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items.*.description",
+          "function": "transform",
+          "args": {
+            "transformer": "regex_mapper",
+            "transformer_args": {
+              "mappings": {
+                "HC-": "",
+                "(?<=\\S)[-_]|[-_](?=\\S)": "[space]-[space]",
+                "\\bIL\\b": "1L",
+                "(\\d+)\\s*mls\\b": "$1ML",
+                "(\\d+)\\s*(?:LTR|LTRS|LT|LTS)\\b": "$1L",
+                "(.*?)(\\b(?:\\d+(?:\\.\\d+)?)\\s*(?:L|LTR|LT|LTS|Liters|Liter|Litre|Litres|ML|MLS|KG|G|GM|GMS|GRM|GRMS|CM|MM)\\b)\\s*(.*?)\\s*([\\(\\[].*[\\)\\]])?$": "$1$3 $2 $4",
+                "\\bMOS\\s*-\\s*KILL\\b": "MOSKILL",
+                "\\b(M/COILS)\\b": "MOSQUITO COILS",
+                "^(?!.*\\b(MOSKILL|MOSQUITO)\\b)(?:(RED|GREEN)(?:[._-]?(COILS?)?)?)$": "MOSKILL $0",
+                "\\b(MATCO)\\b": "$1 72 WP",
+                "\\b(MISTRESS)\\b": "$1 72 WP"
+              },
+              "is_case_sensitive": "0"
+            },
+            "transformer_target_keys": []
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Clean item product descriptions",
+        "stage": "clean_item_product_names",
+        "dependencies": [
+          "uppercase_product_names"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items.*.products_list.*.displayName",
+          "function": "transform",
+          "args": {
+            "transformer": "regex_mapper",
+            "transformer_args": {
+              "mappings": {
+                "(?<=\\S)[-_]|[-_](?=\\S)": "[space]-[space]",
+                "\\(DUDU\\)": "[space]DUDU[space]",
+                "(\\d+)\\s*mls\\b": "$1ML",
+                "(\\d+)\\s*(?:LTR|LTRS|LT|LTS)\\b": "$1L",
+                "(.*?)(\\b(?:\\d+(?:\\.\\d+)?)\\s*(?:L|LTR|LT|LTS|Liters|Liter|Litre|Litres|ML|MLS|KG|G|GM|GMS|GRM|GRMS|CM|MM)\\b)\\s*(.*?)\\s*([\\(\\[].*[\\)\\]])?$": "$1$3 $2 $4",
+                "\\bMOS-KILL\\b": "MOSKILL"
+              },
+              "is_case_sensitive": "0"
+            },
+            "transformer_target_keys": []
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Add pack configuration to description",
+        "stage": "product_description_append_pack_details",
+        "dependencies": [
+          "products_description_transformation",
+          "clean_item_product_names"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items",
+          "function": "map",
+          "args": {
+            "path": "products_list",
+            "function": "map",
+            "args": {
+              "path": "",
+              "function": "concat",
+              "args": {
+                "data_to_concat": [
+                  {
+                    "path": "displayName"
+                  },
+                  {
+                    "path": "PackSize"
+                  }
+                ],
+                "separator": "",
+                "enclosure": "square brackets"
+              },
+              "newField": "displayName",
+              "strict": "1",
+              "condition": ""
+            },
+            "newField": "",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "We add pack configuration details to items for some customers, excluding others",
+    "description": "",
+    "stage": "item_descriptions_add_pack_details",
+    "dependencies": [
+      "match_customer",
+      "clean_item_descriptions"
+    ],
+    "skip": "0",
+    "condition": {
+      "path": "customer_name.meta_data.value",
+      "operator": "not in list all",
+      "value": [
+        "NAIVAS",
+        "MAJID",
+        "QUICK MART"
+      ]
+    },
+    "actions": [
+      {
+        "description": "Append pack size to description",
+        "stage": "item_descriptions_add_pack_details",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items",
+          "function": "map",
+          "args": {
+            "path": "",
+            "function": "append",
+            "args": {
+              "data_to_append": [
+                "[",
+                {
+                  "path": "pack_configuration.pack_size"
+                },
+                "x",
+                {
+                  "path": "pack_configuration.unit_size"
+                },
+                "]"
+              ],
+              "separator": "",
+              "use_data_as_path_value": "1",
+              "value_key": "description"
+            },
+            "newField": "",
+            "strict": "1",
+            "condition": {
+              "operator": "AND",
+              "conditions": [
+                {
+                  "path": "pack_configuration.pack_size",
+                  "operator": "exists"
+                },
+                {
+                  "path": "pack_configuration.pack_size",
+                  "operator": "!=",
+                  "value": "0"
+                },
+                {
+                  "path": "pack_configuration.unit_size",
+                  "operator": "exists"
+                },
+                {
+                  "path": "pack_configuration.unit_size",
+                  "operator": "!=",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Match Products",
+    "description": "",
+    "stage": "match_products",
+    "dependencies": [
+      "item_descriptions_add_pack_details",
+      "product_description_append_pack_details"
+    ],
+    "skip": "0",
+    "condition": {
+      "path": "products_list",
+      "operator": "exists"
+    },
+    "actions": [
+      {
+        "description": "We do semantic search on each product based on its own set of product list",
+        "stage": "match_products",
+        "dependencies": [
+          "extract_top_similar_item_products"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items",
+          "function": "map",
+          "args": {
+            "path": "description",
+            "function": "user_defined_function",
+            "args": {
+              "function_name": "semantic_search",
+              "corpus": {
+                "path": "products_list"
+              },
+              "corpus_search_key": "displayName",
+              "corpus_id_key": "number",
+              "master_data_type": "all products",
+              "similarity_threshold": "0",
+              "stop_words": [
+                "limited",
+                "ltd",
+                "P.O BOX",
+                "Nairobi",
+                "Kenya"
+              ],
+              "model": "adaV3"
+            },
+            "newField": "",
+            "strict": "0",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "",
+        "stage": "remove_item_products_list",
+        "dependencies": [
+          "match_products"
+        ],
+        "skip": "0",
+        "action": "remove_path",
+        "params": {
+          "path": "items.*.products_list"
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Handle quantities and units conversion",
+    "description": "",
+    "stage": "do_unit_conversion",
+    "dependencies": [
+      "remove_item_products_list",
+      "get_metric_conversion_table"
+    ],
+    "skip": "0",
+    "condition": {
+      "path": "items.0.description.meta_data",
+      "operator": "exists"
+    },
+    "actions": [
+      {
+        "description": "First, we standardize item selling unit to be the same unit as the matched product unit, if in metric units",
+        "stage": "match_item_and_product_metric_selling_unit",
+        "dependencies": [],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "",
+          "function": "convert_unit_multi",
+          "args": {
+            "items": {
+              "path": "items"
+            },
+            "conversion_table": {
+              "path": "metric_conversion_table"
+            },
+            "quantity": {
+              "in_item_path": "unit_of_measure.0.selling_quantity"
+            },
+            "from_unit": {
+              "in_item_path": "unit_of_measure.0.selling_unit"
+            },
+            "to_unit": {
+              "in_item_path": "description.meta_data.other_details.pack_unit_of_measure"
+            },
+            "invert_factor": "0",
+            "output_path": "standardized_quantity_unit"
+          },
+          "newField": "items",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Set the default conversion table",
+        "stage": "set_default_conversion_table",
+        "dependencies": [],
+        "skip": "0",
+        "action": "set",
+        "params": {
+          "path": "items.*.conversion_table",
+          "value": [
+            {
+              "from": "",
+              "to": "pieces",
+              "factor": "0"
+            }
+          ],
+          "valueFromField": "",
+          "valueMapping": "",
+          "conditionalValue": [],
+          "newField": ""
+        }
+      },
+      {
+        "description": "Set the conversion table from value",
+        "stage": "set_conversion_table_from_value",
+        "dependencies": [
+          "set_default_conversion_table",
+          "match_item_and_product_metric_selling_unit"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items",
+          "function": "map",
+          "args": {
+            "path": "",
+            "function": "set",
+            "args": {
+              "path": "",
+              "value": "",
+              "valueFromField": "standardized_quantity_unit.converted_unit",
+              "valueMapping": "",
+              "conditionalValue": [],
+              "newField": "conversion_table.0.from"
+            },
+            "newField": "",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Set the conversion table factor value.",
+        "stage": "set_conversion_table_factor_value",
+        "dependencies": [
+          "set_default_conversion_table"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "items",
+          "function": "map",
+          "args": {
+            "path": "",
+            "function": "set",
+            "args": {
+              "path": "",
+              "value": "",
+              "valueFromField": "",
+              "valueMapping": "",
+              "conditionalValue": [
+                {
+                  "condition": {
+                    "path": "conversion_table.0.from",
+                    "operator": "in list any",
+                    "value": [
+                      "\\b(PCS|PC|Piece|Each|Packet|PKT|BG|Pack|Tab)\\b",
+                      "\\b(?!bale/)bag\\b",
+                      "\\b(mg|g)\\b",
+                      "\\b(mm|cm|dm|km)\\b",
+                      "\\b(ml|cl)\\b"
+                    ]
+                  },
+                  "use_data_as_path_value": "0",
+                  "value": "1",
+                  "valueFromField": ""
+                },
+                {
+                  "condition": {
+                    "operator": "AND",
+                    "conditions": [
+                      {
+                        "path": "conversion_table.0.from",
+                        "operator": "in list any",
+                        "value": [
+                          "\\b(kg)\\b",
+                          "\\b(m)\\b",
+                          "\\b(l)\\b"
+                        ]
+                      }
+                    ]
+                  },
+                  "use_data_as_path_value": "0",
+                  "value": "",
+                  "valueFromField": "description.meta_data.other_details.inverse_pack_unit_size"
+                },
+                {
+                  "condition": {
+                    "path": "conversion_table.0.from",
+                    "operator": "not in list all",
+                    "value": [
+                      "\\b(PCS|PC|Piece|Each|Packet|PKT|BG|Pack|Tab)\\b",
+                      "\\b(?!bale/)bag\\b",
+                      "\\b(mg|g|kg)\\b",
+                      "\\b(mm|cm|dm|m|km)\\b",
+                      "\\b(ml|cl|l)\\b"
+                    ]
+                  },
+                  "use_data_as_path_value": "0",
+                  "value": "",
+                  "valueFromField": "description.meta_data.other_details.PcsPerCarton"
+                }
+              ],
+              "newField": "conversion_table.0.factor"
+            },
+            "newField": "",
+            "strict": "1",
+            "condition": ""
+          },
+          "newField": "",
+          "strict": "1",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Handle quantity conversion",
+        "stage": "convert_item_quantity",
+        "dependencies": [
+          "set_conversion_table_factor_value",
+          "set_conversion_table_from_value"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "",
+          "function": "convert_unit_multi",
+          "args": {
+            "items": {
+              "path": "items"
+            },
+            "conversion_table": {
+              "in_item_path": "conversion_table"
+            },
+            "quantity": {
+              "in_item_path": "standardized_quantity_unit.converted_value"
+            },
+            "from_unit": {
+              "in_item_path": "standardized_quantity_unit.converted_unit"
+            },
+            "to_unit": "pieces",
+            "invert_factor": "0",
+            "output_path": "converted_units"
+          },
+          "newField": "items",
+          "strict": "1",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
+    "rule": "Remove all unwanted fields",
+    "description": "",
+    "stage": "remove_unwanted_fields",
+    "dependencies": [],
+    "skip": "0",
+    "condition": "always",
+    "actions": [
+      {
+        "description": "",
+        "stage": "remove_customers_list",
+        "dependencies": [
+          "match_customer"
+        ],
+        "skip": "0",
+        "action": "remove_path",
+        "params": {
+          "path": "customers_list"
+        }
+      },
+      {
+        "description": "",
+        "stage": "remove_products_list",
+        "dependencies": [
+          "remove_item_products_list"
+        ],
+        "skip": "0",
+        "action": "remove_path",
+        "params": {
+          "path": "products_list"
+        }
+      },
+      {
+        "description": "",
+        "stage": "remove_all_products_list",
+        "dependencies": [
+          "remove_item_products_list"
+        ],
+        "skip": "0",
+        "action": "remove_path",
+        "params": {
+          "path": "all_products_list"
+        }
+      },
+      {
+        "description": "",
+        "stage": "remove_metric_conversion_table",
+        "dependencies": [
+          "convert_item_quantity"
+        ],
+        "skip": "0",
+        "action": "remove_path",
+        "params": {
+          "path": "metric_conversion_table"
         }
       }
     ]
