@@ -1303,9 +1303,7 @@
               ]
             },
             "args": {
-              "type": "object",
-              "properties": {},
-              "additionalProperties": false
+              "type": "string"
             }
           },
           "required": [
@@ -1901,10 +1899,7 @@
               ]
             },
             "args": {
-              "type": "object",
-              "properties": {},
-              "required": [],
-              "additionalProperties": false
+              "type": "string"
             }
           },
           "required": [
@@ -2422,9 +2417,7 @@
               ]
             },
             "args": {
-              "type": "object",
-              "properties": {},
-              "additionalProperties": false
+              "type": "string"
             }
           },
           "required": [
@@ -2728,9 +2721,7 @@
               ]
             },
             "args": {
-              "type": "object",
-              "properties": {},
-              "additionalProperties": false
+              "type": "string"
             }
           },
           "required": [
@@ -2898,10 +2889,7 @@
               ]
             },
             "args": {
-              "type": "object",
-              "properties": {},
-              "required": [],
-              "additionalProperties": false
+              "type": "string"
             }
           },
           "required": [
