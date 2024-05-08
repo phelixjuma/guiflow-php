@@ -2022,8 +2022,9 @@ class FunctionActionTest extends TestCase
                 ["description" => "UZURI SUPERMARKET LTD."],
                 ["description" => "QUICKMART LIMITED"],
                 ["description" => "Kamkunji Agrovet"],
+                ["description" => "FARM CARE AGROVET"],
             ],
-            "stop_words" => "LTD,LIMITED"
+            "stop_words" => ["(?<!FARM CARE )(\\bAGRO(?:\\s*)(?:-)?(?:\\s*)VET\\b)"]
         ];
 
         $expectedData = [];
@@ -2036,7 +2037,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+//        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }

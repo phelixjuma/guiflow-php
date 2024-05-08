@@ -55,22 +55,31 @@ class FuzzySearch
 
         // Remove URLs
         $text = preg_replace('/https?:\/\/\S+/i', '', $text);
+
         // Remove special characters except spaces
-        $text = preg_replace('/[^a-zA-Z0-9 ]/i', '', $text);
+        $text = Utils::removeExtraSpaces(preg_replace('/[^a-zA-Z0-9 ]/i', '', $text));
 
         // Remove stop words
         $moreStopWords = array("and", "the", "is", "in", "to", "for", "on", "of", "with", "at", "by", "an", "be", "this", "that", "it", "from", "as", "are"); // You can expand this list
+
+        // Add more stopwords at word boundaries
+        array_walk($moreStopWords, function (&$value, $key) {
+            $value = "\b$value\b";
+        });
 
         $stopWords = array_unique(array_merge($stopWords, $moreStopWords));
 
         if (!empty($stopWords)) {
             foreach ($stopWords as $word) {
-                $text = preg_replace('/\b' . $word . '\b/i', '', $text);
+
+                $pattern = '/' . $word . '/i';
+
+                $text = preg_replace($pattern, '', $text);
             }
         }
 
         // Remove extra spaces
-        return trim(preg_replace('/\s+/', ' ', $text));
+        return Utils::removeExtraSpaces($text);
     }
 
     /**

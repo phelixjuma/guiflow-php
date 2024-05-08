@@ -859,13 +859,12 @@ class Utils
         if (is_string($stopWords)) {
             $stopWords = explode(",", $stopWords);
         }
-        print_r($stopWords);
 
         $fuzz = new Fuzz();
 
         if (!empty($query) && !empty($choices)) {
 
-            // We get stopwords from the query
+            // We get stop-words from the query
             $query = FuzzySearch::cleanText($query, $stopWords);
 
             // We add similarity score

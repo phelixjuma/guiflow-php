@@ -22,7 +22,7 @@ class ConfigurationValidatorTest extends TestCase
             print "\nInvalid\n";
         }
 
-        print_r($data);
+        //print_r($data);
 
         //$this->assertTrue(ConfigurationValidator::validate($data));
     }
