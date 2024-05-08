@@ -53,28 +53,26 @@ class FuzzySearch
     public static function cleanText($text, $stopWords=[]): string
     {
 
-        // Remove URLs
-        $text = preg_replace('/https?:\/\/\S+/i', '', $text);
-
         // Remove special characters except spaces
         $text = Utils::removeExtraSpaces(preg_replace('/[^a-zA-Z0-9 ]/i', '', $text));
 
         // Remove stop words
         $moreStopWords = array("and", "the", "is", "in", "to", "for", "on", "of", "with", "at", "by", "an", "be", "this", "that", "it", "from", "as", "are"); // You can expand this list
 
-        // Add more stopwords at word boundaries
-        array_walk($moreStopWords, function (&$value, $key) {
-            $value = "\b$value\b";
-        });
-
+        // Add the more stop-words
         $stopWords = array_unique(array_merge($stopWords, $moreStopWords));
+
+        // We check whether a wtop word is plain or is a regex pattern
+        array_walk($stopWords, function (&$value, $key) {
+            // If it's a plain word, add word boundaries to it
+            if (!preg_match('/[\\\\^$|()\[\].*+?{}]/', $value)) {
+                $value = "\b" . $value . "\b";
+            }
+        });
 
         if (!empty($stopWords)) {
             foreach ($stopWords as $word) {
-
-                $pattern = '/' . $word . '/i';
-
-                $text = preg_replace($pattern, '', $text);
+                $text = preg_replace('/' . $word . '/i', '', $text);
             }
         }
 

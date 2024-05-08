@@ -2014,7 +2014,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testFuzzyExtractTopNCustomers()
+    public function testFuzzyExtractTopNCustomers()
     {
         $data = [
             "customer_name" => "QUICKMART LTD.",
@@ -2024,7 +2024,10 @@ class FunctionActionTest extends TestCase
                 ["description" => "Kamkunji Agrovet"],
                 ["description" => "FARM CARE AGROVET"],
             ],
-            "stop_words" => ["(?<!FARM CARE )(\\bAGRO(?:\\s*)(?:-)?(?:\\s*)VET\\b)"]
+            "stop_words" => [
+                "(?<!FARM CARE )(\\bAGRO(?:\\s*)(?:-)?(?:\\s*)VET\\b)",
+                "LIMITED"
+            ]
         ];
 
         $expectedData = [];
@@ -2037,7 +2040,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-//        print_r($data);
+        print_r($data);
 
         $this->assertEquals($data, $expectedData);
     }
