@@ -50,35 +50,27 @@ class FuzzySearch
      * @param $stopWords
      * @return string
      */
-    private static function cleanText($text, $stopWords=[]): string
+    public static function cleanText($text, $stopWords=[]): string
     {
 
-        // Convert text to lowercase
-        $text = strtolower($text);
-
         // Remove URLs
-        $text = preg_replace('/https?:\/\/\S+/', '', $text);
+        $text = preg_replace('/https?:\/\/\S+/i', '', $text);
+        // Remove special characters except spaces
+        $text = preg_replace('/[^a-zA-Z0-9 ]/i', '', $text);
 
         // Remove stop words
         $moreStopWords = array("and", "the", "is", "in", "to", "for", "on", "of", "with", "at", "by", "an", "be", "this", "that", "it", "from", "as", "are"); // You can expand this list
 
-        if (is_array($stopWords) && sizeof($stopWords) > 0) {
-            array_walk($stopWords, function (&$v, $k) {
-                $v = strtolower($v);
-            });
-        } else {
-            $stopWords = [];
-        }
-
         $stopWords = array_unique(array_merge($stopWords, $moreStopWords));
 
-        foreach ($stopWords as $word) {
-            $text = preg_replace('/\b' . $word . '\b/', '', $text);
+        if (!empty($stopWords)) {
+            foreach ($stopWords as $word) {
+                $text = preg_replace('/\b' . $word . '\b/i', '', $text);
+            }
         }
 
         // Remove extra spaces
-        $text = preg_replace('/\s+/', ' ', $text);
-        return trim($text);
+        return trim(preg_replace('/\s+/', ' ', $text));
     }
 
     /**

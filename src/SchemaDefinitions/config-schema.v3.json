@@ -1450,6 +1450,12 @@
                     "tokenSortPartialRatio"
                   ],
                   "default": "tokenSetRatio"
+                },
+                "stop_words": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
               },
               "required": [
@@ -1458,7 +1464,8 @@
                 "search_key",
                 "n",
                 "order",
-                "fuzzy_method"
+                "fuzzy_method",
+                "stop_words"
               ],
               "additionalProperties": false
             }
@@ -2848,6 +2855,12 @@
                 },
                 "similarity_threshold": {
                   "type": "string"
+                },
+                "stop_words": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
               },
               "required": [
@@ -2856,7 +2869,8 @@
                 "corpus_key",
                 "search_stemming_patterns",
                 "corpus_stemming_patterns",
-                "similarity_threshold"
+                "similarity_threshold",
+                "stop_words"
               ],
               "additionalProperties": false
             }

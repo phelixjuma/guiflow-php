@@ -2017,17 +2017,21 @@ class FunctionActionTest extends TestCase
     public function _testFuzzyExtractTopNCustomers()
     {
         $data = [
-            "customer_name" => "CIIRA",
+            "customer_name" => "QUICKMART LTD.",
             "customers_list" => [
-                ["description" => "Ciira Agrovet"],
-                ["description" => "Kamkunji Agrovet"],
+                ["description" => "UZURI SUPERMARKET LTD."],
+                ["description" => "QUICKMART LIMITED"],
                 ["description" => "Kamkunji Agrovet"],
             ]
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("", [$this, 'fuzzy_extract_n'], ["query" => ["path" => "customer_name"], "choices" => ["path" => "customers_list"],"searchKey" => "description", "n" => "2"], 'shortlisted_customers',  0 , null);
+        $stopWords = [
+            "LTD", "LIMITED"
+        ];
+
+        $action = new FunctionAction("", [$this, 'fuzzy_extract_n'], ["query" => ["path" => "customer_name"], "choices" => ["path" => "customers_list"],"searchKey" => "description", "n" => "2", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => $stopWords], 'shortlisted_customers',  0 , null);
 
         $action->execute($data);
 

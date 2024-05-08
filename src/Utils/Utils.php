@@ -798,7 +798,10 @@ class Utils
     /**
      * @param $query
      * @param $choices
-     * @return mixed|null
+     * @param $minScore
+     * @param $defaultChoice
+     * @param $fuzzyMethod
+     * @return array|mixed|null
      */
     public static function fuzzy_extract_one($query, $choices, $minScore=50, $defaultChoice="", $fuzzyMethod = 'tokenSetRatio') {
 
@@ -840,23 +843,34 @@ class Utils
     }
 
     /**
+     * @param $data
      * @param $query
      * @param $choices
      * @param $searchKey
-     * @param $topN
+     * @param $n
+     * @param $order
      * @param $fuzzyMethod
+     * @param $stopWords
      * @return mixed|null
      */
-    public static function fuzzy_extract_n($data, $query, $choices, $searchKey, $n=10, $order='desc', $fuzzyMethod = 'tokenSetRatio') {
+    public static function fuzzy_extract_n($data, $query, $choices, $searchKey, $n=10, $order='desc', $fuzzyMethod = 'tokenSetRatio', $stopWords = []) {
 
         $fuzz = new Fuzz();
 
         if (!empty($query) && !empty($choices)) {
 
+            // We get stopwords from the query
+            $query = FuzzySearch::cleanText($query, $stopWords);
+
             // We add similarity score
             foreach ($choices as $key => &$choice) {
                 if (!empty($query) && !empty($choice[$searchKey])) {
-                    $choice['similarity'] = $fuzz->$fuzzyMethod($query, $choice[$searchKey]);
+
+                    // We remove stop words from choice
+                    $choiceSearch = FuzzySearch::cleanText($choice[$searchKey], $stopWords);
+
+                    $choice['similarity'] = $fuzz->$fuzzyMethod($query, $choiceSearch);
+
                 } else {
                     $choice['similarity'] = 0;
                 }
@@ -1249,9 +1263,10 @@ class Utils
      * @param $searchStemmingPatterns
      * @param $corpusStemmingPatterns
      * @param $similarityThreshold
+     * @param $stopWords
      * @return mixed
      */
-    public static function pattern_based_stem_spell_corrections($searchList, $searchKey, $corpusList, $corpusKey, $searchStemmingPatterns, $corpusStemmingPatterns, $similarityThreshold=90) {
+    public static function pattern_based_stem_spell_corrections($searchList, $searchKey, $corpusList, $corpusKey, $searchStemmingPatterns, $corpusStemmingPatterns, $similarityThreshold=90, $stopWords = []) {
 
         // We stem the corpus list
         array_walk($corpusList, function (&$value, $key) use($corpusKey, $corpusStemmingPatterns) {
@@ -1274,7 +1289,7 @@ class Utils
         });
 
         // We stem the search list
-        array_walk($searchList, function (&$value, $key) use($searchKey, $searchStemmingPatterns, $corpusList, $corpusKey ,$similarityThreshold) {
+        array_walk($searchList, function (&$value, $key) use($searchKey, $searchStemmingPatterns, $corpusList, $corpusKey ,$similarityThreshold, $stopWords) {
 
             if (!empty($value[$searchKey])) {
 
@@ -1294,8 +1309,9 @@ class Utils
 
                 // We get the corpus stem key
                 $corpusStemKey = $corpusKey."_stem";
+
                 // We get the top match
-                $topMatch = self::fuzzy_extract_n(null, $value['spell_check_meta_data'][$stemKey], $corpusList, $corpusStemKey, 1);
+                $topMatch = self::fuzzy_extract_n(null, $value['spell_check_meta_data'][$stemKey], $corpusList, $corpusStemKey, 1, 'desc', 'tokenSetRatio', $stopWords);
 
                 // Set the nearest stem
                 $value['spell_check_meta_data']['nearest_stem'] = "";
