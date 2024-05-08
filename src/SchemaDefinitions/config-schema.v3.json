@@ -1452,10 +1452,7 @@
                   "default": "tokenSetRatio"
                 },
                 "stop_words": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "$ref": "#/definitions/valueOrPath"
                 }
               },
               "required": [
@@ -2857,10 +2854,7 @@
                   "type": "string"
                 },
                 "stop_words": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "$ref": "#/definitions/valueOrPath"
                 }
               },
               "required": [

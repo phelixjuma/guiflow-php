@@ -2022,13 +2022,14 @@ class FunctionActionTest extends TestCase
                 ["description" => "UZURI SUPERMARKET LTD."],
                 ["description" => "QUICKMART LIMITED"],
                 ["description" => "Kamkunji Agrovet"],
-            ]
+            ],
+            "stop_words" => "LTD,LIMITED"
         ];
 
         $expectedData = [];
 
         $stopWords = [
-            "LTD", "LIMITED"
+            "path" => "stop_words"
         ];
 
         $action = new FunctionAction("", [$this, 'fuzzy_extract_n'], ["query" => ["path" => "customer_name"], "choices" => ["path" => "customers_list"],"searchKey" => "description", "n" => "2", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => $stopWords], 'shortlisted_customers',  0 , null);
