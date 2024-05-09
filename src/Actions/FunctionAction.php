@@ -46,7 +46,7 @@ class FunctionAction implements ActionInterface
      * @param int $strict
      * @param null $condition
      */
-    public function __construct(string $path, $function, array|null $args, $newField = null, $strict = 0, $condition=null)
+    public function __construct($path, $function, $args, $newField = null, $strict = 0, $condition=null)
     {
         $this->path = $path;
         $this->function = $function;

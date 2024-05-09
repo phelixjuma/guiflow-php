@@ -12,7 +12,7 @@ class AddAction implements ActionInterface
     private $newField;   // the new field where we want to store the result
     private $targetPath; // the path where the new value should be set
 
-    public function __construct(string $path, $value, $valueFromField = null, $newField = null)
+    public function __construct($path, $value, $valueFromField = null, $newField = null)
     {
         $this->path = $path;
         $this->value = $value;
