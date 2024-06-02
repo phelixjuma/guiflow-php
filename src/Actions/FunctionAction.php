@@ -25,7 +25,7 @@ class FunctionAction implements ActionInterface
         'round', 'floor', 'ceil', 'abs', 'exp', 'max', 'min', 'pow', 'sqrt', 'array_sum','count', 'sizeof',
         'json_encode', 'json_decode',
         'intval', 'floatval',
-        'preg_match', 'preg_replace',
+        'preg_match', 'preg_replace', 'date_default_timezone_set',
         // custom functions
         'dictionary_mapper', 'regex_mapper', 'string_to_date_time'
     ];
