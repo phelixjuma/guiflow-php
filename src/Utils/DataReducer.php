@@ -35,6 +35,10 @@ class DataReducer
         return max($this->data);
     }
 
+    private function get_item_at_index($index) {
+        return $this->data[intval($index)] ?? null;
+    }
+
     /**
      * @param $priority
      * @param $default

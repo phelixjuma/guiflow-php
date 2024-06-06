@@ -1203,6 +1203,26 @@
                     "default"
                   ],
                   "additionalProperties": false
+                },
+                {
+                  "title": "Get item at index",
+                  "description": "Returns a specific item at a given index in the list",
+                  "properties": {
+                    "reducer": {
+                      "type": "string",
+                      "enum": [
+                        "get_item_at_index"
+                      ]
+                    },
+                    "index": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "reducer",
+                    "index"
+                  ],
+                  "additionalProperties": false
                 }
               ]
             }

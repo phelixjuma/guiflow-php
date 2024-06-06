@@ -62,6 +62,8 @@ class Workflow
         if (is_array($dataCopy)) {
             if (self::isObject($dataCopy)) {
 
+                $dataCopy['workflow_list_position'] = 0;
+
                 // For an object, we transform it
                 $this->runWorkFlowOnObject($dataCopy, $parallelize);
 
@@ -74,7 +76,9 @@ class Workflow
 
             } else {
                 // it's an array, we loop
-                foreach ($dataCopy as $item) {
+                foreach ($dataCopy as $index => $item) {
+
+                    $item['workflow_list_position'] = $index;
 
                     $this->runWorkFlowOnObject($item, $parallelize);
 
