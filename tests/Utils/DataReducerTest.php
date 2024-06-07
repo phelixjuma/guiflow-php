@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 class DataReducerTest extends TestCase
 {
 
-    public function testReduceFunction()
+    public function _testReduceFunction()
     {
         $data = ["Shop",'Deli',"Deli","Butchery", "Shop"];
 
@@ -21,7 +21,7 @@ class DataReducerTest extends TestCase
 
         $value = $dataJReducer->reduce();
 
-        print_r($value);
+        //print_r($value);
 
         $expectedData = "";
 

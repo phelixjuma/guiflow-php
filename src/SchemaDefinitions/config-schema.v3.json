@@ -1215,7 +1215,7 @@
                       ]
                     },
                     "index": {
-                      "type": "string"
+                      "$ref": "#/definitions/valueOrPath"
                     }
                   },
                   "required": [
