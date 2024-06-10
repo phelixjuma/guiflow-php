@@ -29,28 +29,13 @@ class DataValidator
             $unitPrice = PathResolver::getValueByPath($d, $unitPricePath);
             $totalPrice = PathResolver::getValueByPath($d, $totalPricePath);
 
-            $quantityValid = true; // assume quantity is valid, by default
-            $d['quantity_validation'] = [
-                'is_corrected' => false,
-                'corrections'   => []
-            ];
-
             if ($quantity == 0 || empty($quantity) || !is_numeric($quantity)) {
                 // Quantity is either 0, empty or not a number. We need to validate and fix
-                $quantityValid = false;
 
                 // We attempt to correct
                 if (!empty($unitPrice) && !empty($totalPrice) && $unitPrice > 0) {
                     $quantity = $totalPrice / $unitPrice;
                     PathResolver::setValueByPath($d, $quantityPath, $quantity);
-                    $d['quantity_validation']['is_corrected'] = true;
-
-                    $d['quantity_validation']['corrections'] = [
-                        'quantity'      => $quantity,
-                        'unit_price'    => null,
-                        'total_price'   =>null
-                    ];
-
                 }
 
             } else {
@@ -74,23 +59,12 @@ class DataValidator
                             PathResolver::setValueByPath($d, $quantityPath, $corrections[0]);
                             PathResolver::setValueByPath($d, $unitPricePath, $corrections[1]);
                             PathResolver::setValueByPath($d, $totalPricePath, $corrections[2]);
-
-                            $d['quantity_validation']['is_corrected'] = true;
-
-                            $d['quantity_validation']['corrections'] = [
-                                'quantity'      => $corrections[0],
-                                'unit_price'    => $corrections[1],
-                                'total_price'   => $corrections[2]
-                            ];
                         }
 
                     }
 
                 }
             }
-            // We set the validity status
-            $d['quantity_validation']['is_valid'] = $quantityValid;
-
         }
         return $data;
     }
