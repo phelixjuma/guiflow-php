@@ -95,61 +95,74 @@ class DataValidator
         return $data;
     }
 
-    private static function isCorrect($quantity, $unitPrice, $totalPrice): bool
-    {
+    private static function isCorrect($quantity, $unitPrice, $totalPrice) {
         return $totalPrice == $unitPrice * $quantity && $unitPrice <= $totalPrice;
     }
 
-    private static function checkCorrections($quantity, $unitPrice, $totalPrice): array
-    {
-        // Check if the initial values are correct
+    private static function correctCommonMistakes($value) {
+        // Mapping common OCR misreadings and potential decimal issues
+        $mappings = [
+            '0' => ['8', '6'],   // 0 might be misread as 8 or 6
+            '1' => ['7'],        // 1 might be misread as 7
+            '3' => ['8'],        // 3 might be misread as 8
+            '6' => ['8', '0'],   // 6 might be misread as 8 or 0
+            '8' => ['0', '3', '6'], // 8 might be misread as 0, 3, or 6
+        ];
+
+        $possibleValues = [$value];
+        $strVal = strval($value);
+
+        // Handling potential decimal misinterpretation
+        if (substr($strVal, -2) === '00') {
+            $coreValue = intval(substr($strVal, 0, -2));
+            $possibleValues[] = $coreValue; // Example: 300 to 3.00
+        }
+
+        // Apply common OCR misreadings and decimal errors
+        for ($i = 0; $i < strlen($strVal); $i++) {
+            $digit = $strVal[$i];
+            if (array_key_exists($digit, $mappings)) {
+                foreach ($mappings[$digit] as $replacement) {
+                    $newStrVal = substr_replace($strVal, $replacement, $i, 1);
+                    $possibleValues[] = intval($newStrVal);
+
+                    // Additionally check for decimal placement errors with the new digit
+                    if (substr($newStrVal, -2) === '00') {
+                        $coreValue = intval(substr($newStrVal, 0, -2));
+                        $possibleValues[] = $coreValue;
+                    }
+                }
+            }
+        }
+
+        return $possibleValues;
+    }
+
+    private static function checkCorrections($quantity, $unitPrice, $totalPrice) {
         if (self::isCorrect($quantity, $unitPrice, $totalPrice)) {
             return array($quantity, $unitPrice, $totalPrice);
         }
 
         $values = array('quantity' => $quantity, 'unitPrice' => $unitPrice, 'totalPrice' => $totalPrice);
-        $digits = str_split('0123456789');
+        $results = [];
 
         foreach ($values as $key => $value) {
-            $strVal = strval($value);
+            $correctedValues = self::correctCommonMistakes($value);
 
-            // Try removing each digit
-            for ($i = 0; $i < strlen($strVal); $i++) {
-                $newVal = intval(substr_replace($strVal, '', $i, 1));
-                $newValues = array_merge($values, array($key => $newVal));
+            foreach ($correctedValues as $correctedValue) {
+                $newValues = array_merge($values, array($key => $correctedValue));
                 if (self::isCorrect($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice'])) {
-                    return array($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice']);
-                }
-            }
-
-            // Try changing each digit to each possible digit
-            for ($i = 0; $i < strlen($strVal); $i++) {
-                foreach ($digits as $digit) {
-                    if ($digit != $strVal[$i]) {
-                        $newVal = intval(substr_replace($strVal, $digit, $i, 1));
-                        $newValues = array_merge($values, array($key => $newVal));
-                        if (self::isCorrect($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice'])) {
-                            return array($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice']);
-                        }
-                    }
-                }
-            }
-
-            // Try adding each digit at each position
-            for ($i = 0; $i <= strlen($strVal); $i++) {
-                foreach ($digits as $digit) {
-                    $newVal = intval(substr($strVal, 0, $i) . $digit . substr($strVal, $i));
-                    $newValues = array_merge($values, array($key => $newVal));
-                    if (self::isCorrect($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice'])) {
-                        return array($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice']);
-                    }
+                    $results[] = array($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice']);
                 }
             }
         }
 
-        // If no correction is found, return the original values with a flag indicating an error
-        return array('error' => 'No valid correction found', 'quantity' => $quantity, 'unitPrice' => $unitPrice, 'totalPrice' => $totalPrice);
+        if (empty($results)) {
+            return array('error' => 'No valid correction found', 'quantity' => $quantity, 'unitPrice' => $unitPrice, 'totalPrice' => $totalPrice);
+        } else {
+            // Return the first valid result found
+            return $results[0];
+        }
     }
-
 
 }
