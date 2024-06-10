@@ -2897,6 +2897,47 @@
       ],
       "unevaluatedProperties": false
     },
+    "validateAndCorrectQuantityAndPricesFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "validate_and_correct_quantity_and_prices"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "quantity_path": {
+                  "type": "string"
+                },
+                "unit_price_path": {
+                  "type": "string"
+                },
+                "total_price_path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "quantity_path",
+                "unit_price_path",
+                "total_price_path"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "platformFunctionsFunctionArgs": {
       "allOf": [
         {
@@ -3988,6 +4029,25 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_ValidateAndCorrectQuantityAndPrices": {
+      "title": "Pattern Based Stem Spell Corrections",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/validateAndCorrectQuantityAndPricesFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_Map": {
       "title": "Map",
       "allOf": [
@@ -4137,6 +4197,8 @@
         },
         {
           "$ref": "#/definitions/Action_Function_PatternBasedStemSpellCorrections"
+        },{
+          "$ref": "#/definitions/Action_Function_ValidateAndCorrectQuantityAndPrices"
         },
         {
           "$ref": "#/definitions/Action_Function_Map"
@@ -4309,6 +4371,10 @@
         {
           "title": "Pattern Based Stem Spell Correction",
           "$ref": "#/definitions/patternBasedStemSpellCorrectionsFunctionArgs"
+        },
+        {
+          "title": "Validate and Correct Quantity and Prices",
+          "$ref": "#/definitions/validateAndCorrectQuantityAndPricesFunctionArgs"
         },
         {
           "title": "Platform Functions",
