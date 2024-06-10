@@ -49,6 +49,9 @@ class DataValidator
                         if ($unitPrice > $totalPrice) {
                             // We know unit price is wrong. So we correct it
                             $corrections = [$quantity, ($totalPrice/$quantity), $totalPrice];
+                        } elseif ($unitPrice == $totalPrice) {
+                            // We know quantity is wrong since it's supposed to be 1
+                            $corrections = [1, $unitPrice, $totalPrice];
                         } else {
                             // We need to know which of the three has an error.
                             $corrections = self::checkCorrections($quantity, $unitPrice, $totalPrice);
@@ -86,10 +89,24 @@ class DataValidator
         $possibleValues = [$value];
         $strVal = strval($value);
 
+        // Handle 1 at the end of a number
+        if ($strVal != '1' && substr($strVal, -1) === '1') {
+            $coreValue = intval(substr($strVal, 0, -1));
+            $possibleValues[] = $coreValue; // Example: 300 to 3.00
+        }
+
         // Handling potential decimal misinterpretation
         if (substr($strVal, -2) === '00') {
             $coreValue = intval(substr($strVal, 0, -2));
-            $possibleValues[] = $coreValue; // Example: 300 to 3.00
+            $possibleValues[] = $coreValue; // Example: 11 to 1
+
+            // we add handling of a stray 1 after the removal
+            $coreValueStr = (string)$coreValue;
+            if ($coreValueStr != '1' && substr($coreValueStr, -1) === '1') {
+                $coreValue = intval(substr($coreValueStr, 0, -1));
+                $possibleValues[] = $coreValue; // Example: 1100 to 1
+            }
+
         }
 
         // Apply common OCR misreadings and decimal errors

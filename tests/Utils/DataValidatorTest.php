@@ -60,6 +60,17 @@ class DataValidatorTest extends TestCase
                 ],
                 'unit_price' => 90,
                 'total_price' => 720
+            ],
+            [
+                'description' => 'item 5',
+                'unit_of_measure' => [
+                    [
+                        'quantity' => 200,
+                        'unit_of_measure' => 'PCS'
+                    ]
+                ],
+                'unit_price' => 216,
+                'total_price' => 432
             ]
         ];
 
