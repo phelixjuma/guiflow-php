@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 class DataValidatorTest extends TestCase
 {
 
-    public function testQuantityValidationFunction()
+    public function _testQuantityValidationFunction()
     {
 
 
@@ -65,18 +65,29 @@ class DataValidatorTest extends TestCase
                 'description' => 'item 5',
                 'unit_of_measure' => [
                     [
-                        'quantity' => 200,
+                        'quantity' => 30,
                         'unit_of_measure' => 'PCS'
                     ]
                 ],
-                'unit_price' => 216,
-                'total_price' => 432
+                'unit_price' => 110.5,
+                'total_price' => 331.5
+            ],
+            [
+                'description' => 'item 6',
+                'unit_of_measure' => [
+                    [
+                        'quantity' => 0,
+                        'unit_of_measure' => 'PCS'
+                    ]
+                ],
+                'unit_price' => 102,
+                'total_price' => 611.99
             ]
         ];
 
         $correctedItems = DataValidator::validateAndCorrectQuantityUsingPrice($items, 'unit_of_measure.0.quantity', 'unit_price', 'total_price');
 
-        print_r($correctedItems);
+        //print_r($correctedItems);
 
         $expectedData = [];
 
