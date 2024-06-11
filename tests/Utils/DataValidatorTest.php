@@ -15,7 +15,6 @@ class DataValidatorTest extends TestCase
     public function _testQuantityValidationFunction()
     {
 
-
         $items = [
             [
                 'description' => 'item 1',
@@ -65,7 +64,7 @@ class DataValidatorTest extends TestCase
                 'description' => 'item 5',
                 'unit_of_measure' => [
                     [
-                        'quantity' => 30,
+                        'quantity' => 100,
                         'unit_of_measure' => 'PCS'
                     ]
                 ],
@@ -76,12 +75,23 @@ class DataValidatorTest extends TestCase
                 'description' => 'item 6',
                 'unit_of_measure' => [
                     [
-                        'quantity' => 0,
+                        'quantity' => 600,
                         'unit_of_measure' => 'PCS'
                     ]
                 ],
                 'unit_price' => 102,
                 'total_price' => 611.99
+            ],
+            [
+                'description' => 'item 6',
+                'unit_of_measure' => [
+                    [
+                        'quantity' => 100,
+                        'unit_of_measure' => 'PCS'
+                    ]
+                ],
+                'unit_price' => 288.01,
+                'total_price' => 2880.05
             ]
         ];
 

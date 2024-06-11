@@ -73,7 +73,7 @@ class DataValidator
     }
 
     private static function isCorrect($quantity, $unitPrice, $totalPrice) {
-        return $totalPrice == $unitPrice * $quantity && $unitPrice <= $totalPrice;
+        return round($totalPrice,1) == round($unitPrice,1) * round($quantity,1) && $unitPrice <= $totalPrice;
     }
 
     private static function correctCommonMistakes($value) {
@@ -98,8 +98,12 @@ class DataValidator
 
         // Handling potential decimal misinterpretation
         if (substr($strVal, -2) === '00') {
+
             $coreValue = intval(substr($strVal, 0, -2));
             $possibleValues[] = $coreValue; // Example: 11 to 1
+
+            // We get more possible values for the core value
+            $possibleValues = array_merge($possibleValues,self::getPossibleValues($coreValue));
 
             // we add handling of a stray 1 after the removal
             $coreValueStr = (string)$coreValue;
@@ -118,22 +122,75 @@ class DataValidator
                     $newStrVal = substr_replace($strVal, $replacement, $i, 1);
                     $possibleValues[] = intval($newStrVal);
 
+                    // We get more possible values for the core value
+                    $possibleValues = array_merge($possibleValues,self::getPossibleValues($newStrVal));
+
                     // Additionally check for decimal placement errors with the new digit
                     if (substr($newStrVal, -3) === '000') {
                         $coreValue = intval(substr($newStrVal, 0, -3));
                         $possibleValues[] = $coreValue;
+
+                        // We get more possible values for the core value
+                        $possibleValues = array_merge($possibleValues,self::getPossibleValues($coreValue));
+
                     }
                     if (substr($newStrVal, -2) === '00') {
                         $coreValue = intval(substr($newStrVal, 0, -2));
                         $possibleValues[] = $coreValue;
+
+                        // We get more possible values for the core value
+                        $possibleValues = array_merge($possibleValues,self::getPossibleValues($coreValue));
+
                     }
                     if (substr($newStrVal, -1) === '0') {
                         $coreValue = intval(substr($newStrVal, 0, -1));
                         $possibleValues[] = $coreValue;
+
+                        // We get more possible values for the core value
+                        $possibleValues = array_merge($possibleValues,self::getPossibleValues($coreValue));
+
                     }
                 }
             }
         }
+        return $possibleValues;
+    }
+
+    /**
+     * @param $value
+     * @return array
+     */
+    private static function getPossibleValues($value) {
+
+        /**
+         * Part 2: Check for digit variations
+         */
+        $strVal = strval($value);
+        $digits = str_split('0123456789');
+
+        $possibleValues = [];
+
+        // Try removing each digit
+        for ($i = 0; $i < strlen($strVal); $i++) {
+            $possibleValues[] = intval(substr_replace($strVal, '', $i, 1));
+        }
+
+        // Try changing each digit to each possible digit
+        for ($i = 0; $i < strlen($strVal); $i++) {
+            foreach ($digits as $digit) {
+                if ($digit != $strVal[$i]) {
+                    $possibleValues[] = intval(substr_replace($strVal, $digit, $i, 1));
+                }
+            }
+        }
+
+        // Try adding each digit at each position
+        for ($i = 0; $i <= strlen($strVal); $i++) {
+            foreach ($digits as $digit) {
+                $possibleValues[] = intval(substr($strVal, 0, $i) . $digit . substr($strVal, $i));
+            }
+        }
+
         return $possibleValues;
     }
 
@@ -148,70 +205,46 @@ class DataValidator
 
         foreach ($values as $key => $value) {
 
-            /**
-             * Part 1: Correct common mistakes
-             */
-            $correctedValues = self::correctCommonMistakes($value);
+            if (!str_contains(strval($value), '.')) {
+                /**
+                 * Part 1: Correct common mistakes
+                 */
+                $correctedValues = self::correctCommonMistakes($value);
 
-            foreach ($correctedValues as $correctedValue) {
-                $newValues = array_merge($values, array($key => $correctedValue));
-                if (self::isCorrect($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice'])) {
-                    $results[] = array($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice']);
-                }
-            }
-
-            /**
-             * Part 2: Check for digit variations
-             */
-            $strVal = strval($value);
-            $digits = str_split('0123456789');
-
-            // Try removing each digit
-            for ($i = 0; $i < strlen($strVal); $i++) {
-                $newVal = intval(substr_replace($strVal, '', $i, 1));
-                $newValues = array_merge($values, array($key => $newVal));
-                if (self::isCorrect($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice'])) {
-                    $results[] = array($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice']);
-                }
-            }
-
-            // Try changing each digit to each possible digit
-            for ($i = 0; $i < strlen($strVal); $i++) {
-                foreach ($digits as $digit) {
-                    if ($digit != $strVal[$i]) {
-                        $newVal = intval(substr_replace($strVal, $digit, $i, 1));
-                        $newValues = array_merge($values, array($key => $newVal));
-                        if (self::isCorrect($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice'])) {
-                            $results[] = array($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice']);
-                        }
-                    }
-                }
-            }
-
-            // Try adding each digit at each position
-            for ($i = 0; $i <= strlen($strVal); $i++) {
-                foreach ($digits as $digit) {
-                    $newVal = intval(substr($strVal, 0, $i) . $digit . substr($strVal, $i));
-                    $newValues = array_merge($values, array($key => $newVal));
+                foreach ($correctedValues as $correctedValue) {
+                    $newValues = array_merge($values, array($key => $correctedValue));
                     if (self::isCorrect($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice'])) {
-                        $results[] = array($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice']);
+                        return self::formatResponse(array($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice']));
+                    }
+                }
+
+                /**
+                 * Part 2: Check for digit variations
+                 */
+
+                $possibleValues = self::getPossibleValues($value);
+
+                foreach ($possibleValues as $possibleValue) {
+                    $newValues = array_merge($values, array($key => $possibleValue));
+                    if (self::isCorrect($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice'])) {
+                        return self::formatResponse(array($newValues['quantity'], $newValues['unitPrice'], $newValues['totalPrice']));
                     }
                 }
             }
         }
 
-        if (empty($results)) {
-            return array('error' => 'No valid correction found', 'quantity' => $quantity, 'unitPrice' => $unitPrice, 'totalPrice' => $totalPrice);
-        } else {
-            // Return the first valid result found
-            $correctedResult = $results[0];
+        return array('error' => 'No valid correction found', 'quantity' => $quantity, 'unitPrice' => $unitPrice, 'totalPrice' => $totalPrice);
+    }
 
-            array_walk($correctedResult, function (&$v, $k) {
-               $v = round($v, 1);
-            });
-
-            return $correctedResult;
-        }
+    /**
+     * @param $response
+     * @return mixed
+     */
+    private static function formatResponse($response) {
+        array_walk($response, function (&$v, $k) {
+            $v = round($v, 1);
+        });
+        return $response;
     }
 
 }
