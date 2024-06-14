@@ -2163,7 +2163,7 @@
               "type": "object",
               "properties": {
                 "days": {
-                  "type": "string"
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "operator": {
                   "type": "string",
