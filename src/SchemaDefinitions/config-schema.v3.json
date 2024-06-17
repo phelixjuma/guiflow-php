@@ -40,6 +40,26 @@
             "path"
           ],
           "additionalProperties": false
+        },
+        {
+          "title": "Validation Data",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "data_path": {
+                "type": "string"
+              },
+              "rules": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["data_path", "rules"],
+            "additionalProperties": false
+          }
         }
       ]
     },
