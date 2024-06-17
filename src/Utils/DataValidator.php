@@ -8,6 +8,7 @@ class DataValidator
     const VALIDATION_RULE_PATH_EXISTS = 'path exists';
     const VALIDATION_RULE_IS_NOT_EMPTY = 'is not empty';
     const VALIDATION_RULE_IS_NUMERIC = 'is numeric';
+    const VALIDATION_RULE_IS_NON_ZERO_NUMBER = 'is non zero number';
     const VALIDATION_RULE_IS_DATE = 'is date';
     const VALIDATION_RULE_IS_EMAIL = 'is email';
     const VALIDATION_RULE_IS_LIST = 'is list';
@@ -334,6 +335,21 @@ class DataValidator
                         $validations[$rule]['status'] = $status;
                     } else {
                         $validations[$rule]['status'] = is_numeric($pathData);
+                    }
+                }
+                // check if value is non zero
+                if ($rule == self::VALIDATION_RULE_IS_NON_ZERO_NUMBER) {
+                    if (is_array($pathData)) {
+                        $status = true;
+                        foreach ($pathData as $pData) {
+                            if (!is_numeric($pData) || $pData == 0) {
+                                $status = false;
+                                break;
+                            }
+                        }
+                        $validations[$rule]['status'] = $status;
+                    } else {
+                        $validations[$rule]['status'] = is_numeric($pathData) && $pathData != 0;
                     }
                 }
                 // check if value is email

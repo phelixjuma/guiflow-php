@@ -110,10 +110,10 @@ class DataValidatorTest extends TestCase
         //$this->assertEquals($mergedData, $expectedData);
     }
 
-    public function _testDataStructureFunction()
+    public function testDataStructureFunction()
     {
 
-        $items = [
+        $items = [[
             "customer_name" => "Phelix",
             "items" => [
                 [
@@ -137,7 +137,7 @@ class DataValidatorTest extends TestCase
                     ]
                 ]
             ]
-        ];
+        ]];
 
         $validations = [
             [
@@ -169,12 +169,18 @@ class DataValidatorTest extends TestCase
                 "rules" => [
                     DataValidator::VALIDATION_RULE_PATH_EXISTS, DataValidator::VALIDATION_RULE_IS_NOT_EMPTY, DataValidator::VALIDATION_RULE_IS_NUMERIC
                 ]
+            ],
+            [
+                "path"  => "*",
+                "rules" => [
+                    DataValidator::VALIDATION_RULE_IS_LIST
+                ]
             ]
         ];
 
-        $validationResponse = DataValidator::validateDataStructure($items, $validations, false);
+        $validationResponse = DataValidator::validateDataStructure($items, $validations, true);
 
-        //print_r($validationResponse);
+        print_r($validationResponse);
 
         $expectedData = [];
 
