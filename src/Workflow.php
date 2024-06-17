@@ -281,7 +281,7 @@ class Workflow
     }
 
     private static function isObject($data) {
-        return  array_keys($data) !== range(0, count($data) - 1);
+        return  is_array($data) && array_keys($data) !== range(0, count($data) - 1);
     }
 
     /**
