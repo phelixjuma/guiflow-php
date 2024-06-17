@@ -271,7 +271,7 @@ class DataValidator
      * @param $verbose
      * @return array|bool
      */
-    public static function validateDataStructure($data, $validations, $verbose=true): bool|array
+    public static function validateDataStructure_($data, $validations, $verbose=true): bool|array
     {
 
         $validationResponse = [];
@@ -429,6 +429,118 @@ class DataValidator
                 }
             }
         }
+        return true;
+    }
+
+    public static function validateDataStructure($data, $validations, $verbose = true): bool|array
+    {
+        $validationResponse = [];
+
+        foreach ($validations as $validation) {
+            $path = $validation['path'];
+            $rules = $validation['rules'];
+
+            $pathData = PathResolver::getValueByPath($data, $path);
+            $validationResponse[$path]['value'] = $pathData;
+
+            $validationStatus = [];
+
+            foreach ($rules as $rule) {
+                if ($rule == self::VALIDATION_RULE_IS_LIST || $rule == self::VALIDATION_RULE_IS_DICTIONARY) {
+                    $validationStatus[$rule] = ['rule' => $rule, 'status' => self::validateComplexStructure($pathData, $rule)];
+                } else {
+                    $validationStatus[$rule] = ['rule' => $rule, 'status' => self::applyRule($pathData, $rule)];
+                }
+            }
+
+            $validationResponse[$path]['validations'] = array_values($validationStatus);
+        }
+
+        if ($verbose) {
+            return $validationResponse;
+        }
+
+        foreach ($validationResponse as $response) {
+            foreach ($response['validations'] as $validation) {
+                if (!$validation['status']) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static function applyRule($data, $rule): bool
+    {
+        if (is_array($data)) {
+            foreach ($data as $item) {
+                if (is_array($item)) {
+                    if (!self::applyRule($item, $rule)) {
+                        return false;
+                    }
+                } else {
+                    if (!self::validateValue($item, $rule)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        return self::validateValue($data, $rule);
+    }
+
+    private static function validateValue($value, $rule): bool
+    {
+        switch ($rule) {
+            case self::VALIDATION_RULE_PATH_EXISTS:
+                return !is_null($value);
+
+            case self::VALIDATION_RULE_IS_NOT_EMPTY:
+                return !empty($value) || $value === 0;
+
+            case self::VALIDATION_RULE_IS_NUMERIC:
+                return is_numeric($value);
+
+            case self::VALIDATION_RULE_IS_NON_ZERO_NUMBER:
+                return is_numeric($value) && $value != 0;
+
+            case self::VALIDATION_RULE_IS_EMAIL:
+                return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+
+            case self::VALIDATION_RULE_IS_DATE:
+                return self::isValidDate($value);
+
+            case self::VALIDATION_RULE_IS_LIST:
+                return Utils::isList($value);
+
+            case self::VALIDATION_RULE_IS_DICTIONARY:
+                return Utils::isObject($value);
+
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * @param $data
+     * @param $rule
+     * @return bool
+     */
+    private static function validateComplexStructure($data, $rule): bool
+    {
+        if (!is_array($data)) {
+            return false;
+        }
+
+        if ($rule == self::VALIDATION_RULE_IS_LIST && !Utils::isList($data)) {
+            return false;
+        }
+
+        if ($rule == self::VALIDATION_RULE_IS_DICTIONARY && !Utils::isObject($data)) {
+            return false;
+        }
+
         return true;
     }
 

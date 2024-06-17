@@ -113,31 +113,35 @@ class DataValidatorTest extends TestCase
     public function testDataStructureFunction()
     {
 
-        $items = [[
+        $items = [
             "customer_name" => "Phelix",
             "items" => [
                 [
                     "quantity" => 10
                 ]
             ],
-            "delivery_date" => "2023",
+            "delivery_date" => "223",
             "products" => [
                 [
                     "description" => "item 1",
-                    "uom" => [
-                        "quantity_" => 4,
-                        "unit" => "pcs"
+                    "unit_of_measure" => [
+                        [
+                            "quantity" => 4,
+                            "unit" => "pcs"
+                        ]
                     ]
                 ],
                 [
                     "description" => "item 2",
-                    "uom" => [
-                        "quantity" => "",
-                        "unit" => "pcs"
+                    "unit_of_measure" => [
+                        [
+                            "quantity" => "8",
+                            "unit" => "pcs"
+                        ]
                     ]
                 ]
             ]
-        ]];
+        ];
 
         $validations = [
             [
@@ -171,9 +175,15 @@ class DataValidatorTest extends TestCase
                 ]
             ],
             [
-                "path"  => "*",
+                "path"  => "products.*.unit_of_measure.*.quantity",
                 "rules" => [
-                    DataValidator::VALIDATION_RULE_IS_LIST
+                    DataValidator::VALIDATION_RULE_IS_NON_ZERO_NUMBER
+                ]
+            ],
+            [
+                "path"  => "products.*.unit_of_measure.0",
+                "rules" => [
+                    DataValidator::VALIDATION_RULE_IS_DICTIONARY
                 ]
             ]
         ];
