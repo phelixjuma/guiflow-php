@@ -4,7 +4,7 @@ namespace PhelixJuma\GUIFlow\Utils;
 
 class DataReducer
 {
-    private array $data;
+    private $data;
     private $reducer;
     private $reducerArgs;
 
