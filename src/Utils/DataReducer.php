@@ -39,6 +39,9 @@ class DataReducer
     }
 
     private function get_item_at_index($index) {
+        if (!is_array($this->data) || !is_numeric($index)) {
+            return $this->data;
+        }
         return $this->data[intval($index)] ?? $this->data;
     }
 
