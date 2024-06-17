@@ -10,7 +10,7 @@ class DataReducer
 
     protected PathResolver $pathResolver;
 
-    public function __construct(array $data, $reducer, ...$reducerArgs)
+    public function __construct($data, $reducer, ...$reducerArgs)
     {
         $this->data = $data;
         $this->reducer = $reducer;
@@ -24,6 +24,9 @@ class DataReducer
      */
     public function reduce(): mixed
     {
+        if (empty($this->data)) {
+            return $this->data;
+        }
         return call_user_func([$this, $this->reducer], ...$this->reducerArgs);
     }
 
@@ -36,7 +39,7 @@ class DataReducer
     }
 
     private function get_item_at_index($index) {
-        return $this->data[intval($index)] ?? null;
+        return $this->data[intval($index)] ?? $this->data;
     }
 
     /**
