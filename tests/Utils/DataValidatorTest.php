@@ -110,4 +110,75 @@ class DataValidatorTest extends TestCase
         //$this->assertEquals($mergedData, $expectedData);
     }
 
+    public function _testDataStructureFunction()
+    {
+
+        $items = [
+            "customer_name" => "Phelix",
+            "items" => [
+                [
+                    "quantity" => 10
+                ]
+            ],
+            "delivery_date" => "2023",
+            "products" => [
+                [
+                    "description" => "item 1",
+                    "uom" => [
+                        "quantity_" => 4,
+                        "unit" => "pcs"
+                    ]
+                ],
+                [
+                    "description" => "item 2",
+                    "uom" => [
+                        "quantity" => "",
+                        "unit" => "pcs"
+                    ]
+                ]
+            ]
+        ];
+
+        $validations = [
+            [
+                "path"  => "customer_name",
+                "rules" => [
+                    DataValidator::VALIDATION_RULE_PATH_EXISTS
+                ]
+            ],
+            [
+                "path"  => "delivery_location",
+                "rules" => [
+                    DataValidator::VALIDATION_RULE_PATH_EXISTS
+                ]
+            ],
+            [
+                "path"  => "delivery_date",
+                "rules" => [
+                    DataValidator::VALIDATION_RULE_IS_DATE
+                ]
+            ],
+            [
+                "path"  => "products.*.description",
+                "rules" => [
+                    DataValidator::VALIDATION_RULE_PATH_EXISTS
+                ]
+            ],
+            [
+                "path"  => "products.*.uom.quantity",
+                "rules" => [
+                    DataValidator::VALIDATION_RULE_PATH_EXISTS, DataValidator::VALIDATION_RULE_IS_NOT_EMPTY, DataValidator::VALIDATION_RULE_IS_NUMERIC
+                ]
+            ]
+        ];
+
+        $validationResponse = DataValidator::validateDataStructure($items, $validations, false);
+
+        //print_r($validationResponse);
+
+        $expectedData = [];
+
+        //$this->assertEquals($mergedData, $expectedData);
+    }
+
 }

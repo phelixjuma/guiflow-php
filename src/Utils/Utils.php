@@ -1098,6 +1098,10 @@ class Utils
         return (is_array($value) && array_keys($value) !== range(0, count($value) - 1));
     }
 
+    public static function isList($value) {
+        return (is_array($value) && array_keys($value) == range(0, count($value) - 1));
+    }
+
     /**
      * Flattens an object. Child objects are removed and their values set on the parent using parent.child path notation
      * @param $obj

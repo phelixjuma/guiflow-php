@@ -233,6 +233,8 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::pattern_based_stem_spell_corrections(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'validate_and_correct_quantity_and_prices') {
             $newValue = DataValidator::validateAndCorrectQuantityUsingPrice(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'validate_data_structure') {
+            $newValue = DataValidator::validateDataStructure(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'user_defined_function') {
             // function name is at index 1 (index 0 is the data).
             $functionName = $paramValues[1];

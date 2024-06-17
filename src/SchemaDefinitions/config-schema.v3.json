@@ -2938,6 +2938,61 @@
       ],
       "unevaluatedProperties": false
     },
+    "validateDataStructureFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "validate_data_structure"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "validations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "data_path": {
+                        "type": "string"
+                      },
+                      "rules": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": ["data_path", "rules"],
+                    "additionalProperties": false
+                  }
+                },
+                "verbose": {
+                  "type": "string",
+                  "enum": ["1", "0"],
+                  "default": "1"
+                }
+              },
+              "required": [
+                "validations",
+                "verbose"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "platformFunctionsFunctionArgs": {
       "allOf": [
         {
@@ -4048,6 +4103,25 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_ValidateDataStructure": {
+      "title": "Validate data structure",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/validateDataStructureFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_Map": {
       "title": "Map",
       "allOf": [
@@ -4197,8 +4271,12 @@
         },
         {
           "$ref": "#/definitions/Action_Function_PatternBasedStemSpellCorrections"
-        },{
+        },
+        {
           "$ref": "#/definitions/Action_Function_ValidateAndCorrectQuantityAndPrices"
+        },
+        {
+          "$ref": "#/definitions/Action_Function_ValidateDataStructure"
         },
         {
           "$ref": "#/definitions/Action_Function_Map"
@@ -4375,6 +4453,10 @@
         {
           "title": "Validate and Correct Quantity and Prices",
           "$ref": "#/definitions/validateAndCorrectQuantityAndPricesFunctionArgs"
+        },
+        {
+          "title": "Validate and Correct Quantity and Prices",
+          "$ref": "#/definitions/validateDataStructureFunctionArgs"
         },
         {
           "title": "Platform Functions",

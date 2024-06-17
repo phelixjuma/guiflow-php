@@ -4,6 +4,7 @@ namespace PhelixJuma\GUIFlow\Conditions;
 
 use FuzzyWuzzy\Fuzz;
 use PhelixJuma\GUIFlow\Exceptions\UnknownOperatorException;
+use PhelixJuma\GUIFlow\Utils\DataValidator;
 use PhelixJuma\GUIFlow\Utils\PathResolver;
 use PhelixJuma\GUIFlow\Utils\Utils;
 
@@ -181,6 +182,8 @@ class SimpleCondition implements ConditionInterface
                         return $fuzz->tokenSortPartialRatio($pathValue, $value) >= $similarityThreshold;
                     }
                     return $fuzz->partialRatio($pathValue, $value) >= $similarityThreshold;
+                case 'validates':
+                    return DataValidator::validateDataStructure($pathValue, $value, false);
                 default:
                     throw new UnknownOperatorException("Unknown operator: $operator");
             }

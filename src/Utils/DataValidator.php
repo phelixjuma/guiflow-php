@@ -2,75 +2,16 @@
 
 namespace PhelixJuma\GUIFlow\Utils;
 
-use ArrayJoin\Builder;
-use ArrayJoin\On;
-use FuzzyWuzzy\Fuzz;
-use FuzzyWuzzy\Process;
-use PhelixJuma\GUIFlow\Actions\FunctionAction;
-use PhelixJuma\GUIFlow\Workflow;
-use PhelixJuma\GUIFlow\Exceptions\UnknownOperatorException;
-
 class DataValidator
 {
 
-    /**
-     * @param $data
-     * @param $quantityPath
-     * @param $unitPricePath
-     * @param $totalPricePath
-     * @return mixed
-     */
-    public static function validateAndCorrectQuantityUsingPrice($data, $quantityPath, $unitPricePath, $totalPricePath)
-    {
-        // We first check where quantity is empty
-        foreach ($data as &$d) {
-
-            $quantity = PathResolver::getValueByPath($d, $quantityPath);
-            $unitPrice = PathResolver::getValueByPath($d, $unitPricePath);
-            $totalPrice = PathResolver::getValueByPath($d, $totalPricePath);
-
-            if ($quantity == 0 || empty($quantity) || !is_numeric($quantity)) {
-                // Quantity is either 0, empty or not a number. We need to validate and fix
-
-                // We attempt to correct
-                if (!empty($unitPrice) && !empty($totalPrice) && $unitPrice > 0) {
-                    $quantity = round($totalPrice / $unitPrice, 1);
-                    PathResolver::setValueByPath($d, $quantityPath, $quantity);
-                }
-
-            } else {
-                // quantity is a valid number. We validate against unit price and total price, if given
-                if (!empty($unitPrice) && !empty($totalPrice)) {
-
-                    $quantityValid = $quantity * $unitPrice == $totalPrice;
-
-                    if (!$quantityValid) {
-
-                        if ($unitPrice > $totalPrice) {
-                            // We know unit price is wrong. So we correct it
-                            $corrections = [$quantity, round($totalPrice/$quantity, 1), $totalPrice];
-                        } elseif ($unitPrice == $totalPrice) {
-                            // We know quantity is wrong since it's supposed to be 1
-                            $corrections = [1, $unitPrice, $totalPrice];
-                        } else {
-                            // We need to know which of the three has an error.
-                            $corrections = self::checkCorrections($quantity, $unitPrice, $totalPrice);
-                        }
-
-                        if (!isset($corrections['error'])) {
-
-                            PathResolver::setValueByPath($d, $quantityPath, $corrections[0]);
-                            PathResolver::setValueByPath($d, $unitPricePath, $corrections[1]);
-                            PathResolver::setValueByPath($d, $totalPricePath, $corrections[2]);
-                        }
-
-                    }
-
-                }
-            }
-        }
-        return $data;
-    }
+    const VALIDATION_RULE_PATH_EXISTS = 'path exists';
+    const VALIDATION_RULE_IS_NOT_EMPTY = 'is not empty';
+    const VALIDATION_RULE_IS_NUMERIC = 'is numeric';
+    const VALIDATION_RULE_IS_DATE = 'is date';
+    const VALIDATION_RULE_IS_EMAIL = 'is email';
+    const VALIDATION_RULE_IS_LIST = 'is list';
+    const VALIDATION_RULE_IS_DICTIONARY = 'is dictionary';
 
     private static function isCorrect($quantity, $unitPrice, $totalPrice) {
         return round($totalPrice,1) == round($unitPrice,1) * round($quantity,1) && $unitPrice <= $totalPrice;
@@ -245,6 +186,234 @@ class DataValidator
             $v = round($v, 1);
         });
         return $response;
+    }
+
+    /**
+     * @param $data
+     * @param $quantityPath
+     * @param $unitPricePath
+     * @param $totalPricePath
+     * @return mixed
+     */
+    public static function validateAndCorrectQuantityUsingPrice($data, $quantityPath, $unitPricePath, $totalPricePath)
+    {
+        // We first check where quantity is empty
+        foreach ($data as &$d) {
+
+            $quantity = PathResolver::getValueByPath($d, $quantityPath);
+            $unitPrice = PathResolver::getValueByPath($d, $unitPricePath);
+            $totalPrice = PathResolver::getValueByPath($d, $totalPricePath);
+
+            if ($quantity == 0 || empty($quantity) || !is_numeric($quantity)) {
+                // Quantity is either 0, empty or not a number. We need to validate and fix
+
+                // We attempt to correct
+                if (!empty($unitPrice) && !empty($totalPrice) && $unitPrice > 0) {
+                    $quantity = round($totalPrice / $unitPrice, 1);
+                    PathResolver::setValueByPath($d, $quantityPath, $quantity);
+                }
+
+            } else {
+                // quantity is a valid number. We validate against unit price and total price, if given
+                if (!empty($unitPrice) && !empty($totalPrice)) {
+
+                    $quantityValid = $quantity * $unitPrice == $totalPrice;
+
+                    if (!$quantityValid) {
+
+                        if ($unitPrice > $totalPrice) {
+                            // We know unit price is wrong. So we correct it
+                            $corrections = [$quantity, round($totalPrice/$quantity, 1), $totalPrice];
+                        } elseif ($unitPrice == $totalPrice) {
+                            // We know quantity is wrong since it's supposed to be 1
+                            $corrections = [1, $unitPrice, $totalPrice];
+                        } else {
+                            // We need to know which of the three has an error.
+                            $corrections = self::checkCorrections($quantity, $unitPrice, $totalPrice);
+                        }
+
+                        if (!isset($corrections['error'])) {
+
+                            PathResolver::setValueByPath($d, $quantityPath, $corrections[0]);
+                            PathResolver::setValueByPath($d, $unitPricePath, $corrections[1]);
+                            PathResolver::setValueByPath($d, $totalPricePath, $corrections[2]);
+                        }
+
+                    }
+
+                }
+            }
+        }
+        return $data;
+    }
+
+    private static function isValidDate($date) {
+
+        $timestamp = strtotime($date);
+        if ($timestamp === false) {
+            return false;
+        }
+
+        $dateObj = date_create($date);
+        if ($dateObj === false) {
+            return false;
+        }
+
+        // Check if the date is valid by ensuring the formatted output matches the input
+        $formattedDate = $dateObj->format('Y-m-d H:i:s');
+        return strtotime($formattedDate) === $timestamp;
+    }
+
+    /**
+     * @param $data
+     * @param $validations
+     * @param $verbose
+     * @return array|bool
+     */
+    public static function validateDataStructure($data, $validations, $verbose=true): bool|array
+    {
+
+        $validationResponse = [];
+
+        foreach ($validations as $validation) {
+
+            // Get the validation path and rules
+            $path = $validation['path'];
+            $rules = $validation['rules'];
+
+            // We get the path
+            $pathData = PathResolver::getValueByPath($data, $path);
+
+            $validationResponse[$path]['value'] = $pathData;
+
+            $validations = [];
+            foreach ($rules as $rule) {
+
+                $validations[$rule]['rule'] = $rule;
+
+                // Check if path exists
+                if ($rule == self::VALIDATION_RULE_PATH_EXISTS) {
+                    if (is_array($pathData)) {
+                        $status = true;
+                        foreach ($pathData as $pData) {
+                            if (is_null($pData)) {
+                                $status = false;
+                                break;
+                            }
+                        }
+                        $validations[$rule]['status'] = $status;
+                    } else {
+                        $validations[$rule]['status'] = !is_null($pathData);
+                    }
+                }
+                // Check if value is empty or not
+                if ($rule == self::VALIDATION_RULE_IS_NOT_EMPTY) {
+                    if (is_array($pathData)) {
+                        $status = true;
+                        foreach ($pathData as $pData) {
+                            if (empty($pData) && $pData != 0) {
+                                $status = false;
+                                break;
+                            }
+                        }
+                        $validations[$rule]['status'] = $status;
+                    } else {
+                        $validations[$rule]['status'] = !empty($pathData) || $pathData == 0;
+                    }
+                }
+                // check if value is numeric
+                if ($rule == self::VALIDATION_RULE_IS_NUMERIC) {
+                    if (is_array($pathData)) {
+                        $status = true;
+                        foreach ($pathData as $pData) {
+                            if (!is_numeric($pData)) {
+                                $status = false;
+                                break;
+                            }
+                        }
+                        $validations[$rule]['status'] = $status;
+                    } else {
+                        $validations[$rule]['status'] = is_numeric($pathData);
+                    }
+                }
+                // check if value is email
+                if ($rule == self::VALIDATION_RULE_IS_EMAIL) {
+                    if (is_array($pathData)) {
+                        $status = true;
+                        foreach ($pathData as $pData) {
+                            if (!filter_var($pData, FILTER_VALIDATE_EMAIL)) {
+                                $status = false;
+                                break;
+                            }
+                        }
+                        $validations[$rule]['status'] = $status;
+                    } else {
+                        $validations[$rule]['status'] = filter_var($pathData, FILTER_VALIDATE_EMAIL);
+                    }
+                }
+                // check if value is date
+                if ($rule == self::VALIDATION_RULE_IS_DATE) {
+                    if (is_array($pathData)) {
+                        $status = true;
+                        foreach ($pathData as $pData) {
+                            if (!self::isValidDate($pData)) {
+                                $status = false;
+                                break;
+                            }
+                        }
+                        $validations[$rule]['status'] = $status;
+                    } else {
+                        $validations[$rule]['status'] = self::isValidDate($pathData);
+                    }
+                }
+                // check if value is list
+                if ($rule == self::VALIDATION_RULE_IS_LIST) {
+                    if (is_array($pathData)) {
+                        $status = true;
+                        foreach ($pathData as $pData) {
+                            if (!Utils::isList($pData)) {
+                                $status = false;
+                                break;
+                            }
+                        }
+                        $validations[$rule]['status'] = $status;
+                    } else {
+                        $validations[$rule]['status'] = Utils::isList($pathData);
+                    }
+                }
+                // check if value is dictionary
+                if ($rule == self::VALIDATION_RULE_IS_DICTIONARY) {
+                    if (is_array($pathData)) {
+                        $status = true;
+                        foreach ($pathData as $pData) {
+                            if (!Utils::isObject($pData)) {
+                                $status = false;
+                                break;
+                            }
+                        }
+                        $validations[$rule]['status'] = $status;
+                    } else {
+                        $validations[$rule]['status'] = Utils::isObject($pathData);
+                    }
+                }
+            }
+            $validationResponse[$path]['validations'] = array_values($validations);
+
+
+        }
+
+        if ($verbose) {
+            return $validationResponse;
+        }
+        // non-verbose response returns true or false
+        foreach ($validationResponse as $response) {
+            foreach ($response['validations'] as $validation) {
+                if (!$validation['status']) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 }
