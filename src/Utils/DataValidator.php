@@ -15,7 +15,17 @@ class DataValidator
     const VALIDATION_RULE_IS_DICTIONARY = 'is dictionary';
 
     private static function isCorrect($quantity, $unitPrice, $totalPrice) {
-        return round($totalPrice,1) == round($unitPrice,1) * round($quantity,1) && $unitPrice <= $totalPrice;
+
+        if ($totalPrice < $unitPrice) {
+            return false;
+        }
+
+        $totalPriceCheck = round($totalPrice,2) == round($unitPrice * $quantity,2);
+        $unitPriceCheck = round($unitPrice,2) == round($totalPrice/$quantity,2);
+        $quantityCheck = round($quantity,2) == round($totalPrice/$unitPrice,2);
+
+        return $totalPriceCheck || $unitPriceCheck || $quantityCheck;
+
     }
 
     private static function correctCommonMistakes($value) {
@@ -98,6 +108,24 @@ class DataValidator
         return $possibleValues;
     }
 
+    private static function removeTrailingZeros($strVal, &$possibleValues = []) {
+        $possibleValues[] = intval($strVal);
+
+        // Remove trailing zeros and add possible values recursively
+        if (substr($strVal, -1) === '0') {
+            $strVal = substr($strVal, 0, -1);
+            self::removeTrailingZeros($strVal, $possibleValues);
+        }
+
+        // Check for stray '1' at the end after zeros are removed
+        if (substr($strVal, -1) === '1' && $strVal !== '1') {
+            $strVal = substr($strVal, 0, -1);
+            $possibleValues[] = intval($strVal);
+        }
+
+        return $possibleValues;
+    }
+
     /**
      * @param $value
      * @return array
@@ -112,16 +140,31 @@ class DataValidator
 
         $possibleValues = [];
 
+        // Handle 1 at the end of a number
+        if ($strVal != '1' && substr($strVal, -1) === '1') {
+            $coreValue = intval(substr($strVal, 0, -1));
+            $possibleValues[] = $coreValue; // Example: 31 to 3
+        }
+
+        // Handling trailing zeros
+        $possibleValues = self::removeTrailingZeros($strVal);
+
         // Try removing each digit
         for ($i = 0; $i < strlen($strVal); $i++) {
-            $possibleValues[] = intval(substr_replace($strVal, '', $i, 1));
+            $val = intval(substr_replace($strVal, '', $i, 1));
+            if ($val > 0) {
+                $possibleValues[] = $val;
+            }
         }
 
         // Try changing each digit to each possible digit
         for ($i = 0; $i < strlen($strVal); $i++) {
             foreach ($digits as $digit) {
                 if ($digit != $strVal[$i]) {
-                    $possibleValues[] = intval(substr_replace($strVal, $digit, $i, 1));
+                    $val = intval(substr_replace($strVal, $digit, $i, 1));
+                    if ($val > 0) {
+                        $possibleValues[] = $val;
+                    }
                 }
             }
         }
@@ -129,7 +172,10 @@ class DataValidator
         // Try adding each digit at each position
         for ($i = 0; $i <= strlen($strVal); $i++) {
             foreach ($digits as $digit) {
-                $possibleValues[] = intval(substr($strVal, 0, $i) . $digit . substr($strVal, $i));
+                $val = intval(substr($strVal, 0, $i) . $digit . substr($strVal, $i));
+                if ($val > 0) {
+                    $possibleValues[] = $val;
+                }
             }
         }
 
@@ -143,7 +189,6 @@ class DataValidator
         }
 
         $values = array('quantity' => $quantity, 'unitPrice' => $unitPrice, 'totalPrice' => $totalPrice);
-        $results = [];
 
         foreach ($values as $key => $value) {
 

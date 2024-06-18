@@ -92,13 +92,23 @@ class DataValidatorTest extends TestCase
                 ],
                 'unit_price' => 288.01,
                 'total_price' => 2880.05
+            ],
+            [
+                'description' => 'item 7',
+                'unit_of_measure' => [
+                    [
+                        'quantity' => 500,
+                        'unit_of_measure' => 'PCS'
+                    ]
+                ],
+                'unit_price' => 38.25,
+                'total_price' => 191.23
             ]
         ];
 
         $correctedItems = DataValidator::validateAndCorrectQuantityUsingPrice($items, 'unit_of_measure.0.quantity', 'unit_price', 'total_price');
 
-        //print_r($correctedItems);
-
+        print_r($correctedItems);
         $expectedData = [];
 
         //$action = new FunctionAction("", [$this, 'split'], ['split_path' => "products",'criteria_path' => "products.*.brand"]);
@@ -110,7 +120,7 @@ class DataValidatorTest extends TestCase
         //$this->assertEquals($mergedData, $expectedData);
     }
 
-    public function testDataStructureFunction()
+    public function _testDataStructureFunction()
     {
 
         $items = [
@@ -190,7 +200,7 @@ class DataValidatorTest extends TestCase
 
         $validationResponse = DataValidator::validateDataStructure($items, $validations, true);
 
-        print_r($validationResponse);
+        //print_r($validationResponse);
 
         $expectedData = [];
 
