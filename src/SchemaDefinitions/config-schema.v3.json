@@ -174,7 +174,8 @@
                 "in list any",
                 "not in list any",
                 "like",
-                "validates"
+                "validates",
+                "not validates"
               ]
             },
             "value": {
