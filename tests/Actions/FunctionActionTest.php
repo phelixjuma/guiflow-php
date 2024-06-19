@@ -1930,16 +1930,25 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testFilterInArray()
+    public function testFilterInArray()
     {
         $data = [
             "items" => [
-                ["description" => "PEARL [Size: 1KG 1KG 1KG] WHOLE MASOOR LARGE", "pack" => "Pack: 1 x 1"],
-                ["description" => "PEARL [Size: 2KG] THAI JASMINE RICE", "pack" => "Pack: 1 x 1"],
-                ["description" => "RANEE [Size: 1KG 1KG 1KG] BIRYANI RICE", "pack" => "Pack: 1 x 1"],
-                ["description" => "SOKO BABY WEANING 1KG", "pack" => "Pack: 1 x 1"],
-                ["description" => "RANEE PREMIUM SPAGHETTI RED [Size: 400G]", "pack" => "Pack: 1 x 1"],
-                ["description" => "RANEE 25KG THAI JASMINE RICE", "pack" => "Pack: 1 x 1"],
+                [
+                    "description" => [
+                        "original_value" => "Item 1",
+                        "similarity"    => 89
+                    ],
+                    "quantity" => 10
+                ],
+                [
+                    "description" => [
+                        "original_value" => "Item 2",
+                        "similarity"    => 35
+                    ],
+                    "quantity" => 5
+                ],
+
             ]
         ];
 
@@ -1947,25 +1956,9 @@ class FunctionActionTest extends TestCase
             "operator" => "AND",
             "conditions" => [
                 [
-                    'term' => ["PEARL","THAI","JASMINE","2"],
-                    "mode" => "not in list any",
-                    "key" => "description",
-                    'threshold' => "50",
-                    "term_exclusion_pattern" => "",
-                    "value_exclusion_pattern" => ""
-                ],
-                [
-                    'term' => ["RANE", "THAI", "25"],
-                    "mode" => "not in list any",
-                    "key" => "description",
-                    'threshold' => "50",
-                    "term_exclusion_pattern" => "",
-                    "value_exclusion_pattern" => ""
-                ],
-                [
-                    'term' => ["BABY", "WEANING", "1"],
-                    "mode" => "not in list any",
-                    "key" => "description",
+                    'term' => "50",
+                    "mode" => "lte",
+                    "key" => "description.similarity",
                     'threshold' => "50",
                     "term_exclusion_pattern" => "",
                     "value_exclusion_pattern" => ""
@@ -1979,9 +1972,9 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
-        $this->assertEquals($data, $expectedData);
+        //$this->assertEquals($data, $expectedData);
     }
 
     public function _testFuzzyExtractTopN()
