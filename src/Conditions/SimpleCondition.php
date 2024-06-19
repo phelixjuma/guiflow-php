@@ -31,7 +31,7 @@ class SimpleCondition implements ConditionInterface
             return true;
         }
 
-        $pathValues = [];
+        $pathValues = $data;
         if (isset($this->condition['path_value'])) {
             $pathValues = $this->condition['path_value'];
         } elseif(!empty($this->condition['path'])) {
@@ -184,6 +184,8 @@ class SimpleCondition implements ConditionInterface
                     return $fuzz->partialRatio($pathValue, $value) >= $similarityThreshold;
                 case 'validates':
                     return DataValidator::validateDataStructure($pathValue, $value, false);
+                case 'not validates':
+                    return !DataValidator::validateDataStructure($pathValue, $value, false);
                 default:
                     throw new UnknownOperatorException("Unknown operator: $operator");
             }
