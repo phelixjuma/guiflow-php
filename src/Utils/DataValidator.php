@@ -482,7 +482,7 @@ class DataValidator
         $validationResponse = [];
 
         foreach ($validations as $validation) {
-            $path = $validation['path'];
+            $path = !empty($validation['path']) ? $validation['path'] : (!empty($validation['data_path']) ? $validation['data_path'] : "");
             $rules = $validation['rules'];
 
             $pathData = PathResolver::getValueByPath($data, $path);
