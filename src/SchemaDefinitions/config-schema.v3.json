@@ -4074,7 +4074,7 @@
       "unevaluatedProperties": false
     },
     "Action_Function_CorrectDate": {
-      "title": "Length",
+      "title": "Correct Date",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
