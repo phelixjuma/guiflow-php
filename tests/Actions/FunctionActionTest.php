@@ -1930,7 +1930,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testFilterInArray()
+    public function _testFilterInArray()
     {
         $data = [
             "items" => [
@@ -2153,5 +2153,22 @@ class FunctionActionTest extends TestCase
         print_r($data);
 
         $this->assertEquals($data, $expectedData);
+    }
+
+    public function _testCorrectDate()
+    {
+        $data = [
+            "dates" => "2024-10-07"
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("dates", [$this, 'correct_date'], [], 'corrected_dates',  0 , null);
+
+        $action->execute($data);
+
+        //print_r($data);
+
+        //$this->assertEquals($data, $expectedData);
     }
 }

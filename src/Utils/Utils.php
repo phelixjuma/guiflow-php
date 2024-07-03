@@ -1328,4 +1328,70 @@ class Utils
 
     }
 
+    /**
+     * @param $date
+     * @return mixed|string
+     */
+    public static function correct_date($date) {
+
+        if (is_array($date)) {
+            foreach ($date as &$d) {
+                $d = self::correct_date($d);
+            }
+            return $date;
+        }
+
+        // Define the possible date formats
+        $formats = [
+            'Y-m-d', 'd-m-Y', 'm-d-Y', 'Y/m/d', 'd/m/Y', 'm/d/Y',
+            'Y.m.d', 'd.m.Y', 'm.d.Y', 'd M Y', 'M d, Y', 'Y-M-d',
+            'd-m-y', 'm-d-y', 'd/m/y', 'm/d/y', 'y-m-d', 'y/d/m'
+        ];
+
+        // Get the current date
+        $currentDate = new \DateTime();
+
+        // Try to parse the original date
+        $originalDateObj = self::parseDate($date, $formats);
+
+        // If original date is invalid, return the original date (uncorrectable)
+        if (!$originalDateObj) {
+            return $date;
+        }
+
+        // Extract day, month, and year components
+        $originalDay = $originalDateObj->format('d');
+        $originalMonth = $originalDateObj->format('m');
+        $originalYear = $originalDateObj->format('Y');
+
+        // Swap day and month
+        $swappedDateStr = $originalYear . '-' . $originalDay . '-' . $originalMonth;
+        $swappedDateObj = self::parseDate($swappedDateStr, ['Y-m-d']);
+
+        // If both dates are valid, choose the one closest to the current date
+        if ($swappedDateObj) {
+            $originalDiff = abs($currentDate->getTimestamp() - $originalDateObj->getTimestamp());
+            $swappedDiff = abs($currentDate->getTimestamp() - $swappedDateObj->getTimestamp());
+
+            // Return the date that is closest to the current date
+            $correctedDateObj = ($originalDiff <= $swappedDiff) ? $originalDateObj : $swappedDateObj;
+        } else {
+            // If only the original date is valid, use it
+            $correctedDateObj = $originalDateObj;
+        }
+
+        return $correctedDateObj->format('Y-m-d');
+    }
+
+    private static function parseDate($date, $formats) {
+
+        foreach ($formats as $format) {
+            $dateObj = \DateTime::createFromFormat($format, $date);
+            if ($dateObj && $dateObj->format($format) === $date) {
+                return $dateObj;
+            }
+        }
+        return false;
+    }
+
 }

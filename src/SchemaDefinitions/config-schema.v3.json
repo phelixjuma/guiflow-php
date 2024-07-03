@@ -2778,6 +2778,30 @@
       ],
       "unevaluatedProperties": false
     },
+    "correctDateFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "correct_date"
+              ]
+            },
+            "args": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "parseTemplateFunctionArgs": {
       "allOf": [
         {
@@ -4049,6 +4073,25 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_CorrectDate": {
+      "title": "Length",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/correctDateFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_ParseTemplate": {
       "title": "ParseTemplate",
       "allOf": [
@@ -4286,6 +4329,9 @@
           "$ref": "#/definitions/Action_Function_Length"
         },
         {
+          "$ref": "#/definitions/Action_Function_CorrectDate"
+        },
+        {
           "$ref": "#/definitions/Action_Function_ParseTemplate"
         },
         {
@@ -4463,6 +4509,10 @@
         {
           "title": "Length",
           "$ref": "#/definitions/lengthFunctionArgs"
+        },
+        {
+          "title": "Correct Date",
+          "$ref": "#/definitions/correctDateFunctionArgs"
         },
         {
           "title": "Parse Template",
