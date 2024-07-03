@@ -2158,7 +2158,7 @@ class FunctionActionTest extends TestCase
     public function _testCorrectDate()
     {
         $data = [
-            "dates" => "2024-10-07"
+            "dates" => "2024-03-07T12:25:03"
         ];
 
         $expectedData = [];
@@ -2167,7 +2167,7 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
         //$this->assertEquals($data, $expectedData);
     }

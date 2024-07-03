@@ -1341,18 +1341,11 @@ class Utils
             return $date;
         }
 
-        // Define the possible date formats
-        $formats = [
-            'Y-m-d', 'd-m-Y', 'm-d-Y', 'Y/m/d', 'd/m/Y', 'm/d/Y',
-            'Y.m.d', 'd.m.Y', 'm.d.Y', 'd M Y', 'M d, Y', 'Y-M-d',
-            'd-m-y', 'm-d-y', 'd/m/y', 'm/d/y', 'y-m-d', 'y/d/m'
-        ];
-
         // Get the current date
         $currentDate = new \DateTime();
 
         // Try to parse the original date
-        $originalDateObj = self::parseDate($date, $formats);
+        $originalDateObj = self::parseDate($date);
 
         // If original date is invalid, return the original date (uncorrectable)
         if (!$originalDateObj) {
@@ -1366,7 +1359,7 @@ class Utils
 
         // Swap day and month
         $swappedDateStr = $originalYear . '-' . $originalDay . '-' . $originalMonth;
-        $swappedDateObj = self::parseDate($swappedDateStr, ['Y-m-d']);
+        $swappedDateObj = self::parseDate($swappedDateStr);
 
         // If both dates are valid, choose the one closest to the current date
         if ($swappedDateObj) {
@@ -1383,15 +1376,13 @@ class Utils
         return $correctedDateObj->format('Y-m-d');
     }
 
-    private static function parseDate($date, $formats) {
+    private static function parseDate($date) {
 
-        foreach ($formats as $format) {
-            $dateObj = \DateTime::createFromFormat($format, $date);
-            if ($dateObj && $dateObj->format($format) === $date) {
-                return $dateObj;
-            }
+        $timestamp = strtotime($date);
+        if ($timestamp === false) {
+            return false;
         }
-        return false;
+        return (new \DateTime())->setTimestamp($timestamp);
     }
 
 }
