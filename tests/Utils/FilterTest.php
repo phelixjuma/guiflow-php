@@ -230,7 +230,7 @@ class FilterTest extends TestCase
         //$this->assertTrue($data == $filtered);
     }
 
-    public function _testFilterByPath()
+    public function _testFilterListByPath()
     {
         $data = [
             [
