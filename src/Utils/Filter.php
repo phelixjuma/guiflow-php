@@ -64,9 +64,11 @@ class Filter
      */
     private static function matchValueAgainstFilter($value, $term, $mode, int $similarityThreshold=self::DEFAULT_THRESHOLD, $termExclusionPattern = null, $valueExclusionPattern=null): bool|int
     {
-
+        if (is_null($value)) {
+            return false;
+        }
         $term = is_array($term) ? array_map('strtolower', $term) : strtolower($term);
-        $value = strtolower($value);
+        $value = is_string($value) ? strtolower($value) : $value;
 
         // if exclusion pattern is set, we clean the term and value using the pattern.
         if (!empty($termExclusionPattern)) {

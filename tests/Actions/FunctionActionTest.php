@@ -2158,12 +2158,12 @@ class FunctionActionTest extends TestCase
     public function _testCorrectDate()
     {
         $data = [
-            "dates" => "2024-03-07T12:25:03"
+            "dates" => "2024-03-07 12:25:03"
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("dates", [$this, 'correct_date'], [], 'corrected_dates',  0 , null);
+        $action = new FunctionAction("dates", [$this, 'correct_date'], [], '',  1, null);
 
         $action->execute($data);
 

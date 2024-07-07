@@ -208,4 +208,51 @@ class FilterTest extends TestCase
         $this->assertTrue($data == $filtered);
     }
 
+    public function _testFilterByPath()
+    {
+        $data = [
+            'order_date' => 'today',
+            'products' => [
+                ['name' => ''],
+                ['name' => "Oranges"],
+                ['name' => "Lemons"],
+                ['name' => ""],
+                ['name' => ""],
+            ]
+        ];
+
+        $conditions = ['term' => '', 'mode' => Filter::NOT_EMPTY, 'key' => 'name'];
+
+        $data['products'] = Filter::filterArray($data['products'], $conditions);
+
+        //print_r($data);
+
+        //$this->assertTrue($data == $filtered);
+    }
+
+    public function _testFilterByPath()
+    {
+        $data = [
+            [
+                'order_date' => 'today',
+                'products' => [
+                    ['name' => "Oranges"],
+                    ['name' => "Lemons"]
+                ]
+            ],
+            [
+                'order_date' => 'today',
+                'products' => []
+            ]
+        ];
+
+        $conditions = ['term' => '', 'mode' => Filter::NOT_EMPTY, 'key' => 'products'];
+
+        $data = Filter::filterArray($data, $conditions);
+
+        print_r($data);
+
+        //$this->assertTrue($data == $filtered);
+    }
+
 }
