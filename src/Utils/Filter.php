@@ -204,6 +204,8 @@ class Filter
         $valuesForPath = PathResolver::getValueByPath($data, $criteriaPath, true);
         $uniqueValues = array_unique($valuesForPath);
 
+        //print_r($uniqueValues);
+
         if (sizeof($uniqueValues) == 1) {
             return $data;
         }

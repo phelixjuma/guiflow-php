@@ -98,9 +98,9 @@ class SimpleCondition implements ConditionInterface
                 case 'not contains':
                     return empty($pathValue) || empty($value) || !str_contains($pathValue, $value);
                 case 'matches':
-                    return preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
+                    return is_string($pathValue) && preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
                 case 'not matches':
-                    return !preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
+                    return !is_string($pathValue) || !preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
                 case 'exists':
                     // For arrays, we remove empty values
                     if (is_array($pathValue) && !Utils::isObject($pathValue)) {
@@ -114,7 +114,7 @@ class SimpleCondition implements ConditionInterface
                     }
                     return empty($pathValue) && $pathValue !== 0;
                 case 'regex':
-                    return preg_match($value, $pathValue) === 1;
+                    return is_string($pathValue) && preg_match($value, $pathValue) === 1;
                 case 'in':
                     return in_array($pathValue, (array)$value);
                 case 'not in':
@@ -123,30 +123,30 @@ class SimpleCondition implements ConditionInterface
                     if (is_array($value)) {
                         foreach ($value as $v) {
                             $pattern = '/' . Utils::custom_preg_escape(Utils::full_unescape($v)) . '/i';
-                            if (!preg_match($pattern, $pathValue)) {
+                            if (!is_string($pathValue)  || !preg_match($pattern, $pathValue)) {
                                 return false;
                             }
                         }
                         return true;
                     }
-                    return preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
+                    return is_string($pathValue) && preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
                 case 'not in list all':
                     if (is_array($value)) {
                         foreach ($value as $v) {
                             $pattern = '/' . Utils::custom_preg_escape(Utils::full_unescape($v)) . '/i';
-                            if (preg_match($pattern, $pathValue)) {
+                            if (is_string($pathValue) && preg_match($pattern, $pathValue)) {
                                 return false;
                             }
                         }
                         return true;
                     }
-                    return !preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
+                    return !is_string($pathValue)|| !preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
                 case 'in list any':
                     if (is_array($value)) {
                         foreach ($value as $v) {
                             $pattern = '/' . Utils::custom_preg_escape(Utils::full_unescape($v)) . '/i';
 
-                            if (preg_match($pattern, $pathValue)) {
+                            if (is_string($pathValue) && preg_match($pattern, $pathValue)) {
                                 return true;
                             }
                             if (preg_last_error() !== PREG_NO_ERROR) {
@@ -155,12 +155,12 @@ class SimpleCondition implements ConditionInterface
                         }
                         return false;
                     }
-                    return preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
+                    return is_string($pathValue) && preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
                 case 'not in list any':
                     if (is_array($value)) {
                         foreach ($value as $v) {
                             $pattern = '/' . Utils::custom_preg_escape(Utils::full_unescape($v)) . '/i';
-                            if (!preg_match($pattern, $pathValue)) {
+                            if (!is_string($pathValue)  || !preg_match($pattern, $pathValue)) {
                                 return true;
                             }
                             if (preg_last_error() !== PREG_NO_ERROR) {
@@ -169,14 +169,14 @@ class SimpleCondition implements ConditionInterface
                         }
                         return false;
                     }
-                    return !preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
+                    return !is_string($pathValue) || !preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
                 case 'true':
                     return $pathValue === true;
                 case 'false':
                     return $pathValue === false;
                 case 'like':
                     $pattern = str_replace('%', '.*', $value);
-                    return preg_match("/$pattern/", $pathValue) === 1;
+                    return is_string($pathValue) && preg_match("/$pattern/", $pathValue) === 1;
                 case 'similar_to':
                     if ($tokenizeSimilarity) {
                         return $fuzz->tokenSortPartialRatio($pathValue, $value) >= $similarityThreshold;

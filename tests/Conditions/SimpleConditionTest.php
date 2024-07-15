@@ -194,4 +194,37 @@ class SimpleConditionTest extends TestCase
         $this->assertTrue($response);
     }
 
+    public function _testInListAny()
+    {
+        $data = [
+            "from_email" => "eastmattkitengela@yahoo.com",
+            //"from_email" => "fouma@khetia.com",
+            "hours_to_delivery" => 24
+        ];
+
+        $condition = [
+            "path" => "from_email",
+            "operator" => "in list any",
+            "value" => [
+                "@quickmart.co.ke",
+                "@mafcarrefour.com",
+                "@naivass.co.ken",
+                "dplfestivebrands@gmail.com",
+                "@chandaranasupermarkets.co.ke",
+                "@khetia.com",
+                "eastmatt.*@yahoo.com"
+            ]
+        ];
+
+        $pathResolver = new PathResolver();
+
+        $simpleCondition = new SimpleCondition($condition, $pathResolver);
+
+        $response = $simpleCondition->evaluate($data);
+
+        print "\nCondition Returns $response\n";
+
+        $this->assertTrue($response);
+    }
+
 }
