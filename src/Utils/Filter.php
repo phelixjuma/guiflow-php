@@ -67,8 +67,11 @@ class Filter
         if (is_null($value)) {
             return false;
         }
-        $term = is_array($term) ? array_map('strtolower', $term) : strtolower($term);
-        $value = is_string($value) ? strtolower($value) : $value;
+        $term = is_array($term) ? array_map(function($item) {
+            return is_string($item) ? strtolower(trim($item)) : $item;
+        }, $term) : strtolower(trim($term));
+
+        $value = is_string($value) ? strtolower(trim($value)) : $value;
 
         // if exclusion pattern is set, we clean the term and value using the pattern.
         if (!empty($termExclusionPattern)) {

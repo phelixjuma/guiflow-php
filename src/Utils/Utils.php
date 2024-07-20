@@ -772,7 +772,7 @@ class Utils
     public static function cleanText($text)
     {
         // Convert text to lowercase
-        $text = strtolower($text);
+        $text = strtolower(trim($text));
 
         // Remove URLs
         //$text = preg_replace('/https?:\/\/\S+/', '', $text);

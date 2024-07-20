@@ -208,7 +208,7 @@ class FilterTest extends TestCase
         $this->assertTrue($data == $filtered);
     }
 
-    public function _testFilterByPath()
+    public function testFilterByPath()
     {
         $data = [
             'order_date' => 'today',
@@ -217,7 +217,7 @@ class FilterTest extends TestCase
                 ['name' => "Oranges"],
                 ['name' => "Lemons"],
                 ['name' => ""],
-                ['name' => ""],
+                ['name' => "  \n"],
             ]
         ];
 
@@ -225,7 +225,7 @@ class FilterTest extends TestCase
 
         $data['products'] = Filter::filterArray($data['products'], $conditions);
 
-        //print_r($data);
+        print_r($data);
 
         //$this->assertTrue($data == $filtered);
     }
