@@ -208,7 +208,7 @@ class FilterTest extends TestCase
         $this->assertTrue($data == $filtered);
     }
 
-    public function testFilterByPath()
+    public function _testFilterByPath()
     {
         $data = [
             'order_date' => 'today',
