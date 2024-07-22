@@ -1517,6 +1517,120 @@
       ],
       "unevaluatedProperties": false
     },
+    "fuzzySearchFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "fuzzy_search"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "corpus": {
+                  "$ref": "#/definitions/valueOrPath"
+                },
+                "corpus_search_key": {
+                  "type": "string"
+                },
+                "corpus_id_key": {
+                  "type": "string"
+                },
+                "master_data_type": {
+                  "type": "string"
+                },
+                "similarity_threshold": {
+                  "type": "string"
+                },
+                "number_of_matches": {
+                  "type": "string"
+                },
+                "scorer": {
+                  "type": "string",
+                  "enum": ["ratio", "partialRatio", "weightedRatio", "tokenSetRatio", "tokenSortRatio", "tokenSetPartialRatio", "tokenSortPartialRatio"],
+                  "default": "tokenSetRatio"
+                },
+                "stop_words": {
+                  "$ref": "#/definitions/valueOrPath"
+                }
+              },
+              "required": ["corpus", "corpus_search_key", "corpus_id_key", "master_data_type", "similarity_threshold", "number_of_matches", "scorer", "stop_words"],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "fuzzyMatchFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "fuzzy_match"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "search_key": {
+                  "type": "string"
+                },
+                "matching_key": {
+                  "type": "string"
+                },
+                "corpus": {
+                  "$ref": "#/definitions/valueOrPath"
+                },
+                "corpus_search_key": {
+                  "type": "string"
+                },
+                "corpus_id_key": {
+                  "type": "string"
+                },
+                "master_data_type": {
+                  "type": "string"
+                },
+                "similarity_threshold": {
+                  "type": "string"
+                },
+                "number_of_matches": {
+                  "type": "string"
+                },
+                "scorer": {
+                  "type": "string",
+                  "enum": ["ratio", "partialRatio", "weightedRatio", "tokenSetRatio", "tokenSortRatio", "tokenSetPartialRatio", "tokenSortPartialRatio"],
+                  "default": "tokenSetRatio"
+                },
+                "stop_words": {
+                  "$ref": "#/definitions/valueOrPath"
+                }
+              },
+              "required": ["search_key", "matching_key","corpus", "corpus_search_key", "corpus_id_key", "master_data_type", "similarity_threshold", "number_of_matches", "scorer", "stop_words"],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "regexExtractFunctionArgs": {
       "allOf": [
         {
@@ -3579,6 +3693,44 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_FuzzySearch": {
+      "title": "Fuzzy Search",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/fuzzySearchFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "Action_Function_FuzzyMatch": {
+      "title": "Fuzzy Search",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/fuzzyMatchFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_RegexExtract": {
       "title": "Regex Extract",
       "allOf": [
@@ -4251,6 +4403,12 @@
           "$ref": "#/definitions/Action_Function_FuzzyExtractN"
         },
         {
+          "$ref": "#/definitions/Action_Function_FuzzySearch"
+        },
+        {
+          "$ref": "#/definitions/Action_Function_FuzzyMatch"
+        },
+        {
           "$ref": "#/definitions/Action_Function_RegexExtract"
         },
         {
@@ -4405,6 +4563,14 @@
         {
           "title": "Fuzzy Extract N",
           "$ref": "#/definitions/fuzzyExtractNFunctionArgs"
+        },
+        {
+          "title": "Fuzzy Search",
+          "$ref": "#/definitions/fuzzySearchFunctionArgs"
+        },
+        {
+          "title": "Fuzzy Match",
+          "$ref": "#/definitions/fuzzyMatchFunctionArgs"
         },
         {
           "title": "Regex Extract",

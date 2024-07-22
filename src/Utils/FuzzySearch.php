@@ -60,6 +60,9 @@ class FuzzySearch
         $moreStopWords = array("and", "the", "is", "in", "to", "for", "on", "of", "with", "at", "by", "an", "be", "this", "that", "it", "from", "as", "are"); // You can expand this list
 
         // Add the more stop-words
+        if (empty($stopWords)) {
+            $stopWords = [];
+        }
         $stopWords = array_unique(array_merge($stopWords, $moreStopWords));
 
         // We check whether a wtop word is plain or is a regex pattern

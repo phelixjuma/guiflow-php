@@ -362,6 +362,7 @@
             "map_parallel", "set", "join", "reducer",
             "sort_multi_by_key", "format_date",
             "fuzzy_extract_one", "fuzzy_extract_n",
+            "fuzzy_search","fuzzy_match",
             "regex_extract","absolute_value",
             "append", "prepend", "concat", "concat_multi_array_assoc",
             "custom_preg_replace", "regex_mapper_multiple",
@@ -1435,6 +1436,78 @@
         }
       },
       "required": ["query", "choices", "search_key", "n", "order", "fuzzy_method"],
+      "additionalProperties": false
+    },
+    "fuzzy_search": {
+      "type": "object",
+      "properties": {
+        "corpus": {
+          "$ref": "#/definitions/valueOrPath"
+        },
+        "corpus_search_key": {
+          "type": "string"
+        },
+        "corpus_id_key": {
+          "type": "string"
+        },
+        "master_data_type": {
+          "type": "string"
+        },
+        "similarity_threshold": {
+          "type": "string"
+        },
+        "number_of_matches": {
+          "type": "string"
+        },
+        "scorer": {
+          "type": "string",
+          "enum": ["ratio", "partialRatio", "weightedRatio", "tokenSetRatio", "tokenSortRatio", "tokenSetPartialRatio", "tokenSortPartialRatio"],
+          "default": "tokenSetRatio"
+        },
+        "stop_words": {
+          "$ref": "#/definitions/valueOrPath"
+        }
+      },
+      "required": ["corpus", "corpus_search_key", "corpus_id_key", "master_data_type", "similarity_threshold", "number_of_matches", "scorer", "stop_words"],
+      "additionalProperties": false
+    },
+    "fuzzy_match": {
+      "type": "object",
+      "properties": {
+        "search_key": {
+          "type": "string"
+        },
+        "matching_key": {
+          "type": "string"
+        },
+        "corpus": {
+          "$ref": "#/definitions/valueOrPath"
+        },
+        "corpus_search_key": {
+          "type": "string"
+        },
+        "corpus_id_key": {
+          "type": "string"
+        },
+        "master_data_type": {
+          "type": "string"
+        },
+        "similarity_threshold": {
+          "type": "string"
+        },
+        "number_of_matches": {
+          "type": "string"
+        },
+        "scorer": {
+          "type": "string",
+          "enum": ["ratio", "partialRatio", "weightedRatio", "tokenSetRatio", "tokenSortRatio", "tokenSetPartialRatio", "tokenSortPartialRatio"],
+          "default": "tokenSetRatio"
+        },
+        "stop_words": {
+          "$ref": "#/definitions/valueOrPath"
+        }
+      },
+      "required": ["corpus", "corpus_search_key", "corpus_id_key", "master_data_type", "similarity_threshold", "number_of_matches", "scorer", "stop_words"],
       "additionalProperties": false
     },
     "regex_extract": {

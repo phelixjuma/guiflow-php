@@ -3,6 +3,7 @@
 namespace PhelixJuma\GUIFlow\Actions;
 
 use PhelixJuma\GUIFlow\Utils\DataValidator;
+use PhelixJuma\GUIFlow\Utils\FuzzySearch;
 use  Swoole\Coroutine;
 use PhelixJuma\GUIFlow\Exceptions\UnknownOperatorException;
 use PhelixJuma\GUIFlow\Utils\DataJoiner;
@@ -167,6 +168,10 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::fuzzy_extract_one(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_extract_n') {
             $newValue = Utils::fuzzy_extract_n(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_search') {
+            $newValue = (new FuzzySearch())->fuzzySearch(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'fuzzy_match') {
+            $newValue = (new FuzzySearch())->fuzzyMatch(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'regex_extract') {
             $newValue = Utils::regex_extract(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'transform') {
