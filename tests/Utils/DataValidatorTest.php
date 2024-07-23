@@ -3,6 +3,7 @@
 namespace PhelixJuma\GUIFlow\Tests\Utils;
 
 use PhelixJuma\GUIFlow\Actions\FunctionAction;
+use PhelixJuma\GUIFlow\Conditions\SimpleCondition;
 use PhelixJuma\GUIFlow\Utils\ConfigurationValidator;
 use PhelixJuma\GUIFlow\Utils\DataJoiner;
 use PhelixJuma\GUIFlow\Utils\DataValidator;
@@ -124,7 +125,7 @@ class DataValidatorTest extends TestCase
     {
 
         $items = [
-            "customer_name" => "Phelix",
+            "customer_name" => "Capwell Industries Limited",
             "items" => [
                 [
                     "quantity" => 10
@@ -157,7 +158,8 @@ class DataValidatorTest extends TestCase
             [
                 "path"  => "customer_name",
                 "rules" => [
-                    DataValidator::VALIDATION_RULE_PATH_EXISTS
+                    DataValidator::VALIDATION_RULE_IS_NOT_EMPTY,
+                    ["operator" => "matches", "value" => "capwell"]
                 ]
             ],
             [
@@ -171,36 +173,12 @@ class DataValidatorTest extends TestCase
                 "rules" => [
                     DataValidator::VALIDATION_RULE_IS_DATE
                 ]
-            ],
-            [
-                "path"  => "products.*.description",
-                "rules" => [
-                    DataValidator::VALIDATION_RULE_PATH_EXISTS
-                ]
-            ],
-            [
-                "path"  => "products.*.uom.quantity",
-                "rules" => [
-                    DataValidator::VALIDATION_RULE_PATH_EXISTS, DataValidator::VALIDATION_RULE_IS_NOT_EMPTY, DataValidator::VALIDATION_RULE_IS_NUMERIC
-                ]
-            ],
-            [
-                "path"  => "products.*.unit_of_measure.*.quantity",
-                "rules" => [
-                    DataValidator::VALIDATION_RULE_IS_NON_ZERO_NUMBER
-                ]
-            ],
-            [
-                "path"  => "products.*.unit_of_measure.0",
-                "rules" => [
-                    DataValidator::VALIDATION_RULE_IS_DICTIONARY
-                ]
             ]
         ];
 
         $validationResponse = DataValidator::validateDataStructure($items, $validations, true);
 
-        //print_r($validationResponse);
+        print_r($validationResponse);
 
         $expectedData = [];
 

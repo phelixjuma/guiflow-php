@@ -2,6 +2,8 @@
 
 namespace PhelixJuma\GUIFlow\Utils;
 
+use PhelixJuma\GUIFlow\Workflow;
+
 class DataValidator
 {
 
@@ -491,10 +493,13 @@ class DataValidator
             $validationStatus = [];
 
             foreach ($rules as $rule) {
+
+                $key = is_string($rule) ? $rule : json_encode($rule);
+
                 if ($rule == self::VALIDATION_RULE_IS_LIST || $rule == self::VALIDATION_RULE_IS_DICTIONARY) {
-                    $validationStatus[$rule] = ['rule' => $rule, 'status' => self::validateComplexStructure($pathData, $rule)];
+                    $validationStatus[$key] = ['rule' => $rule, 'status' => self::validateComplexStructure($pathData, $rule)];
                 } else {
-                    $validationStatus[$rule] = ['rule' => $rule, 'status' => self::applyRule($pathData, $rule)];
+                    $validationStatus[$key] = ['rule' => $rule, 'status' => self::applyRule($pathData, $rule)];
                 }
             }
 
@@ -542,6 +547,7 @@ class DataValidator
                 return !is_null($value);
 
             case self::VALIDATION_RULE_IS_NOT_EMPTY:
+                $value = is_string($value) ? trim($value) : $value;
                 return !empty($value) || $value === 0;
 
             case self::VALIDATION_RULE_IS_NUMERIC:
@@ -563,7 +569,7 @@ class DataValidator
                 return Utils::isObject($value);
 
             default:
-                return false;
+                return Workflow::evaluateCondition($value, $rule, true);
         }
     }
 
