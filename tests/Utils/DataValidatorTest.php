@@ -125,7 +125,7 @@ class DataValidatorTest extends TestCase
     {
 
         $items = [
-            "customer_name" => "Capwell Industries Limited",
+            "customer_name" => "Naivas Ltd",
             "items" => [
                 [
                     "quantity" => 10
@@ -159,20 +159,23 @@ class DataValidatorTest extends TestCase
                 "path"  => "customer_name",
                 "rules" => [
                     DataValidator::VALIDATION_RULE_IS_NOT_EMPTY,
-                    ["operator" => "matches", "value" => "capwell"]
-                ]
+                    ["operator" => "not similar_to", "value" => "Capwell Industries Limited", "similarity_threshold" => 80]
+                ],
+                "description" => "Customer Name must not be empty and must not have a value similar to Capwell"
             ],
             [
                 "path"  => "delivery_location",
                 "rules" => [
                     DataValidator::VALIDATION_RULE_PATH_EXISTS
-                ]
+                ],
+                "description" => "Delivery Location entity must exist"
             ],
             [
                 "path"  => "delivery_date",
                 "rules" => [
                     DataValidator::VALIDATION_RULE_IS_DATE
-                ]
+                ],
+                "description" => "Delivery Date entity must be a valid date format"
             ]
         ];
 

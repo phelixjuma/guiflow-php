@@ -182,6 +182,11 @@ class SimpleCondition implements ConditionInterface
                         return $fuzz->tokenSortPartialRatio($pathValue, $value) >= $similarityThreshold;
                     }
                     return $fuzz->partialRatio($pathValue, $value) >= $similarityThreshold;
+                case 'not similar_to':
+                    if ($tokenizeSimilarity) {
+                        return $fuzz->tokenSortPartialRatio($pathValue, $value) < $similarityThreshold;
+                    }
+                    return $fuzz->partialRatio($pathValue, $value) < $similarityThreshold;
                 case 'validates':
                     return DataValidator::validateDataStructure($pathValue, $value, false);
                 case 'not validates':

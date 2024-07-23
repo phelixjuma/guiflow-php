@@ -312,183 +312,18 @@ class DataValidator
         return strtotime($formattedDate) === $timestamp;
     }
 
-    /**
-     * @param $data
-     * @param $validations
-     * @param $verbose
-     * @return array|bool
-     */
-    public static function validateDataStructure_($data, $validations, $verbose=true): bool|array
-    {
-
-        $validationResponse = [];
-
-        foreach ($validations as $validation) {
-
-            // Get the validation path and rules
-            $path = $validation['path'];
-            $rules = $validation['rules'];
-
-            // We get the path
-            $pathData = PathResolver::getValueByPath($data, $path);
-
-            $validationResponse[$path]['value'] = $pathData;
-
-            $validations = [];
-            foreach ($rules as $rule) {
-
-                $validations[$rule]['rule'] = $rule;
-
-                // Check if path exists
-                if ($rule == self::VALIDATION_RULE_PATH_EXISTS) {
-                    if (is_array($pathData)) {
-                        $status = true;
-                        foreach ($pathData as $pData) {
-                            if (is_null($pData)) {
-                                $status = false;
-                                break;
-                            }
-                        }
-                        $validations[$rule]['status'] = $status;
-                    } else {
-                        $validations[$rule]['status'] = !is_null($pathData);
-                    }
-                }
-                // Check if value is empty or not
-                if ($rule == self::VALIDATION_RULE_IS_NOT_EMPTY) {
-                    if (is_array($pathData)) {
-                        $status = true;
-                        foreach ($pathData as $pData) {
-                            if (empty($pData) && $pData != 0) {
-                                $status = false;
-                                break;
-                            }
-                        }
-                        $validations[$rule]['status'] = $status;
-                    } else {
-                        $validations[$rule]['status'] = !empty($pathData) || $pathData == 0;
-                    }
-                }
-                // check if value is numeric
-                if ($rule == self::VALIDATION_RULE_IS_NUMERIC) {
-                    if (is_array($pathData)) {
-                        $status = true;
-                        foreach ($pathData as $pData) {
-                            if (!is_numeric($pData)) {
-                                $status = false;
-                                break;
-                            }
-                        }
-                        $validations[$rule]['status'] = $status;
-                    } else {
-                        $validations[$rule]['status'] = is_numeric($pathData);
-                    }
-                }
-                // check if value is non zero
-                if ($rule == self::VALIDATION_RULE_IS_NON_ZERO_NUMBER) {
-                    if (is_array($pathData)) {
-                        $status = true;
-                        foreach ($pathData as $pData) {
-                            if (!is_numeric($pData) || $pData == 0) {
-                                $status = false;
-                                break;
-                            }
-                        }
-                        $validations[$rule]['status'] = $status;
-                    } else {
-                        $validations[$rule]['status'] = is_numeric($pathData) && $pathData != 0;
-                    }
-                }
-                // check if value is email
-                if ($rule == self::VALIDATION_RULE_IS_EMAIL) {
-                    if (is_array($pathData)) {
-                        $status = true;
-                        foreach ($pathData as $pData) {
-                            if (!filter_var($pData, FILTER_VALIDATE_EMAIL)) {
-                                $status = false;
-                                break;
-                            }
-                        }
-                        $validations[$rule]['status'] = $status;
-                    } else {
-                        $validations[$rule]['status'] = filter_var($pathData, FILTER_VALIDATE_EMAIL);
-                    }
-                }
-                // check if value is date
-                if ($rule == self::VALIDATION_RULE_IS_DATE) {
-                    if (is_array($pathData)) {
-                        $status = true;
-                        foreach ($pathData as $pData) {
-                            if (!self::isValidDate($pData)) {
-                                $status = false;
-                                break;
-                            }
-                        }
-                        $validations[$rule]['status'] = $status;
-                    } else {
-                        $validations[$rule]['status'] = self::isValidDate($pathData);
-                    }
-                }
-                // check if value is list
-                if ($rule == self::VALIDATION_RULE_IS_LIST) {
-                    if (is_array($pathData)) {
-                        $status = true;
-                        foreach ($pathData as $pData) {
-                            if (!Utils::isList($pData)) {
-                                $status = false;
-                                break;
-                            }
-                        }
-                        $validations[$rule]['status'] = $status;
-                    } else {
-                        $validations[$rule]['status'] = Utils::isList($pathData);
-                    }
-                }
-                // check if value is dictionary
-                if ($rule == self::VALIDATION_RULE_IS_DICTIONARY) {
-                    if (is_array($pathData)) {
-                        $status = true;
-                        foreach ($pathData as $pData) {
-                            if (!Utils::isObject($pData)) {
-                                $status = false;
-                                break;
-                            }
-                        }
-                        $validations[$rule]['status'] = $status;
-                    } else {
-                        $validations[$rule]['status'] = Utils::isObject($pathData);
-                    }
-                }
-            }
-            $validationResponse[$path]['validations'] = array_values($validations);
-
-
-        }
-
-        if ($verbose) {
-            return $validationResponse;
-        }
-        // non-verbose response returns true or false
-        foreach ($validationResponse as $response) {
-            foreach ($response['validations'] as $validation) {
-                if (!$validation['status']) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     public static function validateDataStructure($data, $validations, $verbose = true): bool|array
     {
         $validationResponse = [];
 
         foreach ($validations as $validation) {
+
             $path = !empty($validation['path']) ? $validation['path'] : (!empty($validation['data_path']) ? $validation['data_path'] : "");
             $rules = $validation['rules'];
 
             $pathData = PathResolver::getValueByPath($data, $path);
             $validationResponse[$path]['value'] = $pathData;
+            $validationResponse[$path]['description'] = $validation['description'] ?? "";
 
             $validationStatus = [];
 
