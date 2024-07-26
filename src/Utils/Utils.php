@@ -288,6 +288,8 @@ class Utils
     {
         $replacement = str_ireplace("[space]", " ", $replacement);
 
+        $pattern = "/".self::custom_preg_escape($pattern)."/i";
+
         $newData = null;
         if (is_array($data)) {
             foreach ($data as $d) {

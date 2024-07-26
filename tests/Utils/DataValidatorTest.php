@@ -131,7 +131,6 @@ class DataValidatorTest extends TestCase
                     "quantity" => 10
                 ]
             ],
-            "delivery_date" => "223",
             "products" => [
                 [
                     "description" => "item 1",
@@ -154,33 +153,43 @@ class DataValidatorTest extends TestCase
             ]
         ];
 
+        $items = json_decode('{"purchase_order_number":"24026726","order_date":"2024-07-24","ordered_by_name":"PHILIP CAROLAN","customer_name":"CARREFOUR MARKET GARDEN CITY MAL","customer_email":"","customer_phone":"254728600531","delivery_location":"SM KEN NBO GARDEN CITY MALL","seller_name":"Kenchic","items":[{"serial_number":"1","item_bar_code":"","description":"NS FRESH CHICKEN BREAST BONELESS PK","unit_of_measure":[{"selling_quantity":"30","selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2024-07-29"}]},{"serial_number":"2","item_bar_code":"","description":"NS FRESH CHICKEN BREAST BONELESS PK","unit_of_measure":[{"selling_quantity":"301","selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2024-07-29"}]}],"pack_configuration":{"pack_size":"","unit_size":"0"},"currency":"KES","total_number_of_items":"2","total_number_of_extracted_items":"2","sub_total":"","total_amount":"","vat_no":""}', JSON_FORCE_OBJECT);
+
         $validations = [
             [
-                "path"  => "customer_name",
-                "rules" => [
-                    DataValidator::VALIDATION_RULE_IS_NOT_EMPTY,
-                    ["operator" => "not similar_to", "value" => "Capwell Industries Limited", "similarity_threshold" => 80]
-                ],
-                "description" => "Customer Name must not be empty and must not have a value similar to Capwell"
+                "path"          => "purchase_order_number", "rules" => [DataValidator::VALIDATION_RULE_PATH_EXISTS],
+                "description"   => "Purchase Order Number must be extracted and included in the response as per the schema"
             ],
             [
-                "path"  => "delivery_location",
-                "rules" => [
-                    DataValidator::VALIDATION_RULE_PATH_EXISTS
-                ],
-                "description" => "Delivery Location entity must exist"
+                "path"          => "customer_name",
+                "rules"         => [DataValidator::VALIDATION_RULE_IS_NOT_EMPTY, ["operator" => "not similar_to", "value" => 'Kenchic', "similarity_threshold" => 80]],
+                "description"   => "Customer Name cannot be empty and must not be similar to 'Kenchic'. Allowable entities are name of a business, business branch or person. If not found, set value to be same as 'ordered_by_name'"
             ],
             [
-                "path"  => "delivery_date",
-                "rules" => [
-                    DataValidator::VALIDATION_RULE_IS_DATE
-                ],
-                "description" => "Delivery Date entity must be a valid date format"
+                "path"          => "delivery_location", "rules" => [DataValidator::VALIDATION_RULE_PATH_EXISTS],
+                "description"   => "Delivery Location must be extracted and included in the response as per the schema"
+            ],
+            [
+                "path"          => "delivery_date", "rules" => [DataValidator::VALIDATION_RULE_PATH_EXISTS, DataValidator::VALIDATION_RULE_IS_NOT_EMPTY, DataValidator::VALIDATION_RULE_IS_DATE],
+                "description"   => "Delivery Date is mandatory and must be extracted and included in the response as per the instructions. It must also be a valid date in the format of YYY-MM-DD. First check for common phrases and tags indicating delivery date and if none exists, set it as the current date"
+            ],
+            [
+                "path"          => "items", "rules" => [DataValidator::VALIDATION_RULE_IS_LIST],
+                "description"   => "Items (list of products) must be an array as per the schema"
+            ],
+            [
+                "path"          => "items.*.description", "rules" => [DataValidator::VALIDATION_RULE_IS_NOT_EMPTY],
+                "description"   => "For every product/item extracted, the description cannot be empty"
+            ],
+            [
+                "path"          => "items.*.unit_of_measure.*.selling_quantity", "rules" => [DataValidator::VALIDATION_RULE_IS_NUMERIC],
+                "description"   => "For every product/item extracted, the selling quantity must be a numeric"
             ]
         ];
 
         $validationResponse = DataValidator::validateDataStructure($items, $validations, true);
 
+        //print($validationResponse ? "True" : "False");
         print_r($validationResponse);
 
         $expectedData = [];
