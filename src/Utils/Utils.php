@@ -298,7 +298,7 @@ class Utils
         } else {
             $newData = preg_replace($pattern, $replacement, $data);
         }
-        return $newData;
+        return trim($newData);
     }
 
     /**
