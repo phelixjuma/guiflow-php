@@ -56,5 +56,44 @@
         }
       }
     ]
+  },
+  {
+    "rule": "Remove discontinued items",
+    "stage": "remove_discontinued_items",
+    "description": "",
+    "dependencies": [],
+    "skip": "0",
+    "condition": "always",
+    "actions": [
+      {
+        "action": "function",
+        "stage": "remove_discontinued_items",
+        "description": "Filter out discontinued items",
+        "dependencies": [],
+        "skip": "0",
+        "params": {
+          "path": "items",
+          "function": "filter",
+          "args": {
+            "filter_criteria": {
+              "operator": "AND",
+              "conditions": [
+                {
+                  "term": "rice",
+                  "mode": "not matches",
+                  "key": "original_value.name",
+                  "similarity_threshold": "",
+                  "term_exclusion_pattern": "",
+                  "value_exclusion_pattern": ""
+                }
+              ]
+            }
+          },
+          "newField": "",
+          "strict": "0",
+          "condition": ""
+        }
+      }
+    ]
   }
 ]

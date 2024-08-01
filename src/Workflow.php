@@ -103,6 +103,12 @@ class Workflow
      */
     public function run(&$data, bool $parallelize = false): void
     {
+        if (Utils::isList($data)) {
+            foreach ($data as $index => &$d) {
+                $d['workflow_list_position'] = $index;
+            }
+        }
+
         if ($parallelize) {
             $this->runWorkFlowParallel($data);
         } else {
@@ -130,16 +136,36 @@ class Workflow
 
             $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 
+            $inputDataCopy = unserialize(serialize($inputData));
+            $inputData = [];
+
             foreach ($config as $rule) {
 
                 try {
 
-                    if (Utils::isObject($inputData)) {
-                        $this->executeRuleSerial($rule, $inputData);
+                    if (Utils::isObject($inputDataCopy)) {
+
+                        $this->executeRuleSerial($rule, $inputDataCopy);
+
+                        if (self::isObject($inputDataCopy)) {
+                            $inputData[] = $inputDataCopy;
+                        } else {
+                            $inputData = $inputDataCopy;
+                        }
+
                     } else {
-                        foreach ($inputData as $index => &$data) {
-                            $data['workflow_list_position'] = $index;
+                        foreach ($inputDataCopy as &$data) {
+
                             $this->executeRuleSerial($rule, $data);
+
+                            if (self::isObject($data)) {
+                                $inputData[] = $data;
+                            } else {
+                                // For a split response, we flatten by adding each item to data
+                                foreach ($data as $d) {
+                                    $inputData[] = $d;
+                                }
+                            }
                         }
                     }
 
@@ -175,20 +201,38 @@ class Workflow
 
             $this->workflowDAG = new DAG();
 
+            $inputDataCopy = unserialize(serialize($inputData));
+            $inputData = [];
+
             foreach ($config as $ruleIndex => $rule) {
 
-                if (Utils::isObject($inputData)) {
+                if (Utils::isObject($inputDataCopy)) {
 
-                    $dataManager = new SharedDataManager($inputData);
+                    $dataManager = new SharedDataManager($inputDataCopy);
                     $this->executeRuleParallel($rule, $ruleIndex, $dataManager);
 
+                    if (self::isObject($inputDataCopy)) {
+                        $inputData[] = $inputDataCopy;
+                    } else {
+                        $inputData = $inputDataCopy;
+                    }
+
                 } else {
-                    foreach ($inputData as $dataIndex => &$data) {
+                    foreach ($inputDataCopy as $dataIndex => &$data) {
 
                         $data['workflow_list_position'] = $dataIndex;
 
                         $dataManager = new SharedDataManager($data);
                         $this->executeRuleParallel($rule, $ruleIndex, $dataManager);
+
+                        if (self::isObject($data)) {
+                            $inputData[] = $data;
+                        } else {
+                            // For a split response, we flatten by adding each item to data
+                            foreach ($data as $d) {
+                                $inputData[] = $d;
+                            }
+                        }
 
                     }
                 }

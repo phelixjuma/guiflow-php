@@ -27,8 +27,13 @@ class GUIFlowTest extends TestCase
         //print "\nExecution Time:\n";
         //print_r($workflow->workflowExecutor->getResults()[0]->getExecutionTime());
 
-        print "\nAfter\n";
-        print_r($data);
+        if (!empty($workflow->errors)) {
+            print "\nFound errors:\n";
+            print_r($workflow->errors);
+        } else {
+            print "\nAfter\n";
+            print_r($data);
+        }
 
         //print_r($data);
 
