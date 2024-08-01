@@ -1,1 +1,60 @@
-[]
+[
+  {
+    "rule": "For Mega Wholesalers, we get the warehouse region for customer matching",
+    "description": "",
+    "stage": "mega_wholesalers_prepare_customer_name",
+    "dependencies": [],
+    "skip": "0",
+    "condition": "always",
+    "actions": [
+      {
+        "description": "",
+        "stage": "jumra_split_order_by_item_classification",
+        "dependencies": [
+          "jumra_get_item_classification"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "",
+          "function": "split",
+          "args": {
+            "split_path": "items",
+            "criteria_path": "items.*.original_value.name"
+          },
+          "newField": "",
+          "strict": "",
+          "condition": ""
+        }
+      },
+      {
+        "description": "Add customer section to name",
+        "stage": "eastmatt_add_customer_section_to_name",
+        "dependencies": [
+          "eastmatt_get_customer_section"
+        ],
+        "skip": "0",
+        "action": "function",
+        "params": {
+          "path": "",
+          "function": "concat",
+          "args": {
+            "data_to_concat": [
+              {
+                "path": "customer_name"
+              },
+              {
+                "path": "items.0.original_value.name"
+              }
+            ],
+            "separator": "",
+            "enclosure": "brackets"
+          },
+          "newField": "customer_name",
+          "strict": "",
+          "condition": ""
+        }
+      }
+    ]
+  }
+]

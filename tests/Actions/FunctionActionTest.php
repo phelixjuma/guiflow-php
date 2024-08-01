@@ -1949,15 +1949,17 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testTemplateParser()
+    public function testTemplateParser()
     {
         $data = [
-            "text" => "Sent By: Dennis Mburu\nEmail: dennis.mburu@javahouseafrica.com\nEmail Subject: Re: JAVA ORDER\nEmail Body:\nGood afternoon Lorna,\n\nI trust you are well, find below order to supply as indicated next week.\n\n| | Monday 15th July 2024 | |\n|---|---|---|\n| THIGH BONELESS | 50 kgs | fresh |\n| STAFF CHICKEN | nil | FROZEN |\n| PIE MEAT | 72 kgs | fresh |\n| CHICKEN BREAST | 120 kgs | fresh |\n| CHICKEN WINGS | 150 kgs | fresh |\n| MATTON | | NIL | |\n| GIZZARD | | nil | |\n| HALF CHICKEN CUT | | 640 pcs | fresh |\n| | Tuesday 16th July 2024 | | fresh |\n| CHICKEN WINGS | | 200 kgs | CHILLED |\n| STAFF CHICKEN | | | FROZEN |\n| PIE MEAT | 100 kgs | | FROZEN |\n| THIGH BONELESS FRESH | 80 kgs | fresh | FROZEN |\n| CHICKEN BREAST | 200 kgs | FRESH | FROZEN |\n| HALF CHICKEN CUT | | 480 PCS | fresh |\n| | | Wednesday 17th July 2024 | |\n| STAFF CHICKEN | | | |\n| CHICKEN WINGS | | 250 KGS | fresh |\n| HALF CHICKEN CUT | | 400 PCS | fresh |\n| PIE MEAT | | 72 kgs | chilled |\n| THIGH BONELESS FRESH | | 80 kgs | fresh |\n| CHICKEN BREAST | 200 KGS | fresh | fresh |\n| | | Thursday 18th July 2024 | |\n| THIGH BONELESS FRESH | | 80 kgs | fresh |\n| HALF CHICKEN CUT | | 400 pcs | chilled |\n| PIE MEAT | | 72 KGS | CHILLED |\n| CHICKEN WINGS | | 200 kgs | CHILLED |\n| CHICKEN BREAST | | 200 kgs | fresh |\n| | Friday 19th July 2024 | | fresh |\n| HALF CHICKEN CUT | | 880 PCS | fresh |\n| PIE MEAT | | 72 KGS | FROZEN |\n| THIGH BONELESS FRESH | | 150KGS | chilled |\n| CHICKEN WINGS | | 250 KGS | fresh |\n| CHICKEN BREAST | 350 kgs | fresh | fresh |\n| | Saturday 20th July 2024 | | fresh |\n| CHICKEN BREAST | | 400 KGS | chilled |\n| CHICKEN WINGS | | 450 KGS | |\n| PIE MEAT | 144 KGS | fresh | |\n| LIVER | NIL | | |\n| THIGH BONELESS FRESH | 120 kgs | fresh | |\n| HALF CHICKEN CUT | | 480 pcs | fresh |\n\nRegards,\n\n| \\| Dennis Mburu \\| \\|---\\| \\| Category Buyer \\| |\n|:--|\n| |\n| | \\| T: \\| +254 712 310 045 \\| \\| E: \\| \\| \\| W: \\| \\| |\n|:--|\n| \\| ABC Place, Waiyaki Way, Nairobi, Kenya \\\\| \\| |\n|:--|\n\n| |\n|---|\n\nCAUTION: This email originated outside of Java House. Exercise caution when opening attachments, clicking links, providing information or passwords and handling payments.\n\nHi Dennis,\n\nThis is noted.\n\n*Kind regards,"
+            "text" => "Email Subject: Purchase order Confirmation: P021751369 - KENCHIC LIMITED :BRANCH-PRESTIGE\n Email Body:\n Dear KENCHIC LIMITED, \n\nPlease find attached Purchase Order for supply. \nKindly deliver on the specified date to PRESTIGE. \nRegards, \nNaivas Team."
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("text", [$this, 'parse_template'], ['template' => "Sent By:\s*{{sender_name}}[\\n\\r]Email:(?:.*)@{{email_domain}}\.(?:.*?)[\\n\\r]\s*Email Subject:{{email_subject}}\\s*[\\n\\r]", 'config' => [['non_greedy' => '1'], ['non_greedy' => '1']]], "template_data");
+        $pattern = "Sent By:\s*{{sender_name}}[\n\r]Email:(?:.*)@{{email_domain}}\.(?:.*?)[\n\r]\s*Email Subject:{{email_subject}}[\n\r]";
+
+        $action = new FunctionAction("text", [$this, 'parse_template'], ['template' => $pattern, 'config' => [['non_greedy' => '1'], ['non_greedy' => '1'], ['non_greedy' => '1']]], "template_data");
 
         $action->execute($data);
 
