@@ -109,15 +109,16 @@ class FunctionAction implements ActionInterface
 
             list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
 
-            foreach ($currentData as &$value) {
+            if (!empty($currentData)) {
+                foreach ($currentData as &$value) {
 
-                try {
-                    (new FunctionAction($path, [$this->function[0], $function], $args, $newField, $strict, $condition))->execute($value);
-                } catch (\Exception|\Throwable $e) {
-                    //print "\nError in map function: ".$e->getMessage()."\n";
+                    try {
+                        (new FunctionAction($path, [$this->function[0], $function], $args, $newField, $strict, $condition))->execute($value);
+                    } catch (\Exception|\Throwable $e) {
+                        //print "\nError in map function: ".$e->getMessage()."\n";
+                    }
                 }
             }
-
             $newValue = $currentData;
 
         } elseif (isset($this->function[1]) && $this->function['1'] == 'map_parallel') {

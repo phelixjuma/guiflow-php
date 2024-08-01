@@ -1044,7 +1044,9 @@ class Utils
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
                     $replace = str_ireplace("[space]", " ", $replace);
 
-                    $value = preg_replace($pattern, $replace, $value);
+                    if (!empty($value)) {
+                        $value = preg_replace($pattern, $replace, $value);
+                    }
 
                     if (preg_last_error() !== PREG_NO_ERROR) {
                         //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));

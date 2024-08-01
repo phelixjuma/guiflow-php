@@ -451,8 +451,8 @@ class Workflow
                 } catch (\Exception|\Throwable $e ) {
                     $error = [
                         'action'    => $action['stage'],
-                        'message' => $e->getMessage(),
-                        'trace' => $e->getTrace()
+                        'message' => "{$e->getMessage()} on line {$e->getLine()} of file {$e->getFile()}. Error code is {$e->getCode()}",
+                        'trace' => $e->getTraceAsString()
                     ];
                     $this->errors[] = $error;
                 }

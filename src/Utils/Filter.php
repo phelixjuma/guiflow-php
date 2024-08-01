@@ -159,12 +159,16 @@ class Filter
     }
 
     /**
-     * @param array $array
+     * @param $array
      * @param $filters
-     * @return array
+     * @return array|mixed
      */
-    public static function filterArray(array $array, $filters): array
+    public static function filterArray($array, $filters)
     {
+
+        if (empty($array)) {
+            return $array;
+        }
 
         foreach ($array as $key => $value) {
 
