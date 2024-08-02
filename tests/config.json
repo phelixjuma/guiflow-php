@@ -1,5 +1,41 @@
 [
   {
+    "rule": "Set order date, if empty",
+    "description": "",
+    "stage": "set_current_date_as_order_date",
+    "dependencies": [],
+    "skip": "0",
+    "condition": {
+      "path": "order_date",
+      "operator": "not exists"
+    },
+    "actions": [
+      {
+        "description": "",
+        "stage": "set_current_date_as_order_date",
+        "dependencies": [],
+        "action": "function",
+        "skip": "0",
+        "params": {
+          "path": "order_date",
+          "function": "transform",
+          "args": {
+            "transformer": "string_to_date_time",
+            "transformer_args": {
+              "format": "Y-m-d H:i:s",
+              "pre_modifier": "Today",
+              "post_modifier": ""
+            },
+            "transformer_target_keys": []
+          },
+          "newField": "",
+          "strict": "",
+          "condition": ""
+        }
+      }
+    ]
+  },
+  {
     "rule": "For Mega Wholesalers, we get the warehouse region for customer matching",
     "description": "",
     "stage": "mega_wholesalers_prepare_customer_name",

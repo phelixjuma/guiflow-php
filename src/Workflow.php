@@ -52,55 +52,6 @@ class Workflow
      * @param bool $parallelize
      * @return void
      */
-    public function run_(&$data, bool $parallelize = false): void
-    {
-
-        $dataCopy = $data;
-        $data = [];
-
-        if (is_array($dataCopy)) {
-            if (self::isObject($dataCopy)) {
-
-                $dataCopy['workflow_list_position'] = 0;
-
-                // For an object, we transform it
-                $this->runWorkFlowOnObject($dataCopy, $parallelize);
-
-                // Set the response into data: checking if the response has been split or not.
-                if (self::isObject($dataCopy)) {
-                    $data[] = $dataCopy;
-                } else {
-                    $data = $dataCopy;
-                }
-
-            } else {
-                // it's an array, we loop
-                foreach ($dataCopy as $index => $item) {
-
-                    $item['workflow_list_position'] = $index;
-
-                    $this->runWorkFlowOnObject($item, $parallelize);
-
-                    // Set the response into data: checking if the response has been split or not.
-                    if (self::isObject($item)) {
-                        $data[] = $item;
-                    } else {
-                        // For a split response, we flatten by adding each item to data
-                        foreach ($item as $it) {
-                            $data[] = $it;
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-    /**
-     * @param $data
-     * @param bool $parallelize
-     * @return void
-     */
     public function run(&$data, bool $parallelize = false): void
     {
         if (Utils::isList($data)) {
@@ -116,19 +67,6 @@ class Workflow
         }
     }
 
-    /**
-     * @param $data
-     * @param $isParallel
-     * @return void
-     */
-    private function runWorkFlowOnObject(&$data, $isParallel = false) {
-        if ($isParallel) {
-            $this->runWorkFlowOnObjectParallel($data);
-        } else {
-            $this->runWorkFlowOnObjectSerial($data);
-        }
-    }
-
     private function runWorkFlowSerial(&$inputData): void
     {
 
@@ -136,37 +74,30 @@ class Workflow
 
             $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 
-            $inputDataCopy = unserialize(serialize($inputData));
-            $inputData = [];
-
             foreach ($config as $rule) {
 
                 try {
 
-                    if (Utils::isObject($inputDataCopy)) {
-
-                        $this->executeRuleSerial($rule, $inputDataCopy);
-
-                        if (self::isObject($inputDataCopy)) {
-                            $inputData[] = $inputDataCopy;
-                        } else {
-                            $inputData = $inputDataCopy;
-                        }
-
+                    if (Utils::isObject($inputData)) {
+                        $this->executeRuleSerial($rule, $inputData);
                     } else {
-                        foreach ($inputDataCopy as &$data) {
+                        $tempData = [];
+                        foreach ($inputData as &$data) {
 
                             $this->executeRuleSerial($rule, $data);
 
-                            if (self::isObject($data)) {
-                                $inputData[] = $data;
+                            if (Utils::isObject($data)) {
+                                // An object. Set to temp data
+                                $tempData[] = $data;
                             } else {
                                 // For a split response, we flatten by adding each item to data
                                 foreach ($data as $d) {
-                                    $inputData[] = $d;
+                                    $tempData[] = $d;
                                 }
                             }
                         }
+                        // Set the temp data to input data
+                        $inputData = $tempData;
                     }
 
                 } catch (\Exception|\Throwable $e ) {
@@ -201,210 +132,32 @@ class Workflow
 
             $this->workflowDAG = new DAG();
 
-            $inputDataCopy = unserialize(serialize($inputData));
-            $inputData = [];
-
             foreach ($config as $ruleIndex => $rule) {
 
-                if (Utils::isObject($inputDataCopy)) {
+                if (Utils::isObject($inputData)) {
 
-                    $dataManager = new SharedDataManager($inputDataCopy);
+                    $dataManager = new SharedDataManager($inputData);
                     $this->executeRuleParallel($rule, $ruleIndex, $dataManager);
 
-                    if (self::isObject($inputDataCopy)) {
-                        $inputData[] = $inputDataCopy;
-                    } else {
-                        $inputData = $inputDataCopy;
-                    }
-
                 } else {
-                    foreach ($inputDataCopy as $dataIndex => &$data) {
+                    $tempData = [];
+                    foreach ($inputData as $dataIndex => &$data) {
 
                         $data['workflow_list_position'] = $dataIndex;
 
                         $dataManager = new SharedDataManager($data);
                         $this->executeRuleParallel($rule, $ruleIndex, $dataManager);
 
-                        if (self::isObject($data)) {
-                            $inputData[] = $data;
+                        if (Utils::isObject($data)) {
+                            $tempData[] = $data;
                         } else {
                             // For a split response, we flatten by adding each item to data
                             foreach ($data as $d) {
-                                $inputData[] = $d;
-                            }
-                        }
-
-                    }
-                }
-            }
-
-            // Initialize the task executor
-            $this->workflowExecutor = new TaskExecutor($this->workflowDAG);
-            $this->workflowExecutor->execute();
-
-        } catch (\Exception|\Throwable $e ) {
-            $this->errors[] = $e->getMessage();
-        }
-    }
-
-    /**
-     * @param $data
-     * @return void
-     */
-    private function runWorkFlowOnObjectSerial(&$data): void
-    {
-
-        try {
-
-            $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
-
-            foreach ($config as $rule) {
-
-                try {
-
-                    $skip = $rule['skip'] ?? 0;
-                    $condition = $rule['condition'];
-                    $actions = $rule['actions'];
-
-                    // We execute this rule if it is not skipped and the conditions are true
-                    if ($skip != 1 && self::evaluateCondition($data, $condition)) {
-                        // Execute the actions
-                        foreach ($actions as $action) {
-                            try {
-
-                                $skipAction = $action['skip'] ?? 0;
-
-                                // We execute the action, if it is not set to be skipped.
-                                if ($skipAction != 1) {
-
-                                    if (self::isObject($data)) {
-                                        $this->executeAction($data, $action);
-                                    } else {
-                                        array_walk($data, function (&$value, $key) use($action) {
-                                            $this->executeAction($value, $action);
-                                        });
-                                    }
-                                }
-
-                            } catch (\Exception|\Throwable $e ) {
-                                $error = [
-                                    'action'    => $action['stage'],
-                                    'message' => $e->getMessage(),
-                                    'trace' => $e->getTrace()
-                                ];
-                                $this->errors[] = $error;
+                                $tempData[] = $d;
                             }
                         }
                     }
-                } catch (\Exception|\Throwable $e ) {
-                    $error = [
-                        'rule'  => $rule['stage'],
-                        'message' => $e->getMessage(),
-                        'trace' => $e->getTrace()
-                    ];
-                    $this->errors[] = $error;
-                }
-            }
-
-        } catch (\Exception|\Throwable $e ) {
-            $error = [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTrace()
-            ];
-            $this->errors[] = $error;
-        }
-    }
-
-    /**
-     * @param $inputData
-     * @return void
-     */
-    private function runWorkFlowOnObjectParallel(&$inputData): void
-    {
-
-        try {
-
-            $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
-
-            $this->workflowDAG = new DAG();
-            $dataManager = new SharedDataManager($inputData);
-
-            foreach ($config as $index => $rule) {
-
-                $skip = $rule['skip'] ?? 0;
-                $ruleStage = "rule_" . (!empty($rule['stage']) ? $rule['stage'] : $index);
-                $ruleDependencies = $rule['dependencies'] ?? [];
-                $condition = $rule['condition'];
-                $actions = $rule['actions'];
-
-                // Define the rule task, which is to evaluate its condition.
-                $ruleTask = new Task($ruleStage, function() use ($ruleStage, $dataManager, $skip, $condition) {
-
-                    // Evaluate the rule's condition to determine if actions should be skipped
-                    $isSkipped = $skip == 1 || !self::evaluateCondition($dataManager->getData(), $condition);
-
-                    return ['isSkipped' => $isSkipped];
-                });
-
-                // Add the rule task to the workflow.
-                $this->workflowDAG->addTask($ruleTask);
-
-                // Add the actions
-                foreach ($actions as $actionIndex => $action) {
-
-                    $actionStage = "action_" . ( !empty($action['stage']) ? $action['stage'] : $actionIndex);
-                    $actionDependencies = $action['dependencies'] ?? [];
-                    $skipAction = $action['skip'] ?? 0;
-
-                    $actionTask = new Task($actionStage, function($parentResults) use ($dataManager,$actionStage, $action, $skipAction) {
-
-                        $shouldSkipRule = array_reduce($parentResults, function($carry, $result) {
-                            return $carry || (isset($result['isSkipped']) && $result['isSkipped']);
-                        }, false);
-
-                        // We must pass data by reference since all transformers must work on the same data
-                        $dataToUse = &$dataManager->getData();
-
-                        if (!$shouldSkipRule && !$skipAction) {
-
-                            // Execute the action logic here if the rule was not skipped
-                            if (self::isObject($dataToUse)) {
-                                $this->executeAction($dataToUse, $action);
-                            } else {
-                                array_walk($dataToUse, function (&$value, $key) use($action) {
-                                    $this->executeAction($value, $action);
-                                });
-                            }
-
-                            // We modify the data manager data
-                            $dataManager->modifyData(function($currentData) use(&$dataToUse) {
-                                return $dataToUse;
-                            });
-
-                        }
-
-                        return $dataToUse;
-                    });
-
-                    // Add the action to the workflow
-                    $this->workflowDAG->addTask($actionTask);
-
-                    // We add the rule as a dependency to this action.
-                    $this->workflowDAG->addParent($actionStage, $ruleStage);
-
-                    // Add Action Task dependencies
-                    if (!empty($actionDependencies)) {
-                        foreach ($actionDependencies as $actionDependency) {
-                            $this->workflowDAG->addParent($actionStage, "action_$actionDependency");
-                        }
-                    }
-                }
-
-                // Add Rule Task dependencies
-                if (!empty($ruleDependencies)) {
-                    foreach ($ruleDependencies as $dependency) {
-                        $this->workflowDAG->addParent($ruleStage, "action_$dependency");
-                    }
+                    $inputData = $tempData;
                 }
             }
 
@@ -439,12 +192,22 @@ class Workflow
                     // We execute the action, if it is not set to be skipped.
                     if ($skipAction != 1) {
 
-                        if (self::isObject($data)) {
+                        if (Utils::isObject($data)) {
                             $this->executeAction($data, $action);
                         } else {
-                            array_walk($data, function (&$value, $key) use($action) {
-                                $this->executeAction($value, $action);
-                            });
+                            $temp = [];
+                            foreach ($data as &$datum) {
+                                $this->executeAction($datum, $action);
+
+                                if (Utils::isObject($datum)) {
+                                    $temp[] = $datum;
+                                } else {
+                                    foreach ($datum as $d) {
+                                        $temp[] = $d;
+                                    }
+                                }
+                            }
+                            $data = $temp;
                         }
                     }
 
@@ -505,12 +268,22 @@ class Workflow
                 if (!$shouldSkipRule && !$skipAction) {
 
                     // Execute the action logic here if the rule was not skipped
-                    if (self::isObject($dataToUse)) {
+                    if (Utils::isObject($dataToUse)) {
                         $this->executeAction($dataToUse, $action);
                     } else {
-                        array_walk($dataToUse, function (&$value, $key) use($action) {
-                            $this->executeAction($value, $action);
-                        });
+                        $temp = [];
+                        foreach ($dataToUse as &$item) {
+                            $this->executeAction($item, $action);
+
+                            if (Utils::isObject($item)) {
+                                $temp[] = $item;
+                            } else {
+                                foreach ($item as $it) {
+                                    $temp[] = $it;
+                                }
+                            }
+                        }
+                        $dataToUse = $temp;
                     }
 
                     // We modify the data manager data
@@ -543,10 +316,6 @@ class Workflow
                 $this->workflowDAG->addParent($ruleStage, "action_$dependency");
             }
         }
-    }
-
-    private static function isObject($data) {
-        return  is_array($data) && array_keys($data) !== range(0, count($data) - 1);
     }
 
     /**
