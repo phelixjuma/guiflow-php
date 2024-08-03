@@ -123,7 +123,7 @@
               "type": "string",
               "enum": [
                 "==", "!=", "gt", "gte", "lt", "lte", "contains","not contains", "matches", "not matches",
-                "regex", "in", "no in", "in list all", "not in list all", "in list any", "not in list any", "like"
+                "regex", "in", "not in", "in list all", "not in list all", "in list any", "not in list any", "like"
               ]
             },
             "value": {
@@ -228,7 +228,7 @@
                   "type": "string",
                   "enum": [
                     "==", "!=", "gt", "gte", "lt", "lte", "contains","not contains", "matches", "not matches",
-                    "regex", "in", "no in", "in list all", "not in list all", "in list any", "not in list any", "like",
+                    "regex", "in", "not in", "in list all", "not in list all", "in list any", "not in list any", "like",
                     "similar_to"
                   ]
                 },
@@ -295,7 +295,7 @@
               "enum": [
                 "==", "!=", ">", ">=", "<", "<=", "in", "not in", "regex", "true", "false", "empty", "not empty",
                 "startswith", "endswith", "similar_to", "gt", "gte", "lt", "lte", "contains","not contains", "matches", "not matches",
-                "no in", "in list all", "not in list all", "in list any", "not in list any", "like"
+                "not in", "in list all", "not in list all", "in list any", "not in list any", "like"
               ]
             },
             "key": {
