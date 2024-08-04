@@ -895,6 +895,13 @@
                 "criteria_path": {
                   "description": "The path that determines the criteria for splitting. Akin to 'groupBy'",
                   "type": "string"
+                },
+                "criteria": {
+                  "$ref": "#/definitions/condition"
+                },
+                "running_total_limit": {
+                  "description": "The max totals per group when doing group by running totals",
+                  "type": "string"
                 }
               },
               "required": [

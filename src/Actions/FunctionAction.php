@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\GUIFlow\Actions;
 
+use PhelixJuma\GUIFlow\Utils\DataSplitter;
 use PhelixJuma\GUIFlow\Utils\DataValidator;
 use PhelixJuma\GUIFlow\Utils\FuzzySearch;
 use  Swoole\Coroutine;
@@ -102,7 +103,7 @@ class FunctionAction implements ActionInterface
         if (isset($this->function[1]) && $this->function['1'] == 'filter') {
             $newValue = Filter::filterArray(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'split') {
-            $newValue = Filter::splitByPath(...$paramValues);
+            $newValue = DataSplitter::split(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'merge') {
             $newValue = Utils::join(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'map') {

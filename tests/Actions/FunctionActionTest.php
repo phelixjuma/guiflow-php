@@ -5,6 +5,7 @@ namespace PhelixJuma\GUIFlow\Tests\Actions;
 use Kuza\Krypton\Framework\Helpers\UtilsHelper;
 use PhelixJuma\GUIFlow\Actions\FunctionAction;
 use PhelixJuma\GUIFlow\Actions\SetValueAction;
+use PhelixJuma\GUIFlow\Utils\DataSplitter;
 use PhelixJuma\GUIFlow\Utils\Filter;
 use PhelixJuma\GUIFlow\Utils\Helpers;
 use PhelixJuma\GUIFlow\Utils\PathResolver;
@@ -563,7 +564,7 @@ class FunctionActionTest extends TestCase
         // Second, we split the orders along products based on scheduled delivery dates. This way, products to be delivered on the same date/day form the same order
         foreach ($data as $bOrder) {
 
-            $splitOrder = Filter::splitByPath($bOrder, 'items', 'items.*.unit_of_measure.0.scheduled_delivery_date_or_day_of_week');
+            $splitOrder = DataSplitter::split($bOrder, '','items', 'items.*.unit_of_measure.0.scheduled_delivery_date_or_day_of_week', null, null);
 
             if (Helpers::isIndexedArray($splitOrder)) {
                 $finalOrdersList = array_merge($finalOrdersList, $splitOrder);
@@ -574,6 +575,66 @@ class FunctionActionTest extends TestCase
         }
 
         print_r($finalOrdersList);
+
+        //$this->assertEquals($data, $expectedData);
+    }
+
+    public function _testSplitByRunningTotalFunction()
+    {
+
+        $data = [
+            'customer' => 'Naivas',
+            'location' => [
+                'address' => 'Kilimani',
+                'region' => 'Nairobi'
+            ],
+            'products' => [
+                [
+                    'name' => 'KFC CHICKEN BREAST',
+                    'unit_of_measure'   => [[
+                        'selling_quantity' => 8,
+                        'scheduled_delivery_date_or_day_of_week' => 'Thursday'
+                    ]],
+                ],
+                [
+                    'name' => 'KFC CHICKEN BREAST FILLETS',
+                    'unit_of_measure'   => [[
+                        'selling_quantity' => 3,
+                        'scheduled_delivery_date_or_day_of_week' => 'Saturday'
+                    ]],
+                ],
+                [
+                    'name' => 'KFC CHICKEN COB 9 PIECE',
+                    'unit_of_measure'   => [[
+                        'selling_quantity' => 60,
+                        'scheduled_delivery_date_or_day_of_week' => 'Tuesday'
+                    ]],
+                ],
+                [
+                    'name' => 'KFC CHICKEN COB 6 PIECE',
+                    'unit_of_measure'   => [[
+                        'selling_quantity' => 12,
+                        'scheduled_delivery_date_or_day_of_week' => 'Thursday'
+                    ]]
+                ],
+                [
+                    'name' => 'KFC CHICKEN COB 12 PIECE',
+                    'unit_of_measure'   => [
+                        [
+                            'selling_quantity' => 30,
+                            'scheduled_delivery_date_or_day_of_week' => 'Saturday'
+                        ]
+                    ],
+                ],
+            ],
+            'total_unit_price' => 500
+        ];
+
+        $action = new FunctionAction("", [$this, 'split'], ['method' => 'running_total', 'split_path' => "products", "criteria_path" => "unit_of_measure.0.selling_quantity", "criteria" => "", "running_total_limit" => 50], '');
+
+        $action->execute($data);
+
+        print_r($data);
 
         //$this->assertEquals($data, $expectedData);
     }
