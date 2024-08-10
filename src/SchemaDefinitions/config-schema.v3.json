@@ -91,269 +91,6 @@
         }
       ]
     },
-    "condition": {
-      "title": "Condition",
-      "oneOf": [
-        {
-          "title": "Always True Condition",
-          "type": "string",
-          "const": "always"
-        },
-        {
-          "title": "No Condition",
-          "type": "string",
-          "const": ""
-        },
-        {
-          "title": "Existence Checker Condition",
-          "type": "object",
-          "properties": {
-            "path": {
-              "type": "string"
-            },
-            "operator": {
-              "type": "string",
-              "enum": [
-                "exists",
-                "not exists"
-              ]
-            }
-          },
-          "required": [
-            "path",
-            "operator"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "title": "True/False Condition",
-          "type": "object",
-          "properties": {
-            "path": {
-              "type": "string"
-            },
-            "operator": {
-              "type": "string",
-              "enum": [
-                "true",
-                "false"
-              ]
-            }
-          },
-          "required": [
-            "path",
-            "operator"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "title": "Simple Condition",
-          "type": "object",
-          "properties": {
-            "path": {
-              "type": "string"
-            },
-            "operator": {
-              "type": "string",
-              "enum": [
-                "==",
-                "!=",
-                "gt",
-                "gte",
-                "lt",
-                "lte",
-                "contains",
-                "not contains",
-                "matches",
-                "not matches",
-                "regex",
-                "in",
-                "not in",
-                "in list all",
-                "not in list all",
-                "in list any",
-                "not in list any",
-                "like",
-                "validates",
-                "not validates"
-              ]
-            },
-            "value": {
-              "$ref": "#/definitions/valueOrPath"
-            }
-          },
-          "required": [
-            "path",
-            "operator",
-            "value"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "title": "Simple Condition for Similarity",
-          "description": "Uses Fuzzy string matching to calculate similarity between strings",
-          "type": "object",
-          "properties": {
-            "path": {
-              "type": "string"
-            },
-            "operator": {
-              "type": "string",
-              "enum": [
-                "similar_to"
-              ]
-            },
-            "value": {
-              "$ref": "#/definitions/valueOrPath"
-            },
-            "similarity_threshold": {
-              "description": "Minimum Fuzzy Ratio between 0-100 (similarity score) for condition to be true",
-              "type": "string"
-            },
-            "tokenize_similarity": {
-              "type": "string",
-              "enum": [
-                "1",
-                "0"
-              ],
-              "default": "0"
-            }
-          },
-          "required": [
-            "path",
-            "operator",
-            "value",
-            "similarity_threshold",
-            "tokenize_similarity"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "title": "Nested Conditions",
-          "type": "object",
-          "properties": {
-            "operator": {
-              "type": "string",
-              "enum": [
-                "AND",
-                "OR"
-              ]
-            },
-            "conditions": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/condition"
-              }
-            }
-          },
-          "required": [
-            "operator",
-            "conditions"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "title": "Join Condition",
-          "type": "object",
-          "properties": {
-            "path": {
-              "type": "string"
-            },
-            "operator": {
-              "type": "string",
-              "not": {
-                "enum": [
-                  "exists",
-                  "not exists"
-                ]
-              }
-            }
-          },
-          "required": [
-            "path",
-            "operator"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "title": "Condition for Set Function (no path)",
-          "type": "object",
-          "oneOf": [
-            {
-              "title": "Simple",
-              "properties": {
-                "operator": {
-                  "type": "string",
-                  "enum": [
-                    "==",
-                    "!=",
-                    "gt",
-                    "gte",
-                    "lt",
-                    "lte",
-                    "contains",
-                    "not contains",
-                    "matches",
-                    "not matches",
-                    "regex",
-                    "in",
-                    "not in",
-                    "in list all",
-                    "not in list all",
-                    "in list any",
-                    "not in list any",
-                    "like",
-                    "similar_to"
-                  ]
-                },
-                "value": {
-                  "$ref": "#/definitions/valueOrPath"
-                }
-              },
-              "required": [
-                "operator",
-                "value"
-              ],
-              "additionalProperties": false
-            },
-            {
-              "title": "Existence Checker",
-              "type": "object",
-              "properties": {
-                "operator": {
-                  "type": "string",
-                  "enum": [
-                    "exists",
-                    "not exists"
-                  ]
-                }
-              },
-              "required": [
-                "operator"
-              ],
-              "additionalProperties": false
-            },
-            {
-              "title": "True/False",
-              "type": "object",
-              "properties": {
-                "operator": {
-                  "type": "string",
-                  "enum": [
-                    "true",
-                    "false"
-                  ]
-                }
-              },
-              "required": [
-                "operator"
-              ],
-              "additionalProperties": false
-            }
-          ]
-        }
-      ]
-    },
     "filterConditions": {
       "title": "Filter Criteria",
       "oneOf": [
@@ -560,7 +297,7 @@
           "default": "1"
         },
         "condition": {
-          "$ref": "#/definitions/condition",
+          "$ref": "#/definitions/Condition",
           "default": ""
         }
       },
@@ -902,7 +639,7 @@
                   "type": "string"
                 },
                 "criteria": {
-                  "$ref": "#/definitions/condition"
+                  "$ref": "#/definitions/Condition"
                 },
                 "running_total_limit": {
                   "description": "The max totals per group when doing group by running totals",
@@ -1081,7 +818,7 @@
                     "type": "object",
                     "properties": {
                       "condition": {
-                        "$ref": "#/definitions/condition"
+                        "$ref": "#/definitions/Condition"
                       },
                       "value": {
                         "type": [
@@ -1160,7 +897,7 @@
                 },
                 "criteria": {
                   "description": "The conditions to be met for the joining to be done. Two datasets are only merged if both meet the criteria",
-                  "$ref": "#/definitions/condition"
+                  "$ref": "#/definitions/Condition"
                 }
               },
               "required": [
@@ -2103,7 +1840,7 @@
                   "description": "The key/field that is to be summated"
                 },
                 "condition": {
-                  "$ref": "#/definitions/condition"
+                  "$ref": "#/definitions/Condition"
                 }
               },
               "required": [
@@ -3221,6 +2958,270 @@
       "unevaluatedProperties": false
     },
 
+    "Condition": {
+      "title": "Condition",
+      "oneOf": [
+        {
+          "title": "Always True Condition",
+          "type": "string",
+          "const": "always"
+        },
+        {
+          "title": "No Condition",
+          "type": "string",
+          "const": ""
+        },
+        {
+          "title": "Existence Checker Condition",
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
+                "exists",
+                "not exists"
+              ]
+            }
+          },
+          "required": [
+            "path",
+            "operator"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "True/False Condition",
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          },
+          "required": [
+            "path",
+            "operator"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Simple Condition",
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
+                "==",
+                "!=",
+                "gt",
+                "gte",
+                "lt",
+                "lte",
+                "contains",
+                "not contains",
+                "matches",
+                "not matches",
+                "regex",
+                "in",
+                "not in",
+                "in list all",
+                "not in list all",
+                "in list any",
+                "not in list any",
+                "like",
+                "validates",
+                "not validates"
+              ]
+            },
+            "value": {
+              "$ref": "#/definitions/valueOrPath"
+            }
+          },
+          "required": [
+            "path",
+            "operator",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Simple Condition for Similarity",
+          "description": "Uses Fuzzy string matching to calculate similarity between strings",
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
+                "similar_to"
+              ]
+            },
+            "value": {
+              "$ref": "#/definitions/valueOrPath"
+            },
+            "similarity_threshold": {
+              "description": "Minimum Fuzzy Ratio between 0-100 (similarity score) for condition to be true",
+              "type": "string"
+            },
+            "tokenize_similarity": {
+              "type": "string",
+              "enum": [
+                "1",
+                "0"
+              ],
+              "default": "0"
+            }
+          },
+          "required": [
+            "path",
+            "operator",
+            "value",
+            "similarity_threshold",
+            "tokenize_similarity"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Nested Conditions",
+          "type": "object",
+          "properties": {
+            "operator": {
+              "type": "string",
+              "enum": [
+                "AND",
+                "OR"
+              ]
+            },
+            "conditions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Condition"
+              }
+            }
+          },
+          "required": [
+            "operator",
+            "conditions"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Join Condition",
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string",
+              "not": {
+                "enum": [
+                  "exists",
+                  "not exists"
+                ]
+              }
+            }
+          },
+          "required": [
+            "path",
+            "operator"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "Condition for Set Function (no path)",
+          "type": "object",
+          "oneOf": [
+            {
+              "title": "Simple",
+              "properties": {
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    "==",
+                    "!=",
+                    "gt",
+                    "gte",
+                    "lt",
+                    "lte",
+                    "contains",
+                    "not contains",
+                    "matches",
+                    "not matches",
+                    "regex",
+                    "in",
+                    "not in",
+                    "in list all",
+                    "not in list all",
+                    "in list any",
+                    "not in list any",
+                    "like",
+                    "similar_to"
+                  ]
+                },
+                "value": {
+                  "$ref": "#/definitions/valueOrPath"
+                }
+              },
+              "required": [
+                "operator",
+                "value"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "title": "Existence Checker",
+              "type": "object",
+              "properties": {
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    "exists",
+                    "not exists"
+                  ]
+                }
+              },
+              "required": [
+                "operator"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "title": "True/False",
+              "type": "object",
+              "properties": {
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              },
+              "required": [
+                "operator"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      ]
+    },
+
     "Action_Arithmetic": {
       "title": "Arithmetic Action",
       "type": "object",
@@ -3380,7 +3381,7 @@
                     "type": "object",
                     "properties": {
                       "condition": {
-                        "$ref": "#/definitions/condition"
+                        "$ref": "#/definitions/Condition"
                       },
                       "value": {
                         "type": [
@@ -4756,7 +4757,7 @@
           "default": "0"
         },
         "condition": {
-          "$ref": "#/definitions/condition"
+          "$ref": "#/definitions/Condition"
         },
         "actions": {
           "title": "List of Actions",
