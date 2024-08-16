@@ -481,7 +481,7 @@
                         "corpus_id_key": {
                           "type": "string"
                         },
-                        "meta_data_type": {
+                        "master_data_type": {
                           "type": "string"
                         },
                         "similarity_threshold": {
@@ -495,7 +495,7 @@
                         }
                       },
                       "required": [
-                        "search_phrase", "corpus", "corpus_search_key", "corpus_id_key", "meta_data_type",
+                        "search_phrase", "corpus", "corpus_search_key", "corpus_id_key", "master_data_type",
                         "similarity_threshold", "item_type", "context"
                       ],
                       "additionalProperties": false
@@ -536,7 +536,7 @@
                         "corpus_id_key": {
                           "type": "string"
                         },
-                        "meta_data_type": {
+                        "master_data_type": {
                           "type": "string"
                         },
                         "similarity_threshold": {
@@ -551,7 +551,7 @@
                       },
                       "required": [
                         "data_to_match", "search_key","match_key", "corpus", "corpus_search_key", "corpus_id_key",
-                        "meta_data_type", "similarity_threshold", "item_type", "context"
+                        "master_data_type", "similarity_threshold", "item_type", "context"
                       ],
                       "additionalProperties": false
                     }
