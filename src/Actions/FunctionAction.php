@@ -255,8 +255,9 @@ class FunctionAction implements ActionInterface
         } elseif (isset($this->function[1]) && $this->function['1'] == 'system_defined_function') {
             // function name is at index 1 (index 0 is the data).
             $functionName = $paramValues[1];
+
             // We get the function params
-            $functionParams = $paramValues[2] ?? [];
+            $functionParams = self::resolveParam($paramValues[0], $paramValues[2]) ?? [];
 
             // We call the user defined function
             $newValue = call_user_func_array([$this->function[0],$functionName], $functionParams);
@@ -307,5 +308,28 @@ class FunctionAction implements ActionInterface
             }
         }
         return $criteria;
+    }
+
+    /**
+     * @param $data
+     * @param $param
+     * @return array|mixed|null
+     */
+    protected function resolveParam($data, $param) {
+
+        if (is_array($param)) {
+            if (isset($param['path'])) {
+                $paramPath = $param['path'];
+                return PathResolver::getValueByPath($data, $paramPath);
+            } else {
+                // Recursively resolve each element in the array
+                $resolvedArray = [];
+                foreach ($param as $key => $value) {
+                    $resolvedArray[$key] = $this->resolveParam($data, $value);
+                }
+                return $resolvedArray;
+            }
+        }
+        return $param;
     }
 }
