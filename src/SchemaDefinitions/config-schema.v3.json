@@ -185,6 +185,108 @@
         }
       ]
     },
+    "promptContext": {
+      "type": "object",
+      "properties": {
+        "spelling_corrections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pattern": {
+                "type": "string"
+              },
+              "correction": {
+                "type": "string"
+              }
+            },
+            "required": ["pattern", "correction"],
+            "additionalProperties": false
+          }
+        },
+        "abbreviations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "abbreviation": {
+                "type": "string"
+              },
+              "full_phrase": {
+                "type": "string"
+              }
+            },
+            "required": ["abbreviation", "full_phrase"],
+            "additionalProperties": false
+          }
+        },
+        "language_translations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "phrase": {
+                "type": "string"
+              },
+              "translation": {
+                "type": "string"
+              }
+            },
+            "required": ["phrase", "translation"],
+            "additionalProperties": false
+          }
+        },
+        "stop_words_to_ignore": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "conditional_rules": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["if", "else if", "else"]
+                },
+                "condition": {
+                  "type": "string"
+                },
+                "then": {
+                  "type": "string"
+                }
+              },
+              "required": ["type", "condition", "then"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "additional_instructions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "spelling_corrections", "abbreviations", "language_translations", "stop_words_to_ignore", "aliases",
+        "conditional_rules", "additional_instructions"
+      ],
+      "additionalProperties": false
+    },
 
     "actionBase": {
       "type": "object",
@@ -332,6 +434,166 @@
                 "function_name"
               ],
               "additionalProperties": true
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "systemDefinedFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "system_defined_function"
+              ]
+            },
+            "args": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "function_name": {
+                      "type": "string",
+                      "enum": ["prompt_search"],
+                      "const": "prompt_search"
+                    },
+                    "function_params": {
+                      "properties": {
+                        "search_phrase": {
+                          "$ref": "#/definitions/valueOrPath"
+                        },
+                        "corpus": {
+                          "$ref": "#/definitions/valueOrPath"
+                        },
+                        "corpus_search_key": {
+                          "type": "string"
+                        },
+                        "corpus_id_key": {
+                          "type": "string"
+                        },
+                        "meta_data_type": {
+                          "type": "string"
+                        },
+                        "similarity_threshold": {
+                          "type": "string"
+                        },
+                        "item_type": {
+                          "type": "string"
+                        },
+                        "context": {
+                          "$ref": "#/definitions/promptContext"
+                        }
+                      },
+                      "required": [
+                        "search_phrase", "corpus", "corpus_search_key", "corpus_id_key", "meta_data_type",
+                        "similarity_threshold", "item_type", "context"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "function_name",
+                    "function_params"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "function_name": {
+                      "type": "string",
+                      "enum": ["prompt_match"],
+                      "const": "prompt_match"
+                    },
+                    "function_params": {
+                      "properties": {
+                        "data_to_match": {
+                          "$ref": "#/definitions/valueOrPath"
+                        },
+                        "search_key": {
+                          "type": "string"
+                        },
+                        "match_key": {
+                          "type": "string"
+                        },
+                        "corpus": {
+                          "$ref": "#/definitions/valueOrPath"
+                        },
+                        "corpus_search_key": {
+                          "type": "string"
+                        },
+                        "corpus_id_key": {
+                          "type": "string"
+                        },
+                        "meta_data_type": {
+                          "type": "string"
+                        },
+                        "similarity_threshold": {
+                          "type": "string"
+                        },
+                        "item_type": {
+                          "type": "string"
+                        },
+                        "context": {
+                          "$ref": "#/definitions/promptContext"
+                        }
+                      },
+                      "required": [
+                        "data_to_match", "search_key","match_key", "corpus", "corpus_search_key", "corpus_id_key",
+                        "meta_data_type", "similarity_threshold", "item_type", "context"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "function_name",
+                    "function_params"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "function_name": {
+                      "type": "string",
+                      "enum": ["prompt_classification"],
+                      "const": "prompt_classification"
+                    },
+                    "function_params": {
+                      "properties": {
+                        "subject": {
+                          "$ref": "#/definitions/valueOrPath"
+                        },
+                        "corpus": {
+                          "$ref": "#/definitions/valueOrPath"
+                        },
+                        "item_type": {
+                          "type": "string"
+                        },
+                        "context": {
+                          "$ref": "#/definitions/promptContext"
+                        }
+                      },
+                      "required": ["subject", "corpus", "item_type", "context"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "function_name",
+                    "function_params"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
             }
           },
           "required": [
@@ -3457,6 +3719,28 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_SystemDefinedFunction": {
+      "title": "System Defined Function",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/systemDefinedFunctionArgs"
+            }
+          },
+          "required": [
+            "params"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_Transform": {
       "title": "Transform",
       "allOf": [
@@ -4380,6 +4664,9 @@
           "$ref": "#/definitions/Action_Function_UserDefinedFunction"
         },
         {
+          "$ref": "#/definitions/Action_Function_SystemDefinedFunction"
+        },
+        {
           "$ref": "#/definitions/Action_Function_Transform"
         },
         {
@@ -4528,6 +4815,10 @@
         {
           "title": "User Defined Function",
           "$ref": "#/definitions/userDefinedFunctionArgs"
+        },
+        {
+          "title": "System Defined Function",
+          "$ref": "#/definitions/systemDefinedFunctionArgs"
         },
         {
           "title": "Transform",

@@ -252,6 +252,14 @@ class FunctionAction implements ActionInterface
 
             // We call the user defined function
             $newValue = call_user_func_array([$this->function[0],$functionName], $functionParams);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'system_defined_function') {
+            // function name is at index 1 (index 0 is the data).
+            $functionName = $paramValues[1];
+            // We get the function params
+            $functionParams = $paramValues[2] ?? [];
+
+            // We call the user defined function
+            $newValue = call_user_func_array([$this->function[0],$functionName], $functionParams);
         }
         elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
             if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {
