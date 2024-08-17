@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "vendor/bin/phpunit",
-    "human-json": "generate-schema-doc ../src/SchemaDefinitions/config-schema.v2.json --config template_name=js_offline"
+    "human-json": "generate-schema-doc ../src/SchemaDefinitions/config-schema.v3.json --config template_name=js_offline"
   },
   "autoload": {
     "psr-4": {
