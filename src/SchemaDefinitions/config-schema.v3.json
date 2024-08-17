@@ -5061,18 +5061,23 @@
           "items": {
             "oneOf": [
               {
+                "title": "Delete Path Action",
                 "$ref": "#/definitions/Action_Deletion_DeletePathValue"
               },
               {
+                "title": "Remove Path Action",
                 "$ref": "#/definitions/Action_Deletion_RemovePath"
               },
               {
+                "title": "Arithmetic Action",
                 "$ref": "#/definitions/Action_Arithmetic"
               },
               {
+                "title": "Set Action",
                 "$ref": "#/definitions/Action_Set"
               },
               {
+                "title": "Function Action",
                 "$ref": "#/definitions/actionFunctionsList"
               }
             ]
