@@ -5,7 +5,6 @@ namespace PhelixJuma\GUIFlow\Actions;
 use PhelixJuma\GUIFlow\Utils\DataSplitter;
 use PhelixJuma\GUIFlow\Utils\DataValidator;
 use PhelixJuma\GUIFlow\Utils\FuzzySearch;
-use  Swoole\Coroutine;
 use PhelixJuma\GUIFlow\Exceptions\UnknownOperatorException;
 use PhelixJuma\GUIFlow\Utils\DataJoiner;
 use PhelixJuma\GUIFlow\Utils\DataReducer;
@@ -16,6 +15,8 @@ use PhelixJuma\GUIFlow\Utils\TemplateParserService;
 use PhelixJuma\GUIFlow\Utils\UnitConverter;
 use PhelixJuma\GUIFlow\Utils\Utils;
 use PhelixJuma\GUIFlow\Utils\PathResolver;
+use OpenSwoole\Coroutine as Co;
+use OpenSwoole\Core\Coroutine\WaitGroup;
 
 class FunctionAction implements ActionInterface
 {
@@ -130,11 +131,12 @@ class FunctionAction implements ActionInterface
             $function = [$this->function[0], $function];
 
             $count = sizeof($currentData);
-            $wg = new Coroutine\WaitGroup();
+
+            $wg = new WaitGroup();
 
             for ($index = 0; $index < $count; $index++) {
                 $wg->add();
-                Coroutine\go(function () use(&$currentData, $index, $path, $function, $args, $newField, $strict, $condition, $wg) {
+                co::go(function () use(&$currentData, $index, $path, $function, $args, $newField, $strict, $condition, $wg) {
                     // execute the task
                     try {
                         (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($currentData[$index]);
