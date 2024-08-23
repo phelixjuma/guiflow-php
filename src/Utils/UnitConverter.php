@@ -54,7 +54,7 @@ class UnitConverter
                 $response['converted_value'] = match($decimalHandler) {
                    "up" =>   ceil($convertedValue),
                    "down" =>   floor($convertedValue),
-                   "off" =>   round($convertedValue, $numberOfDecimalPlaces),
+                   "off" =>   round($convertedValue, intval($numberOfDecimalPlaces)),
                     default => $convertedValue
                 };
                 $response['converted_unit'] = $to_unit;
@@ -102,7 +102,7 @@ class UnitConverter
 
         $items = isset($items['path']) ? PathResolver::getValueByPath($data, $items['path']) : $items;
 
-        array_walk($items, function (&$item, $key) use($conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor, $outputPath) {
+        array_walk($items, function (&$item, $key) use($conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor, $decimalHandler, $numberOfDecimalPlaces, $outputPath) {
 
             $conversionTable = isset($conversionTable['in_item_path']) ? PathResolver::getValueByPath($item, $conversionTable['in_item_path']) : $conversionTable;
             $quantity = isset($quantity['in_item_path']) ? PathResolver::getValueByPath($item, $quantity['in_item_path']) : $quantity;
