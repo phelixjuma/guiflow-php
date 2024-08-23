@@ -2453,13 +2453,30 @@
                     "1",
                     "0"
                   ]
+                },
+                "decimal_handler": {
+                  "description": "How to handle decimals ie round off, round up or round down",
+                  "type": "string",
+                  "enum": [
+                    "up",
+                    "down",
+                    "off"
+                  ],
+                  "default": "up"
+                },
+                "number_of_decimal_places": {
+                  "description": "The number of decimal places when rounding off",
+                  "type": "string",
+                  "default": "0"
                 }
               },
               "required": [
                 "quantity",
                 "from_unit",
                 "to_unit",
-                "invert_factor"
+                "invert_factor",
+                "decimal_handler",
+                "number_of_decimal_places"
               ],
               "additionalProperties": false
             }
@@ -2553,6 +2570,21 @@
                   ],
                   "default": "0"
                 },
+                "decimal_handler": {
+                  "description": "How to handle decimals ie round off, round up or round down",
+                  "type": "string",
+                  "enum": [
+                    "up",
+                    "down",
+                    "off"
+                  ],
+                  "default": "up"
+                },
+                "number_of_decimal_places": {
+                  "description": "The number of decimal places when rounding off",
+                  "type": "string",
+                  "default": "0"
+                },
                 "output_path": {
                   "description": "The field path where the conversion results will be stored",
                   "type": "string"
@@ -2565,6 +2597,8 @@
                 "from_unit",
                 "to_unit",
                 "invert_factor",
+                "decimal_handler",
+                "number_of_decimal_places",
                 "output_path"
               ],
               "additionalProperties": false

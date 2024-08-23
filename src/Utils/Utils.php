@@ -282,7 +282,7 @@ class Utils
      * @param $data
      * @param $pattern
      * @param $replacement
-     * @return array|string|string[]|null
+     * @return string
      */
     public static function custom_preg_replace($data, $pattern, $replacement)
     {

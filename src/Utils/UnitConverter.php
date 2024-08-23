@@ -15,9 +15,11 @@ class UnitConverter
      * @param $from_unit
      * @param $to_unit
      * @param $invertFactor
+     * @param $decimalHandler
+     * @param $numberOfDecimalPlaces
      * @return mixed
      */
-    public static function convert($conversionTable, $quantity, $from_unit, $to_unit, $invertFactor=false): mixed
+    public static function convert($conversionTable, $quantity, $from_unit, $to_unit, $invertFactor=false, $decimalHandler="up", $numberOfDecimalPlaces=0): mixed
     {
 
         $from_unit = strtolower($from_unit);
@@ -47,7 +49,14 @@ class UnitConverter
                     }
                 }
 
-                $response['converted_value'] = ceil($quantity * $factor);
+                $convertedValue = $quantity * $factor;
+
+                $response['converted_value'] = match($decimalHandler) {
+                   "up" =>   ceil($convertedValue),
+                   "down" =>   floor($convertedValue),
+                   "off" =>   round($convertedValue, $numberOfDecimalPlaces),
+                    default => $convertedValue
+                };
                 $response['converted_unit'] = $to_unit;
             }
         }
@@ -79,10 +88,13 @@ class UnitConverter
      * @param $quantity
      * @param $fromUnit
      * @param $toUnit
+     * @param $invertFactor
+     * @param $decimalHandler
+     * @param $numberOfDecimalPlaces
      * @param $outputPath
      * @return array
      */
-    public static function convert_multiple($data, $items, $conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor, $outputPath): array
+    public static function convert_multiple($data, $items, $conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor,$decimalHandler, $numberOfDecimalPlaces, $outputPath): array
     {
         if (isset($conversionTable['path'])) {
             $conversionTable = PathResolver::getValueByPath($data, $conversionTable['path']);
@@ -97,7 +109,7 @@ class UnitConverter
             $fromUnit = isset($fromUnit['in_item_path']) ? PathResolver::getValueByPath($item, $fromUnit['in_item_path']) : $fromUnit;
             $toUnit = isset($toUnit['in_item_path']) ? PathResolver::getValueByPath($item, $toUnit['in_item_path']) : $toUnit;
 
-            $conversionResponse = self::convert($conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor);
+            $conversionResponse = self::convert($conversionTable, $quantity, $fromUnit, $toUnit, $invertFactor, $decimalHandler, $numberOfDecimalPlaces);
 
             PathResolver::setValueByPath($item,  $outputPath, $conversionResponse);
 
