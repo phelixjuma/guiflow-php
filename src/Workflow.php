@@ -20,6 +20,8 @@ use PhelixJuma\GUIFlow\Utils\ConfigurationValidator;
 use PhelixJuma\GUIFlow\Utils\PathResolver;
 use PhelixJuma\GUIFlow\Utils\Utils;
 
+use OpenSwoole\Coroutine as Co;
+
 class Workflow
 {
     private array $config;
@@ -81,23 +83,48 @@ class Workflow
                     if (Utils::isObject($inputData)) {
                         $this->executeRuleSerial($rule, $inputData);
                     } else {
+
                         $tempData = [];
-                        foreach ($inputData as &$data) {
 
-                            $this->executeRuleSerial($rule, $data);
+                        co::run(function() use(&$tempData, $inputData, $rule) {
 
-                            if (Utils::isObject($data)) {
-                                // An object. Set to temp data
-                                $tempData[] = $data;
-                            } else {
-                                // For a split response, we flatten by adding each item to data
-                                foreach ($data as $d) {
-                                    $tempData[] = $d;
-                                }
+                            foreach ($inputData as &$data) {
+
+                                go(function () use(&$tempData, &$data, $rule) {
+
+                                    $this->executeRuleSerial($rule, $data);
+
+                                    if (Utils::isObject($data)) {
+                                        // An object. Set to temp data
+                                        $tempData[] = $data;
+                                    } else {
+                                        // For a split response, we flatten by adding each item to data
+                                        foreach ($data as $d) {
+                                            $tempData[] = $d;
+                                        }
+                                    }
+                                });
                             }
-                        }
+                        });
                         // Set the temp data to input data
                         $inputData = $tempData;
+
+//                        foreach ($inputData as &$data) {
+//
+//                            $this->executeRuleSerial($rule, $data);
+//
+//                            if (Utils::isObject($data)) {
+//                                // An object. Set to temp data
+//                                $tempData[] = $data;
+//                            } else {
+//                                // For a split response, we flatten by adding each item to data
+//                                foreach ($data as $d) {
+//                                    $tempData[] = $d;
+//                                }
+//                            }
+//                        }
+//                        // Set the temp data to input data
+//                        $inputData = $tempData;
                     }
 
                 } catch (\Exception|\Throwable $e ) {
@@ -195,19 +222,41 @@ class Workflow
                         if (Utils::isObject($data)) {
                             $this->executeAction($data, $action);
                         } else {
-                            $temp = [];
-                            foreach ($data as &$datum) {
-                                $this->executeAction($datum, $action);
 
-                                if (Utils::isObject($datum)) {
-                                    $temp[] = $datum;
-                                } else {
-                                    foreach ($datum as $d) {
-                                        $temp[] = $d;
-                                    }
+                            $temp = [];
+                            co::run(function() use(&$temp, &$data, $action) {
+
+                                foreach ($data as &$datum) {
+
+                                    go(function () use (&$temp, &$datum, $action) {
+
+                                        $this->executeAction($datum, $action);
+
+                                        if (Utils::isObject($datum)) {
+                                            $temp[] = $datum;
+                                        } else {
+                                            foreach ($datum as $d) {
+                                                $temp[] = $d;
+                                            }
+                                        }
+                                    });
                                 }
-                            }
+                            });
                             $data = $temp;
+
+//                            $temp = [];
+//                            foreach ($data as &$datum) {
+//                                $this->executeAction($datum, $action);
+//
+//                                if (Utils::isObject($datum)) {
+//                                    $temp[] = $datum;
+//                                } else {
+//                                    foreach ($datum as $d) {
+//                                        $temp[] = $d;
+//                                    }
+//                                }
+//                            }
+//                            $data = $temp;
                         }
                     }
 
