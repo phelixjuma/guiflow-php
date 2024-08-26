@@ -57,16 +57,16 @@
         },
         {
             "name": "jumaphelix/php-dag",
-            "version": "v2.0.4",
+            "version": "v2.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jumaphelix/php-dag.git",
-                "reference": "2f3eeffaba0c431fc2a31a0e364684bbd6175a34"
+                "reference": "401c8f170bdd0d4366c052fb74c2ac71b8bfcb95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jumaphelix/php-dag/zipball/2f3eeffaba0c431fc2a31a0e364684bbd6175a34",
-                "reference": "2f3eeffaba0c431fc2a31a0e364684bbd6175a34",
+                "url": "https://api.github.com/repos/jumaphelix/php-dag/zipball/401c8f170bdd0d4366c052fb74c2ac71b8bfcb95",
+                "reference": "401c8f170bdd0d4366c052fb74c2ac71b8bfcb95",
                 "shasum": ""
             },
             "require": {
@@ -96,9 +96,9 @@
             "description": "Implementation of Directed Acyclic Graphs (DAG) based task executions with parallelization in PHP",
             "support": {
                 "issues": "https://github.com/jumaphelix/php-dag/issues",
-                "source": "https://github.com/jumaphelix/php-dag/tree/v2.0.4"
+                "source": "https://github.com/jumaphelix/php-dag/tree/v2.0.5"
             },
-            "time": "2024-08-26T07:34:27+00:00"
+            "time": "2024-08-26T07:40:52+00:00"
         },
         {
             "name": "openswoole/core",
