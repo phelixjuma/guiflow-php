@@ -21,6 +21,7 @@ use PhelixJuma\GUIFlow\Utils\PathResolver;
 use PhelixJuma\GUIFlow\Utils\Utils;
 
 use OpenSwoole\Coroutine as Co;
+use function OpenSwoole\Coroutine\batch;
 
 class Workflow
 {
@@ -72,78 +73,89 @@ class Workflow
     private function runWorkFlowSerial(&$inputData): void
     {
 
-        try {
+        // We execute within a coroutine environment to support parallelization
+        co::run(function() use(&$inputData) {
+            try {
 
-            $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
+                $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 
-            foreach ($config as $rule) {
+                foreach ($config as $rule) {
 
-                try {
+                    try {
 
-                    if (Utils::isObject($inputData)) {
-                        $this->executeRuleSerial($rule, $inputData);
-                    } else {
+                        if (Utils::isObject($inputData)) {
+                            $this->executeRuleSerial($rule, $inputData);
+                        } else {
 
-                        $tempData = [];
+                            $tempData = [];
 
-                        co::run(function() use(&$tempData, $inputData, $rule) {
+                            // We parallelize the execution of the data
+//                            foreach ($inputData as &$data) {
+//
+//                                go(function () use(&$tempData, &$data, $rule) {
+//
+//                                    $this->executeRuleSerial($rule, $data);
+//
+//                                    if (Utils::isObject($data)) {
+//                                        // An object. Set to temp data
+//                                        $tempData[] = $data;
+//                                    } else {
+//                                        // For a split response, we flatten by adding each item to data
+//                                        foreach ($data as $d) {
+//                                            $tempData[] = $d;
+//                                        }
+//                                    }
+//                                });
+//                            }
+                            $tasks = [];
+                            foreach ($inputData as $data) {
 
-                            foreach ($inputData as &$data) {
-
-                                go(function () use(&$tempData, &$data, $rule) {
+                                $tasks[] = function () use($data, $rule) {
 
                                     $this->executeRuleSerial($rule, $data);
 
                                     if (Utils::isObject($data)) {
                                         // An object. Set to temp data
-                                        $tempData[] = $data;
+                                        return [$data];
                                     } else {
-                                        // For a split response, we flatten by adding each item to data
-                                        foreach ($data as $d) {
-                                            $tempData[] = $d;
-                                        }
+                                        return $data;
                                     }
-                                });
+                                };
                             }
-                        });
-                        // Set the temp data to input data
-                        $inputData = $tempData;
+                            // We fetch the results from all the tasks
+                            $results = batch($tasks);
 
-//                        foreach ($inputData as &$data) {
-//
-//                            $this->executeRuleSerial($rule, $data);
-//
-//                            if (Utils::isObject($data)) {
-//                                // An object. Set to temp data
-//                                $tempData[] = $data;
-//                            } else {
-//                                // For a split response, we flatten by adding each item to data
-//                                foreach ($data as $d) {
-//                                    $tempData[] = $d;
-//                                }
-//                            }
-//                        }
-//                        // Set the temp data to input data
-//                        $inputData = $tempData;
+                            // Flatten the results and merge them into $tempData
+                            foreach ($results as $result) {
+                                if (is_array($result)) {
+                                    $tempData = array_merge($tempData, $result);
+                                } else {
+                                    $tempData[] = $result;
+                                }
+                            }
+
+                            // Set the temp data to input data
+                            $inputData = $tempData;
+                        }
+                    } catch (\Exception|\Throwable $e ) {
+                        $error = [
+                            'rule'  => $rule['stage'],
+                            'message' => $e->getMessage(),
+                            'trace' => $e->getTrace()
+                        ];
+                        $this->errors[] = $error;
                     }
-
-                } catch (\Exception|\Throwable $e ) {
-                    $error = [
-                        'rule'  => $rule['stage'],
-                        'message' => $e->getMessage(),
-                        'trace' => $e->getTrace()
-                    ];
-                    $this->errors[] = $error;
                 }
+
+            } catch (\Exception|\Throwable $e ) {
+                $error = [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTrace()
+                ];
+                $this->errors[] = $error;
             }
 
-        } catch (\Exception|\Throwable $e ) {
-            $error = [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTrace()
-            ];
-            $this->errors[] = $error;
-        }
+        });
     }
 
     /**
@@ -223,40 +235,38 @@ class Workflow
                             $this->executeAction($data, $action);
                         } else {
 
+
+                            // we parallelize the execution of each action for the dataset
                             $temp = [];
-                            co::run(function() use(&$temp, &$data, $action) {
+                            $tasks = [];
+                            foreach ($data as $datum) {
 
-                                foreach ($data as &$datum) {
+                                $tasks[] = function () use ($datum, $action) {
 
-                                    go(function () use (&$temp, &$datum, $action) {
+                                    $this->executeAction($datum, $action);
 
-                                        $this->executeAction($datum, $action);
+                                    if (Utils::isObject($datum)) {
+                                        return [$datum];
+                                    } else {
+                                        return $datum;
+                                    }
+                                };
+                            }
 
-                                        if (Utils::isObject($datum)) {
-                                            $temp[] = $datum;
-                                        } else {
-                                            foreach ($datum as $d) {
-                                                $temp[] = $d;
-                                            }
-                                        }
-                                    });
+                            // We fetch the results from all the tasks
+                            $results = batch($tasks);
+
+                            // Flatten the results and merge them into $tempData
+                            foreach ($results as $result) {
+                                if (is_array($result)) {
+                                    $temp = array_merge($temp, $result);
+                                } else {
+                                    $temp[] = $result;
                                 }
-                            });
-                            $data = $temp;
+                            }
 
-//                            $temp = [];
-//                            foreach ($data as &$datum) {
-//                                $this->executeAction($datum, $action);
-//
-//                                if (Utils::isObject($datum)) {
-//                                    $temp[] = $datum;
-//                                } else {
-//                                    foreach ($datum as $d) {
-//                                        $temp[] = $d;
-//                                    }
-//                                }
-//                            }
-//                            $data = $temp;
+                            // Set the temp data to input data
+                            $data = $temp;
                         }
                     }
 

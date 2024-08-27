@@ -18,6 +18,8 @@ use PhelixJuma\GUIFlow\Utils\PathResolver;
 use OpenSwoole\Coroutine as Co;
 use OpenSwoole\Core\Coroutine\WaitGroup;
 
+use function OpenSwoole\Coroutine\batch;
+
 class FunctionAction implements ActionInterface
 {
     const SUPPORTED_FUNCTIONS = [
@@ -134,12 +136,17 @@ class FunctionAction implements ActionInterface
 
             $wg = new WaitGroup();
 
+            $tasks = [];
             for ($index = 0; $index < $count; $index++) {
                 $wg->add();
                 co::go(function () use(&$currentData, $index, $path, $function, $args, $newField, $strict, $condition, $wg) {
                     // execute the task
+                    $dataCopy = $currentData[$index]; // Work with a local copy
                     try {
-                        (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($currentData[$index]);
+                        // execute the function
+                        (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataCopy);
+                        // set the result back
+                        $currentData[$index] = $dataCopy;
                     } catch (\Exception|\Throwable $e) {
                     }
                     // Signal completion
