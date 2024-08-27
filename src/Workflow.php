@@ -21,7 +21,7 @@ use PhelixJuma\GUIFlow\Utils\PathResolver;
 use PhelixJuma\GUIFlow\Utils\Utils;
 
 use OpenSwoole\Coroutine as Co;
-use function OpenSwoole\Coroutine\batch;
+//use function OpenSwoole\Coroutine\batch;
 
 class Workflow
 {
@@ -123,7 +123,7 @@ class Workflow
                                 };
                             }
                             // We fetch the results from all the tasks
-                            $results = batch($tasks);
+                            $results = \OpenSwoole\Coroutine\batch($tasks);
 
                             // Flatten the results and merge them into $tempData
                             foreach ($results as $result) {
@@ -254,7 +254,7 @@ class Workflow
                             }
 
                             // We fetch the results from all the tasks
-                            $results = batch($tasks);
+                            $results = \OpenSwoole\Coroutine\batch($tasks);
 
                             // Flatten the results and merge them into $tempData
                             foreach ($results as $result) {
