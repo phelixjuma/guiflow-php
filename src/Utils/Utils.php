@@ -326,6 +326,7 @@ class Utils
             }
         } elseif(self::isObject($data)) {
 
+            // Get key 1 and 2 values
             $key1Value = PathResolver::getValueByPath($data, $key1);
             $key2Value = PathResolver::getValueByPath($data, $key2);
 
@@ -334,8 +335,8 @@ class Utils
             }
 
             // Create the patterns for both key1 and key2
-            $pattern1 = "/{$regexPreModifier}{$key1Value}{$regexPostModifier}/i";
-            $pattern2 = "/{$regexPreModifier}{$key2Value}{$regexPostModifier}/i";
+            $pattern1 = "/{$regexPreModifier}".preg_replace('/\s+/', '\\s*', $key1Value)."{$regexPostModifier}/i";
+            $pattern2 = "/{$regexPreModifier}".preg_replace('/\s+/', '\\s*', $key2Value)."{$regexPostModifier}/i";
 
             if (empty($newKey)) {
                 $newKey = $key1;

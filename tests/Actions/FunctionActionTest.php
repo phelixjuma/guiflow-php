@@ -673,7 +673,7 @@ class FunctionActionTest extends TestCase
             'products' => [
                 ['name' => 'Capon Chicken 2kg', 'units' => [['quantity' => 2, 'uom' => '2kgs']]],
                 ['name' => 'Chicken Sausages 1kg', 'units' =>[['quantity' => 1, 'uom' => '1kg']]],
-                ['name' => 'Chicken Sausages 1kgs', 'units' => [['quantity' => 1, 'uom' => '1kg']]],
+                ['name' => 'Chicken Sausages 1kgs', 'units' => [['quantity' => 1, 'uom' => '1 kg']]],
             ],
         ];
 
