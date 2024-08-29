@@ -1964,6 +1964,55 @@
       ],
       "unevaluatedProperties": false
     },
+    "stringDiffFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "string_diff"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "first_path": {
+                  "type": "string"
+                },
+                "second_path": {
+                  "type": "string"
+                },
+                "regex_pre_modifier": {
+                  "type": "string"
+                },
+                "regex_post_modifier": {
+                  "type": "string"
+                },
+                "new_path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "first_path",
+                "second_path",
+                "regex_pre_modifier",
+                "regex_post_modifier",
+                "new_path"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "regexMapperMultipleFunctionArgs": {
       "allOf": [
         {
@@ -4179,6 +4228,25 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_StringDiff": {
+      "title": "String Diff",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/stringDiffFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_RegexMapperMultiple": {
       "title": "Regex Mapper Multiple",
       "allOf": [
@@ -4764,6 +4832,9 @@
           "$ref": "#/definitions/Action_Function_CustomPregReplace"
         },
         {
+          "$ref": "#/definitions/Action_Function_StringDiff"
+        },
+        {
           "$ref": "#/definitions/Action_Function_RegexMapperMultiple"
         },
         {
@@ -4936,6 +5007,10 @@
         {
           "title": "Custom Preg Replace",
           "$ref": "#/definitions/customPregReplaceFunctionArgs"
+        },
+        {
+          "title": "String Diff",
+          "$ref": "#/definitions/stringDiffFunctionArgs"
         },
         {
           "title": "Regex Mapper Multiple",

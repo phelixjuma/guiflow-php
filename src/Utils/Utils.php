@@ -288,6 +288,9 @@ class Utils
     {
         $replacement = str_ireplace("[space]", " ", $replacement);
 
+        if (empty($pattern)) {
+            return $data;
+        }
         $pattern = "/".self::custom_preg_escape($pattern)."/i";
 
         $newData = null;
@@ -299,6 +302,59 @@ class Utils
             $newData = preg_replace($pattern, $replacement, $data);
         }
         return trim($newData);
+    }
+
+    /**
+     * @param $data
+     * @param $key1
+     * @param $key2
+     * @param $regexPreModifier
+     * @param $regexPostModifier
+     * @param $newKey
+     * @return array|mixed
+     */
+    public static function string_diff($data, $key1, $key2, $regexPreModifier=null, $regexPostModifier=null, $newKey=null)
+    {
+        if (empty($data) || empty($key1) || empty($key2)) {
+            return $data;
+        }
+
+        $newData = null;
+        if (self::isList($data)) {
+            foreach ($data as $d) {
+                $newData[] = self::string_diff($d, $key1, $key2, $regexPreModifier, $regexPostModifier, $newKey);
+            }
+        } elseif(self::isObject($data)) {
+
+            $key1Value = PathResolver::getValueByPath($data, $key1);
+            $key2Value = PathResolver::getValueByPath($data, $key2);
+
+            if ($key1Value == null || $key2Value == null) {
+                return $data;
+            }
+
+            // Create the patterns for both key1 and key2
+            $pattern1 = "/{$regexPreModifier}{$key1Value}{$regexPostModifier}/i";
+            $pattern2 = "/{$regexPreModifier}{$key2Value}{$regexPostModifier}/i";
+
+            if (empty($newKey)) {
+                $newKey = $key1;
+            }
+
+            // Check which pattern matches first
+            if (preg_match($pattern1, $key2Value)) {
+                PathResolver::setValueByPath($data, $newKey, preg_replace($pattern1, "", $key2Value));
+            } elseif (preg_match($pattern2, $key1Value)) {
+                PathResolver::setValueByPath($data, $newKey, preg_replace($pattern2, "", $key1Value));
+            } else {
+                // No match found; fallback to original data if needed
+                PathResolver::setValueByPath($data, $newKey, $key1Value);
+            }
+            $newData = $data;
+        } else {
+            $newData = $data;
+        }
+        return $newData;
     }
 
     /**

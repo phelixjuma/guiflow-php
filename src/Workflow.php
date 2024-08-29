@@ -89,24 +89,6 @@ class Workflow
 
                             $tempData = [];
 
-                            // We parallelize the execution of the data
-//                            foreach ($inputData as &$data) {
-//
-//                                go(function () use(&$tempData, &$data, $rule) {
-//
-//                                    $this->executeRuleSerial($rule, $data);
-//
-//                                    if (Utils::isObject($data)) {
-//                                        // An object. Set to temp data
-//                                        $tempData[] = $data;
-//                                    } else {
-//                                        // For a split response, we flatten by adding each item to data
-//                                        foreach ($data as $d) {
-//                                            $tempData[] = $d;
-//                                        }
-//                                    }
-//                                });
-//                            }
                             $tasks = [];
                             foreach ($inputData as $data) {
 
