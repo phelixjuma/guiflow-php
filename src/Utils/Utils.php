@@ -327,8 +327,8 @@ class Utils
         } elseif(self::isObject($data)) {
 
             // Get key 1 and 2 values
-            $key1Value = PathResolver::getValueByPath($data, $key1);
-            $key2Value = PathResolver::getValueByPath($data, $key2);
+            $key1Value = self::removeExtraSpaces(PathResolver::getValueByPath($data, $key1));
+            $key2Value = self::removeExtraSpaces(PathResolver::getValueByPath($data, $key2));
 
             if ($key1Value == null || $key2Value == null) {
                 return $data;
@@ -344,9 +344,9 @@ class Utils
 
             // Check which pattern matches first
             if (preg_match($pattern1, $key2Value)) {
-                PathResolver::setValueByPath($data, $newKey, preg_replace($pattern1, "", $key2Value));
+                PathResolver::setValueByPath($data, $newKey, self::removeExtraSpaces(preg_replace($pattern1, "", $key2Value)));
             } elseif (preg_match($pattern2, $key1Value)) {
-                PathResolver::setValueByPath($data, $newKey, preg_replace($pattern2, "", $key1Value));
+                PathResolver::setValueByPath($data, $newKey, self::removeExtraSpaces(preg_replace($pattern2, "", $key1Value)));
             } else {
                 // No match found; fallback to original data if needed
                 PathResolver::setValueByPath($data, $newKey, $key1Value);
