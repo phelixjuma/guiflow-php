@@ -96,7 +96,6 @@ class FunctionAction implements ActionInterface
                 } else {
                     $paramValues[] = $param;
                 }
-                print_r($paramValues);
             }
         }
 
