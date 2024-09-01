@@ -274,7 +274,26 @@
             }
           }
         },
-        "additional_instructions": {
+        "domain_definitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "phrase": {
+                "type": "string"
+              },
+              "definition": {
+                "type": "string"
+              }
+            },
+            "required": ["phrase", "domain_definitions"],
+            "additionalProperties": false
+          }
+        },
+        "background_information": {
+          "type": "string"
+        },
+        "work_plan": {
           "type": "array",
           "items": {
             "type": "string"
@@ -283,7 +302,7 @@
       },
       "required": [
         "spelling_corrections", "abbreviations", "language_translations", "stop_words_to_ignore", "aliases",
-        "conditional_rules", "additional_instructions"
+        "conditional_rules", "domain_definitions", "background_information", "work_plan"
       ],
       "additionalProperties": false
     },
