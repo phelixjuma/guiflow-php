@@ -290,8 +290,11 @@
             "additionalProperties": false
           }
         },
-        "background_information": {
-          "type": "string"
+        "additional_context": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "work_plan": {
           "type": "array",
@@ -302,7 +305,7 @@
       },
       "required": [
         "spelling_corrections", "abbreviations", "language_translations", "stop_words_to_ignore", "aliases",
-        "conditional_rules", "domain_definitions", "background_information", "work_plan"
+        "conditional_rules", "domain_definitions", "additional_context", "work_plan"
       ],
       "additionalProperties": false
     },
