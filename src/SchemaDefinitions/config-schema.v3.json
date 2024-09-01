@@ -286,7 +286,7 @@
                 "type": "string"
               }
             },
-            "required": ["phrase", "domain_definitions"],
+            "required": ["phrase", "definition"],
             "additionalProperties": false
           }
         },
