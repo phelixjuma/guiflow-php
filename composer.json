@@ -6,6 +6,7 @@
   "require": {
     "php": ">=8.0",
     "ext-json": "*",
+    "ext-ctype": "*",
     "wyndow/fuzzywuzzy": "^0.6.0",
     "erdalceylan/array-join": "^2.1",
     "ext-openssl": "*",

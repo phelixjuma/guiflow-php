@@ -15,6 +15,9 @@ class DataValidator
     const VALIDATION_RULE_IS_EMAIL = 'is email';
     const VALIDATION_RULE_IS_LIST = 'is list';
     const VALIDATION_RULE_IS_DICTIONARY = 'is dictionary';
+    const VALIDATION_RULE_IS_UPC_BAR_CODE = 'is upc barcode';
+    const VALIDATION_RULE_IS_EAN_13_BAR_CODE = 'is ean13 barcode';
+    const VALIDATION_RULE_IS_ISBN = 'is isbn10';
 
     private static function isCorrect($quantity, $unitPrice, $totalPrice) {
 
@@ -403,6 +406,15 @@ class DataValidator
             case self::VALIDATION_RULE_IS_DICTIONARY:
                 return Utils::isObject($value);
 
+            case self::VALIDATION_RULE_IS_UPC_BAR_CODE:
+                return self::validateUPCBarCode($value);
+
+            case self::VALIDATION_RULE_IS_EAN_13_BAR_CODE:
+                return self::validateEAN13BarCode($value);
+
+            case self::VALIDATION_RULE_IS_ISBN:
+                return self::validateISBN10($value);
+
             default:
                 return Workflow::evaluateCondition($value, $rule, true);
         }
@@ -428,6 +440,84 @@ class DataValidator
         }
 
         return true;
+    }
+
+    /**
+     * @param $barcode
+     * @return bool
+     */
+    private static function validateUPCBarCode($barcode) {
+
+        if (strlen($barcode) != 12 || !ctype_digit($barcode)) {
+            return false;
+        }
+
+        $sum = 0;
+        for ($i = 0; $i < 11; $i++) {
+            $digit = intval($barcode[$i]);
+            if ($i % 2 == 0) {
+                $sum += $digit * 3;
+            } else {
+                $sum += $digit;
+            }
+        }
+
+        $checksum = (10 - ($sum % 10)) % 10;
+        return $checksum == intval($barcode[11]);
+    }
+
+    /**
+     * @param $barcode
+     * @return bool
+     */
+    private static function validateEAN13BarCode($barcode) {
+
+        if (strlen($barcode) != 13 || !ctype_digit($barcode)) {
+            return false;
+        }
+
+        $sum = 0;
+        for ($i = 0; $i < 12; $i++) {
+            $digit = intval($barcode[$i]);
+            if ($i % 2 == 0) {
+                $sum += $digit;
+            } else {
+                $sum += $digit * 3;
+            }
+        }
+
+        $checksum = (10 - ($sum % 10)) % 10;
+        return $checksum == intval($barcode[12]);
+    }
+
+    /**
+     * @param $isbn
+     * @return bool
+     */
+    private static function validateISBN10($isbn) {
+
+        // Remove any hyphens
+        $isbn = str_replace('-', '', $isbn);
+
+        // Check if the length is exactly 10 and the characters are valid
+        if (strlen($isbn) != 10 || !preg_match('/^\d{9}[\dX]$/', $isbn)) {
+            return false;
+        }
+
+        $sum = 0;
+        for ($i = 0; $i < 9; $i++) {
+            $sum += intval($isbn[$i]) * ($i + 1);
+        }
+
+        $checksum = $isbn[9];
+        if ($checksum == 'X') {
+            $checksum = 10;
+        }
+
+        $sum += intval($checksum) * 10;
+
+        // The sum should be divisible by 11
+        return $sum % 11 == 0;
     }
 
 }
