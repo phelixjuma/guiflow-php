@@ -93,6 +93,18 @@ class SimpleCondition implements ConditionInterface
                     return $pathValue < $value;
                 case 'lte':
                     return $pathValue <= $value;
+                case 'strleneq':
+                    return is_string($pathValue) && strlen($pathValue) == $value;
+                case 'strlenneq':
+                    return is_string($pathValue) && strlen($pathValue) != $value;
+                case 'strlengt':
+                    return is_string($pathValue) && strlen($pathValue) > $value;
+                case 'strlengte':
+                    return is_string($pathValue) && strlen($pathValue) >= $value;
+                case 'strlenlt':
+                    return is_string($pathValue) && strlen($pathValue) < $value;
+                case 'strlenlte':
+                    return is_string($pathValue) && strlen($pathValue) <= $value;
                 case 'contains':
                     return !empty($pathValue) && !empty($value) && str_contains($pathValue, $value);
                 case 'not contains':
