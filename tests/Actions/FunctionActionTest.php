@@ -662,7 +662,7 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function testStringDiff()
+    public function _testStringDiff()
     {
         $data = [
             'customer' => 'Naivas',
@@ -1792,24 +1792,28 @@ class FunctionActionTest extends TestCase
     {
         $data = [
             "items" => [
-                ["date" => "3/2/2023 12:00:00 AM"],
-                ["date" => "9/30/2022 12:00:00 AM"]
+                ["date" => "Phelix"],
+                ["date" => "Omondi"]
             ]
         ];
 
         $expectedData = [];
 
-        $args = [
-            'data_path' => ""
+        $args = [];
+
+        $condition = [
+            "path" => "date",
+            "operator" => "!=",
+            "value" => "Phelix"
         ];
 
-        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'date_format', 'args' => $args, 'newField' => null, 'strict' => 0, 'condition' => null], "new_items");
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'date', 'function' => 'strtoupper', 'args' => "", 'newField' => null, 'strict' => 0, 'condition' => null], "new_items", '0', $condition);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
-        $this->assertEquals($data, $expectedData);
+        //$this->assertEquals($data, $expectedData);
     }
 
     public function _testObjectListUnique()

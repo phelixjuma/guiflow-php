@@ -18,6 +18,7 @@ use PhelixJuma\GUIFlow\Utils\PathResolver;
 use OpenSwoole\Coroutine as Co;
 use OpenSwoole\Core\Coroutine\WaitGroup;
 
+use PhelixJuma\GUIFlow\Workflow;
 use function OpenSwoole\Coroutine\batch;
 
 class FunctionAction implements ActionInterface
@@ -111,53 +112,60 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::join(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'map') {
 
-            list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
+            //list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
+            list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
 
-            if (!empty($currentData)) {
-                foreach ($currentData as &$value) {
+            if (!empty($currentValues)) {
+                foreach ($currentValues as &$value) {
 
-                    try {
-                        (new FunctionAction($path, [$this->function[0], $function], $args, $newField, $strict, $condition))->execute($value);
-                    } catch (\Exception|\Throwable $e) {
-                        //print "\nError in map function: ".$e->getMessage()."\n";
+                    if (empty($this->condition) || Workflow::evaluateCondition($value, $this->condition)) {
+                        try {
+                            (new FunctionAction($path, [$this->function[0], $function], $args, $newField, $strict, $condition))->execute($value);
+                        } catch (\Exception|\Throwable $e) {
+                            //print "\nError in map function: ".$e->getMessage()."\n";
+                        }
                     }
                 }
             }
-            $newValue = $currentData;
+            $newValue = $currentValues;
 
         } elseif (isset($this->function[1]) && $this->function['1'] == 'map_parallel') {
 
-            list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
+            //list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
+            //$currentData = $paramValues[0];
+            list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
 
             // Set function as an array with the udf object
             $function = [$this->function[0], $function];
 
-            $count = sizeof($currentData);
+            $count = sizeof($currentValues);
 
             $wg = new WaitGroup();
 
-            $tasks = [];
             for ($index = 0; $index < $count; $index++) {
-                $wg->add();
-                co::go(function () use(&$currentData, $index, $path, $function, $args, $newField, $strict, $condition, $wg) {
-                    // execute the task
-                    $dataCopy = $currentData[$index]; // Work with a local copy
-                    try {
-                        // execute the function
-                        (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataCopy);
-                        // set the result back
-                        $currentData[$index] = $dataCopy;
-                    } catch (\Exception|\Throwable $e) {
-                    }
-                    // Signal completion
-                    $wg->done();
-                });
+
+                if (empty($this->condition) || Workflow::evaluateCondition($currentValues[$index], $this->condition)) {
+                    $wg->add();
+                    co::go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg) {
+                        // execute the task
+                        $dataCopy = $currentValues[$index]; // Work with a local copy
+                        try {
+                            // execute the function
+                            (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataCopy);
+                            // set the result back
+                            $currentValues[$index] = $dataCopy;
+                        } catch (\Exception|\Throwable $e) {
+                        }
+                        // Signal completion
+                        $wg->done();
+                    });
+                }
             }
 
             // Wait for all tasks to complete
             $wg->wait();
 
-            $newValue = $currentData;
+            $newValue = $currentValues;
 
         } elseif (isset($this->function[1]) && $this->function['1'] == 'set') {
 
