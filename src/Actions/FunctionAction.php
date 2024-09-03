@@ -15,11 +15,13 @@ use PhelixJuma\GUIFlow\Utils\TemplateParserService;
 use PhelixJuma\GUIFlow\Utils\UnitConverter;
 use PhelixJuma\GUIFlow\Utils\Utils;
 use PhelixJuma\GUIFlow\Utils\PathResolver;
-use OpenSwoole\Coroutine as Co;
-use OpenSwoole\Core\Coroutine\WaitGroup;
 
 use PhelixJuma\GUIFlow\Workflow;
-use function OpenSwoole\Coroutine\batch;
+
+use OpenSwoole\Coroutine as Co;
+use function OpenSwoole\Core\Coroutine\batch;
+use OpenSwoole\Core\Coroutine\WaitGroup;
+
 
 class FunctionAction implements ActionInterface
 {
@@ -142,11 +144,13 @@ class FunctionAction implements ActionInterface
 
             $wg = new WaitGroup();
 
+            $tasks = [];
             for ($index = 0; $index < $count; $index++) {
 
                 if (empty($this->condition) || Workflow::evaluateCondition($currentValues[$index], $this->condition)) {
                     $wg->add();
-                    co::go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg) {
+
+                    go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg) {
                         // execute the task
                         $dataCopy = $currentValues[$index]; // Work with a local copy
                         try {
