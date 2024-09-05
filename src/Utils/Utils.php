@@ -932,9 +932,10 @@ class Utils
             $sortedData = self::sortMultiAssocArrayByKey($choices, 'similarity', $order);
 
             if (empty($n)) {
-                // We get only those with 100% match
-                return array_filter($sortedData, function ($data) {
-                    return $data['similarity'] == 100;
+                // We get only those with the top match
+                $topMatch = $sortedData[0]['similarity'];
+                return array_filter($sortedData, function ($data) use($topMatch) {
+                    return $data['similarity'] == $topMatch;
                 });
             }
 
