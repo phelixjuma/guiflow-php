@@ -901,7 +901,7 @@ class Utils
      * @param $stopWords
      * @return mixed|null
      */
-    public static function fuzzy_extract_n($data, $query, $choices, $searchKey, $n=10, $order='desc', $fuzzyMethod = 'tokenSetRatio', $stopWords = null) {
+    public static function fuzzy_extract_n($data, $query, $choices, $searchKey, $n='', $order='desc', $fuzzyMethod = 'tokenSetRatio', $stopWords = null) {
 
         // For strings, we split into an array
         if (is_string($stopWords)) {
@@ -930,6 +930,13 @@ class Utils
 
             // We sort in descending order
             $sortedData = self::sortMultiAssocArrayByKey($choices, 'similarity', $order);
+
+            if (empty($n)) {
+                // We get only those with 100% match
+                return array_filter($sortedData, function ($data) {
+                    return $data['similarity'] == 100;
+                });
+            }
 
             // We get the top n
             return array_slice($sortedData, 0, $n, true);
