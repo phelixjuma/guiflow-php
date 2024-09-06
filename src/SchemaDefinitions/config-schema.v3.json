@@ -1734,6 +1734,89 @@
       ],
       "unevaluatedProperties": false
     },
+    "extractUnitFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "extract_unit"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "additional_uoms": {
+                  "type": "array",
+                  "items":  {
+                    "type": "object",
+                    "properties": {
+                      "uom": {
+                        "type": "string"
+                      },
+                      "variants": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["uom", "variants"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "additional_uoms"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "getTopNRankedItemsByKeyFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "get_top_n_ranked_items_by_key"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "n": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "n"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "appendFunctionArgs": {
       "allOf": [
         {
@@ -4176,6 +4259,44 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_ExtractUnit": {
+      "title": "Regex Extract",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/extractUnitFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "Action_Function_GetTopNRankedItemsByKey": {
+      "title": "Regex Extract",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/getTopNRankedItemsByKeyFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_Append": {
       "title": "Append",
       "allOf": [
@@ -4860,6 +4981,12 @@
           "$ref": "#/definitions/Action_Function_RegexExtract"
         },
         {
+          "$ref": "#/definitions/Action_Function_ExtractUnit"
+        },
+        {
+          "$ref": "#/definitions/Action_Function_GetTopNRankedItemsByKey"
+        },
+        {
           "$ref": "#/definitions/Action_Function_Append"
         },
         {
@@ -5030,6 +5157,14 @@
         {
           "title": "Regex Extract",
           "$ref": "#/definitions/regexExtractFunctionArgs"
+        },
+        {
+          "title": "Extract Unit",
+          "$ref": "#/definitions/extractUnitFunctionArgs"
+        },
+        {
+          "title": "Get Top N Ranked Items By Key",
+          "$ref": "#/definitions/getTopNRankedItemsByKeyFunctionArgs"
         },
         {
           "title": "Append",

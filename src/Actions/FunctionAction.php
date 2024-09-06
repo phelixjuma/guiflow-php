@@ -197,6 +197,10 @@ class FunctionAction implements ActionInterface
             $newValue = (new FuzzySearch())->fuzzyMatch(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'regex_extract') {
             $newValue = Utils::regex_extract(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'extract_unit') {
+            $newValue = Utils::extract_unit(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'get_top_n_ranked_items_by_key') {
+            $newValue = Utils::get_top_n_ranked_items_by_key(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'transform') {
             $newValue = Utils::transform_data(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'append') {

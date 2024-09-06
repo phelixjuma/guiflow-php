@@ -987,6 +987,83 @@ class Utils
     }
 
     /**
+     * @param $string
+     * @param $additionalUoMs
+     * @return string|null
+     */
+    public static function extract_unit($string, $additionalUoMs = []) {
+
+        // Define a mapping for units and their common abbreviations
+        $unitMappings = [
+            'G'     => ['G', 'GM', 'GMS', 'GRM', 'GRMS', 'GRAM', 'GRAMS', 'GRAMMES'],
+            'KG'    => ['KG', 'KGS', 'K', 'KILOGRAM', 'KILOGRAMS'],
+            'L'     => ['L', 'LTR', 'LTRS', 'LT', 'LTS', 'LITRE', 'LITRES', 'LITER', 'LITERS'],
+            'ML'    => ['ML'],
+            'PCS'   => ['PCS', 'PC', 'PIECES', 'PIECE', 'EACH'],
+            'PKT'   => ['PKT', 'PKTS', 'PACKET', 'PACKETS'],
+            'BG'    => ['BG', 'BAG', 'BAGS'],
+            'BL'    => ['BL', 'BLS', 'BALE', 'BALES'],
+            'BDL'   => ['BDL', 'BDLS', 'BUNDLE', 'BUNDLES'],
+            'CTN'   => ['CTN', 'CTNS', 'CARTON', 'CARTONS'],
+            'PK'    => ['PACK', 'PACKS', 'PK'],
+            'SET'   => ['SET'],
+            'BOX'   => ['BOX', 'BOXES', 'BX'],
+            'SACK'  => ['SACK', 'SACKS'],
+            'DOZEN' => ['DOZEN', 'DOZENS', 'DZN', 'DZ', 'DZS']
+        ];
+
+        // We add additional UoMs
+        if (!empty($additionalUoMs)) {
+            foreach ($additionalUoMs as $additionalUoM) {
+                if (!empty($additionalUoM['uom']) && !empty($additionalUoM['variants'])) {
+                    $uom = strtoupper($additionalUoM['uom']);
+                    $variants = $additionalUoM['variants'];
+                    $variants[] = $uom;
+
+                    if (array_key_exists($uom, $unitMappings)) {
+                        $unitMappings[$uom] = array_values(array_unique(array_merge($unitMappings[$uom], $variants)));
+                    } else {
+                        $unitMappings[$uom] = array_values(array_unique($variants));
+                    }
+                }
+            }
+        }
+
+
+        // Flatten the unit mappings to a regex pattern for matching
+        $unitPattern = [];
+        foreach ($unitMappings as $standardUnit => $abbreviations) {
+            foreach ($abbreviations as $abbreviation) {
+                $unitPattern[] = preg_quote($abbreviation, '/');
+            }
+        }
+        $unitPattern = implode('|', $unitPattern);
+
+        // Define the regex to extract the quantity and unit from the string
+        $pattern = '/(\d+(?:\.\d+)?)\s*(' . $unitPattern . ')/i';
+
+        // Search for the unit in the string
+        if (preg_match($pattern, $string, $matches)) {
+            $quantity = $matches[1]; // The number part (e.g., "20")
+            $unit = strtoupper($matches[2]); // The extracted unit (e.g., "G")
+
+            // Normalize the unit based on the mappings
+            foreach ($unitMappings as $standardUnit => $abbreviations) {
+                if (in_array(strtoupper($unit), $abbreviations)) {
+                    $unit = $standardUnit;
+                    break;
+                }
+            }
+
+            // Return the formatted quantity with normalized unit
+            return $quantity . $unit;
+        }
+
+        // Return null if no unit found
+        return null;
+    }
+
+    /**
      * @param $text
      * @return array|string|string[]|null
      */
