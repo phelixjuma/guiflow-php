@@ -950,7 +950,7 @@ class Utils
                 });
             }
 
-            return $sortedData;
+            return array_values($sortedData);
         }
         return null;
     }
