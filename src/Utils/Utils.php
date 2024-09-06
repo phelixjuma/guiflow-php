@@ -952,7 +952,7 @@ class Utils
 
             return array_values($sortedData);
         }
-        return null;
+        return [];
     }
 
     public static function full_unescape($string) {
