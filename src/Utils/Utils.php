@@ -940,7 +940,8 @@ class Utils
                     return $data['similarity'] == $topMatch;
                 });
             } else {
-                $sortedData = array_slice($sortedData, 0, $n, true);
+                //$sortedData = array_slice($sortedData, 0, $n, true);
+                $sortedData = self::get_top_n_ranked_items_by_key($sortedData, 'similarity', $n);
             }
 
             // min score given. We filter further to ensure none of the top n are below the min score
@@ -957,6 +958,32 @@ class Utils
 
     public static function full_unescape($string) {
         return html_entity_decode(htmlspecialchars_decode($string, ENT_QUOTES), ENT_QUOTES);
+    }
+
+    public static function get_top_n_ranked_items_by_key($data, $key, $n) {
+
+        // Step 1: Sort the data by the specified key in descending order
+        usort($data, function($a, $b) use ($key) {
+            return $b[$key] <=> $a[$key];
+        });
+
+        // Step 2: Group the items by the key to ensure all items with the same value share the same rank
+        $groupedData = [];
+        foreach ($data as $item) {
+            $groupedData[$item[$key]][] = $item;
+        }
+
+        // Step 3: Collect the top N ranked items
+        $result = [];
+        $rankCount = 0;
+
+        foreach ($groupedData as $group) {
+            if ($rankCount >= $n) break;
+            $result = array_merge($result, $group);
+            $rankCount++;
+        }
+
+        return array_values($result);
     }
 
     /**
