@@ -932,23 +932,22 @@ class Utils
             // We sort in descending order
             $sortedData = self::sortMultiAssocArrayByKey($choices, 'similarity', $order);
 
-            // no n and no min score
-            if (empty($n) && empty($minScore)) {
+            // no n - we get the top matching item(s)
+            if (empty($n)) {
                 // We get only those with the top match
                 $topMatch = $sortedData[0]['similarity'];
-                return array_filter($sortedData, function ($data) use($topMatch) {
+                $sortedData = array_filter($sortedData, function ($data) use($topMatch) {
                     return $data['similarity'] == $topMatch;
                 });
+            } else {
+                $sortedData = array_slice($sortedData, 0, $n, true);
             }
-            // min score given. We filter by min score
+
+            // min score given. We filter further to ensure none of the top n are below the min score
             if (!empty($minScore)) {
                 $sortedData = array_filter($sortedData, function ($data) use($minScore) {
                     return $data['similarity'] >= $minScore;
                 });
-            }
-            // n given, we get the top n
-            if (!empty($n)) {
-                $sortedData = array_slice($sortedData, 0, $n, true);
             }
 
             return $sortedData;
