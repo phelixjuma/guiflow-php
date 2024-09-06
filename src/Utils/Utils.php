@@ -988,10 +988,12 @@ class Utils
 
     /**
      * @param $string
+     * @param $onlyInclude
+     * @param $exclude
      * @param $additionalUoMs
      * @return string|null
      */
-    public static function extract_unit($string, $additionalUoMs = []) {
+    public static function extract_unit($string, $onlyInclude = [], $exclude=[], $additionalUoMs = []) {
 
         // Define a mapping for units and their common abbreviations
         $unitMappings = [
@@ -1029,6 +1031,28 @@ class Utils
             }
         }
 
+        // if only include is specified:
+        if (!empty($onlyInclude)) {
+            array_walk($onlyInclude, function (&$value, $key) {
+               $value = strtoupper($value);
+            });
+            foreach ($unitMappings as $key => $value) {
+                if (!in_array($key, $onlyInclude)) {
+                    unset($unitMappings[$key]);
+                }
+            }
+        }
+        // if exclude is specified:
+        if (!empty($exclude)) {
+            array_walk($exclude, function (&$value, $key) {
+                $value = strtoupper($value);
+            });
+            foreach ($exclude as $ex) {
+                if (isset($unitMappings[$ex])) {
+                    unset($unitMappings[$ex]);
+                }
+            }
+        }
 
         // Flatten the unit mappings to a regex pattern for matching
         $unitPattern = [];

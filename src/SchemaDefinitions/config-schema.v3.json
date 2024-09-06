@@ -1749,6 +1749,18 @@
             "args": {
               "type": "object",
               "properties": {
+                "only_include": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "exclude": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
                 "additional_uoms": {
                   "type": "array",
                   "items":  {
@@ -1767,6 +1779,8 @@
                 }
               },
               "required": [
+                "only_include",
+                "exclude",
                 "additional_uoms"
               ],
               "additionalProperties": false
