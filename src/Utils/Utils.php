@@ -997,21 +997,21 @@ class Utils
 
         // Define a mapping for units and their common abbreviations
         $unitMappings = [
-            'G'     => ['G', 'GM', 'GMS', 'GRM', 'GRMS', 'GRAM', 'GRAMS', 'GRAMMES'],
-            'KG'    => ['KG', 'KGS', 'K', 'KILOGRAM', 'KILOGRAMS'],
-            'L'     => ['L', 'LTR', 'LTRS', 'LT', 'LTS', 'LITRE', 'LITRES', 'LITER', 'LITERS'],
-            'ML'    => ['ML'],
-            'PCS'   => ['PCS', 'PC', 'PIECES', 'PIECE', 'EACH'],
-            'PKT'   => ['PKT', 'PKTS', 'PACKET', 'PACKETS'],
-            'BG'    => ['BG', 'BAG', 'BAGS'],
-            'BL'    => ['BL', 'BLS', 'BALE', 'BALES'],
-            'BDL'   => ['BDL', 'BDLS', 'BUNDLE', 'BUNDLES'],
-            'CTN'   => ['CTN', 'CTNS', 'CARTON', 'CARTONS'],
-            'PK'    => ['PACK', 'PACKS', 'PK'],
-            'SET'   => ['SET'],
-            'BOX'   => ['BOX', 'BOXES', 'BX'],
-            'SACK'  => ['SACK', 'SACKS'],
-            'DOZEN' => ['DOZEN', 'DOZENS', 'DZN', 'DZ', 'DZS']
+            'G'         => ['G', 'GM', 'GMS', 'GRM', 'GRMS', 'GRAM', 'GRAMS', 'GRAMMES'],
+            'KG'        => ['KG', 'KGS', 'K', 'KILOGRAM', 'KILOGRAMS'],
+            'L'         => ['L', 'LTR', 'LTRS', 'LT', 'LTS', 'LITRE', 'LITRES', 'LITER', 'LITERS'],
+            'ML'        => ['ML'],
+            'PIECES'    => ['PCS', 'PC', 'PIECES', 'PIECE', 'EACH'],
+            'PACKETS'   => ['PKT', 'PKTS', 'PACKET', 'PACKETS'],
+            'BAGS'      => ['BG', 'BAG', 'BAGS'],
+            'BALES'     => ['BL', 'BLS', 'BALE', 'BALES'],
+            'BUNDLES'   => ['BDL', 'BDLS', 'BUNDLE', 'BUNDLES'],
+            'CARTONS'   => ['CTN', 'CTNS', 'CARTON', 'CARTONS'],
+            'PACKS'     => ['PACK', 'PACKS', 'PK'],
+            'SETS'      => ['SET'],
+            'BOXES'     => ['BOX', 'BOXES', 'BX'],
+            'SACKS'     => ['SACK', 'SACKS'],
+            'DOZEN'     => ['DOZEN', 'DOZENS', 'DZN', 'DZ', 'DZS']
         ];
 
         // We add additional UoMs

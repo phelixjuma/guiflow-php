@@ -1752,13 +1752,21 @@
                 "only_include": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "G", "KG", "L", "ML", "PIECES", "PACKETS", "BAGS", "BALES", "BUNDLES", "CARTONS", "PACKS", "SETS",
+                      "BOXES", "SACKS", "DOZEN"
+                    ]
                   }
                 },
                 "exclude": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "G", "KG", "L", "ML", "PIECES", "PACKETS", "BAGS", "BALES", "BUNDLES", "CARTONS", "PACKS", "SETS",
+                      "BOXES", "SACKS", "DOZEN"
+                    ]
                   }
                 },
                 "additional_uoms": {
