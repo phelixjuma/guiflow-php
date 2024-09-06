@@ -1064,7 +1064,7 @@ class Utils
         $unitPattern = implode('|', $unitPattern);
 
         // Define the regex to extract the quantity and unit from the string
-        $pattern = '/(\d+(?:\.\d+)?)\s*(' . $unitPattern . ')/i';
+        $pattern = '/[\sx\*](\d+(?:\.\d+)?)\s*(' . $unitPattern . ')/i';
 
         // Search for the unit in the string
         if (preg_match($pattern, $string, $matches)) {
