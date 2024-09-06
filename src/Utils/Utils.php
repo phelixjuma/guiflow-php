@@ -896,12 +896,13 @@ class Utils
      * @param $choices
      * @param $searchKey
      * @param $n
+     * @param $minScore
      * @param $order
      * @param $fuzzyMethod
      * @param $stopWords
      * @return mixed|null
      */
-    public static function fuzzy_extract_n($data, $query, $choices, $searchKey, $n='', $order='desc', $fuzzyMethod = 'tokenSetRatio', $stopWords = null) {
+    public static function fuzzy_extract_n($data, $query, $choices, $searchKey, $n='', $minScore='', $order='desc', $fuzzyMethod = 'tokenSetRatio', $stopWords = null) {
 
         // For strings, we split into an array
         if (is_string($stopWords)) {
@@ -931,16 +932,26 @@ class Utils
             // We sort in descending order
             $sortedData = self::sortMultiAssocArrayByKey($choices, 'similarity', $order);
 
-            if (empty($n)) {
+            // no n and no min score
+            if (empty($n) && empty($minScore)) {
                 // We get only those with the top match
                 $topMatch = $sortedData[0]['similarity'];
                 return array_filter($sortedData, function ($data) use($topMatch) {
                     return $data['similarity'] == $topMatch;
                 });
             }
+            // min score given. We filter by min score
+            if (!empty($minScore)) {
+                $sortedData = array_filter($sortedData, function ($data) use($minScore) {
+                    return $data['similarity'] >= $minScore;
+                });
+            }
+            // n given, we get the top n
+            if (!empty($n)) {
+                $sortedData = array_slice($sortedData, 0, $n, true);
+            }
 
-            // We get the top n
-            return array_slice($sortedData, 0, $n, true);
+            return $sortedData;
         }
         return null;
     }
