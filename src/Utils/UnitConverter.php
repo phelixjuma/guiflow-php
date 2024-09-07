@@ -74,7 +74,14 @@ class UnitConverter
                     }
                 }
 
-                $response['converted_value'] = ceil($quantity / $factor);
+                $convertedValue = $quantity / $factor;
+
+                $response['converted_value'] = match($decimalHandler) {
+                    "up" =>   ceil($convertedValue),
+                    "down" =>   floor($convertedValue),
+                    "off" =>   round($convertedValue, intval($numberOfDecimalPlaces)),
+                    default => $convertedValue
+                };
                 $response['converted_unit'] = $to_unit;
             }
         }

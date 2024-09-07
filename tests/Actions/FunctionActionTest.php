@@ -630,7 +630,7 @@ class FunctionActionTest extends TestCase
             'total_unit_price' => 500
         ];
 
-        $action = new FunctionAction("", [$this, 'split'], ['method' => 'running_total', 'split_path' => "products", "criteria_path" => "unit_of_measure.0.selling_quantity", "criteria" => "", "running_total_limit" => 50], '');
+        $action = new FunctionAction("", [$this, 'split'], ['method' => 'running_total', 'split_path' => "products", "criteria_path" => "unit_of_measure.0.selling_quantity", "criteria" => "", "running_total_limit" => "50"], '');
 
         $action->execute($data);
 
@@ -1668,9 +1668,9 @@ class FunctionActionTest extends TestCase
     {
         $data = [
             "items" => [
-                ["code" => "PC0002", 'quantity' => 17, 'uom' => 'PCS',
+                ["code" => "PC0002", 'quantity' => 12, 'uom' => 'PCS',
                     "conversion_table" => [
-                        ["from" => "PCS", "to" => "Bales", "factor" => "3"]
+                        ["from" => "CTN", "to" => "PCS", "factor" => "24"]
                     ]
                 ]
             ]
@@ -1678,7 +1678,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("", [$this, 'convert_unit_multi'], ['items' => ["path" => "items"], 'conversionTable' => ['in_item_path' => 'conversion_table'], 'quantity' => ['in_item_path' => 'quantity'], 'from_unit' => ['in_item_path' => 'uom'], 'to_unit' => 'Bales', 'invert_factor' => 1, 'decimal_handler' => 'off', 'number_of_decimal_places' => "3", 'output_path' => 'converted_units'], "items");
+        $action = new FunctionAction("", [$this, 'convert_unit_multi'], ['items' => ["path" => "items"], 'conversionTable' => ['in_item_path' => 'conversion_table'], 'quantity' => ['in_item_path' => 'quantity'], 'from_unit' => ['in_item_path' => 'uom'], 'to_unit' => 'CTN', 'invert_factor' => 0, 'decimal_handler' => 'off', 'number_of_decimal_places' => "4", 'output_path' => 'converted_units'], "items");
 
         $action->execute($data);
 
