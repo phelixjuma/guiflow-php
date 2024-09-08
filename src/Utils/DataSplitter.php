@@ -111,7 +111,12 @@ class DataSplitter
             }
         }
 
-        // Step 2: Sort items in descending order by quantity
+        // We add rank key for later sorting
+        foreach ($newItems as $key => &$item) {
+            $item['rank'] = $key;
+        }
+
+        // Step 2: Sort items in descending order by criteria path value
         usort($newItems, function($a, $b) use ($criteriaPath) {
             return PathResolver::getValueByPath($b, $criteriaPath) <=> PathResolver::getValueByPath($a, $criteriaPath);
         });
@@ -130,11 +135,11 @@ class DataSplitter
                     continue; // Skip already used items
                 }
 
-                $quantity = PathResolver::getValueByPath($item, $criteriaPath);
+                $splitValue = PathResolver::getValueByPath($item, $criteriaPath);
 
-                if ($currentTotal + $quantity <= $limit) {
+                if ($currentTotal + $splitValue <= $limit) {
                     $currentGroup[] = $item;
-                    $currentTotal += $quantity;
+                    $currentTotal += $splitValue;
                     $usedItems[] = $index;
                 }
             }
@@ -142,6 +147,17 @@ class DataSplitter
             // Save the current group if it's not empty
             if (!empty($currentGroup)) {
                 $dataCopy = $data;
+
+                // first, we sort the current group
+                usort($currentGroup, function($a, $b) {
+                    return $a['rank'] <=> $b['rank'];
+                });
+
+                // Remove the rank key
+                foreach ($currentGroup as $key => &$item) {
+                    unset($item['rank']);
+                }
+
                 PathResolver::setValueByPath($dataCopy, $splitPath, $currentGroup);
                 $results[] = $dataCopy;
             }

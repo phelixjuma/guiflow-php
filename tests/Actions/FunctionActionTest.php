@@ -579,7 +579,7 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function _testSplitByRunningTotalFunction()
+    public function testSplitByRunningTotalFunction()
     {
 
         $data = [
