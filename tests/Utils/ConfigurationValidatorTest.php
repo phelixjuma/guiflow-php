@@ -3,28 +3,32 @@
 namespace PhelixJuma\GUIFlow\Tests\Utils;
 
 use PhelixJuma\GUIFlow\Utils\ConfigurationValidator;
+use PhelixJuma\GUIFlow\Utils\JsonSchemaResolver;
 use PHPUnit\Framework\TestCase;
 
 class ConfigurationValidatorTest extends TestCase
 {
-    public function _testValidate()
+    public function _testSchemaResolver()
     {
 
-        $config_json = file_get_contents(dirname(__DIR__) ."/config.json");
-        $config = json_decode($config_json);
+        $resolvedSchema = JsonSchemaResolver::resolveSchema('v3');
 
-        // validate the config
-        $valid = ConfigurationValidator::validate($config, 'v3');
+        // Save all refs to a JSON file
+        $jsonString = json_encode($resolvedSchema, JSON_PRETTY_PRINT);
+        echo "\n$jsonString\n";
 
-        if ($valid) {
-            print "\nValid\n";
-        } else {
-            print "\nInvalid\n";
-        }
-
-        //print_r($data);
-
-        //$this->assertTrue(ConfigurationValidator::validate($data));
+        $this->assertNotEmpty($resolvedSchema, "There should be \$ref occurrences in the schema");
     }
 
+    public function _testSchemaComponents()
+    {
+
+        $components = ConfigurationValidator::getSchemaComponents('v3');
+
+        // Save all refs to a JSON file
+        //$jsonString = file_put_contents("schema-components.json", json_encode($components));
+        //echo "\n$jsonString\n";
+
+        //$this->assertNotEmpty($components, "There should be \$ref occurrences in the schema");
+    }
 }
