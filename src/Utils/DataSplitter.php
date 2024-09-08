@@ -112,8 +112,8 @@ class DataSplitter
         }
 
         // We add rank key for later sorting
-        foreach ($newItems as $key => &$item) {
-            $item['rank'] = $key;
+        foreach ($newItems as $key => &$newItem) {
+            $newItem['rank'] = $key;
         }
 
         // Step 2: Sort items in descending order by criteria path value
@@ -154,8 +154,8 @@ class DataSplitter
                 });
 
                 // Remove the rank key
-                foreach ($currentGroup as $key => &$item) {
-                    unset($item['rank']);
+                foreach ($currentGroup as &$groupItem) {
+                    unset($groupItem['rank']);
                 }
 
                 PathResolver::setValueByPath($dataCopy, $splitPath, $currentGroup);
