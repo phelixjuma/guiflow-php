@@ -2363,4 +2363,21 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
+    public function _testExtractUnit()
+    {
+        $data = [
+            "description" => "Afri 701 Tape Brown 48mmx50Mt 50 Pcs x 72Rolls"
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("description", [$this, 'extract_unit'], ["only_include" => [], "exclude" => [], "additional_uoms" =>[], "priority" => ["ROLLS", "PIECES"]], 'unit',  0, null);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        //$this->assertEquals($data, $expectedData);
+    }
+
 }

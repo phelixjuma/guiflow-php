@@ -991,9 +991,10 @@ class Utils
      * @param $onlyInclude
      * @param $exclude
      * @param $additionalUoMs
+     * @param $priority
      * @return string|null
      */
-    public static function extract_unit($string, $onlyInclude = [], $exclude=[], $additionalUoMs = []) {
+    public static function extract_unit($string, $onlyInclude = [], $exclude=[], $additionalUoMs = [], $priority = []) {
 
         // Define a mapping for units and their common abbreviations
         $unitMappings = [
@@ -1015,7 +1016,10 @@ class Utils
             'PAGES'     => ['PAGE', 'PAGES', 'PG', 'PGS'],
             'ROLLS'     => ['ROLL', 'ROLLS', 'RLLS'],
             'SHEETS'    => ['SHEET', 'SHEETS', 'SHT', 'SHTS'],
-            "MM"        => ['MM', 'MILLIMETRE', 'MILLIMETER']
+            "MM"        => ['MM', 'MILLIMETRE', 'MILLIMETER'],
+            'M'         => ['M', 'MT', 'MTS', 'METER', 'METERS', 'METRE', 'METRES'],
+            'CM'        => ['CM', 'CMS', 'CENTIMETER', 'CENTIMETERS', 'CENTIMETRE', 'CENTIMETRES'],
+            'KM'        => ['KM', 'KMS', 'KILOMETER', 'KILOMETERS', 'KILOMETRE', 'KILOMETRES']
         ];
 
         // We add additional UoMs
@@ -1058,6 +1062,9 @@ class Utils
             }
         }
 
+        // We check if dimension exists and remove it
+        $string = preg_replace("/[\sx*](\d+(\.\d+)?\s?(MM|CM|Mts?|M)\s*x\s*\d+(\.\d+)?\s?(MM|CM|Mts?|M))/i", "", $string);
+
         // Flatten the unit mappings to a regex pattern for matching
         $unitPattern = [];
         foreach ($unitMappings as $standardUnit => $abbreviations) {
@@ -1071,22 +1078,70 @@ class Utils
         $pattern = '/[\sx\*](\d+(?:\.\d+)?)\s*(' . $unitPattern . ')/i';
 
         // Search for the unit in the string
-        if (preg_match($pattern, $string, $matches)) {
-            $quantity = $matches[1]; // The number part (e.g., "20")
-            $unit = strtoupper($matches[2]); // The extracted unit (e.g., "G")
+//        if (preg_match($pattern, $string, $matches)) {
+//            $quantity = $matches[1]; // The number part (e.g., "20")
+//            $unit = strtoupper($matches[2]); // The extracted unit (e.g., "G")
+//
+//            // Normalize the unit based on the mappings
+//            foreach ($unitMappings as $standardUnit => $abbreviations) {
+//                if (in_array(strtoupper($unit), $abbreviations)) {
+//                    $unit = $standardUnit;
+//                    break;
+//                }
+//            }
+//
+//            // Return the formatted quantity with normalized unit
+//            return $quantity . $unit;
+//        }
 
-            // Normalize the unit based on the mappings
-            foreach ($unitMappings as $standardUnit => $abbreviations) {
-                if (in_array(strtoupper($unit), $abbreviations)) {
-                    $unit = $standardUnit;
-                    break;
+        // Collect all matches in case we have multiple units in the string
+        preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
+
+        // If units are found
+        if ($matches) {
+            $foundUnits = [];
+
+            // Normalize each found unit and store it
+            foreach ($matches as $match) {
+                $quantity = $match[1]; // The number part (e.g., "20")
+                $unit = strtoupper($match[2]); // The extracted unit (e.g., "G")
+
+                // Normalize the unit based on the mappings
+                foreach ($unitMappings as $standardUnit => $abbreviations) {
+                    if (in_array(strtoupper($unit), $abbreviations)) {
+                        $foundUnits[] = [
+                            'unit' => $standardUnit,
+                            'quantity' => $quantity
+                        ];
+                        break;
+                    }
                 }
             }
 
-            // Return the formatted quantity with normalized unit
-            return $quantity . $unit;
-        }
+            // Sort found units based on priority
+            if (!empty($priority)) {
+                usort($foundUnits, function ($a, $b) use ($priority) {
+                    $priorityA = array_search($a['unit'], $priority);
+                    $priorityB = array_search($b['unit'], $priority);
 
+                    // If both have priorities, compare them
+                    if ($priorityA !== false && $priorityB !== false) {
+                        return $priorityA <=> $priorityB;
+                    }
+                    // If one has priority, it comes first
+                    if ($priorityA !== false) return -1;
+                    if ($priorityB !== false) return 1;
+
+                    // Otherwise, keep the original order
+                    return 0;
+                });
+            }
+
+            // Return the highest priority unit with its quantity
+            if (!empty($foundUnits)) {
+                return $foundUnits[0]['quantity'] . $foundUnits[0]['unit'];
+            }
+        }
         // Return null if no unit found
         return null;
     }

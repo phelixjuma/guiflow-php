@@ -1755,7 +1755,7 @@
                     "type": "string",
                     "enum": [
                       "G", "KG", "L", "ML", "PIECES", "PACKETS", "BAGS", "BALES", "BUNDLES", "CARTONS", "PACKS", "SETS",
-                      "BOXES", "SACKS", "DOZENS", "PAGES", "ROLLS", "SHEETS", "MM"
+                      "BOXES", "SACKS", "DOZENS", "PAGES", "ROLLS", "SHEETS", "MM", "CM", "M", "KM"
                     ]
                   }
                 },
@@ -1765,7 +1765,7 @@
                     "type": "string",
                     "enum": [
                       "G", "KG", "L", "ML", "PIECES", "PACKETS", "BAGS", "BALES", "BUNDLES", "CARTONS", "PACKS", "SETS",
-                      "BOXES", "SACKS", "DOZENS", "PAGES", "ROLLS", "SHEETS", "MM"
+                      "BOXES", "SACKS", "DOZENS", "PAGES", "ROLLS", "SHEETS", "MM", "CM", "M", "KM"
                     ]
                   }
                 },
@@ -1784,12 +1784,23 @@
                     "required": ["uom", "variants"],
                     "additionalProperties": false
                   }
+                },
+                "priority": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "G", "KG", "L", "ML", "PIECES", "PACKETS", "BAGS", "BALES", "BUNDLES", "CARTONS", "PACKS", "SETS",
+                      "BOXES", "SACKS", "DOZENS", "PAGES", "ROLLS", "SHEETS", "MM", "CM", "M", "KM"
+                    ]
+                  }
                 }
               },
               "required": [
                 "only_include",
                 "exclude",
-                "additional_uoms"
+                "additional_uoms",
+                "priority"
               ],
               "additionalProperties": false
             }
