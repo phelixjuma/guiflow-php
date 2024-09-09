@@ -1011,7 +1011,11 @@ class Utils
             'SETS'      => ['SET'],
             'BOXES'     => ['BOX', 'BOXES', 'BX'],
             'SACKS'     => ['SACK', 'SACKS'],
-            'DOZEN'     => ['DOZEN', 'DOZENS', 'DZN', 'DZ', 'DZS']
+            'DOZENS'    => ['DOZEN', 'DOZENS', 'DZN', 'DZ', 'DZS'],
+            'PAGES'     => ['PAGE', 'PAGES', 'PG', 'PGS'],
+            'ROLLS'     => ['ROLL', 'ROLLS', 'RLLS'],
+            'SHEETS'    => ['SHEET', 'SHEETS', 'SHT', 'SHTS'],
+            "MM"        => ['MM', 'MILLIMETRE', 'MILLIMETER']
         ];
 
         // We add additional UoMs
