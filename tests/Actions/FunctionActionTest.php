@@ -2366,7 +2366,7 @@ class FunctionActionTest extends TestCase
     public function _testExtractUnit()
     {
         $data = [
-            "description" => "Afri 701 Tape Brown 48mmx50Mt 50 Pcs x 72Rolls"
+            "description" => "AFRI BROWN TAPE 48MMX50M 701"
         ];
 
         $expectedData = [];
