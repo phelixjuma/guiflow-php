@@ -2366,12 +2366,28 @@ class FunctionActionTest extends TestCase
     public function _testExtractUnit()
     {
         $data = [
-            "description" => "AFRI BROWN TAPE 48MMX50M 701"
+            "description" => "Afri Label K09 Flourescent Red 1Bx(25Pkt)"
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("description", [$this, 'extract_unit'], ["only_include" => [], "exclude" => [], "additional_uoms" =>[], "priority" => ["ROLLS", "PIECES"]], 'unit',  0, null);
+        $action = new FunctionAction("description", [$this, 'extract_unit'], ["only_include" => ["SHEETS",
+            "ROLLS",
+            "BOXES",
+            "G",
+            "PACKETS",
+            "PAGES",
+            "MM",
+            "DOZENS",
+            "PIECES"], "exclude" => [], "additional_uoms" =>[], "priority" => ["SHEETS",
+            "ROLLS",
+            "BOXES",
+            "G",
+            "PACKETS",
+            "PAGES",
+            "MM",
+            "DOZENS",
+            "PIECES"]], 'unit',  0, null);
 
         $action->execute($data);
 
