@@ -1573,7 +1573,7 @@ class Utils
                 $corpusStemKey = $corpusKey."_stem";
 
                 // We get the top match
-                $topMatch = self::fuzzy_extract_n(null, $value['spell_check_meta_data'][$stemKey], $corpusList, $corpusStemKey, 1, 'desc', 'tokenSetRatio', $stopWords);
+                $topMatch = self::fuzzy_extract_n(null, $value['spell_check_meta_data'][$stemKey], $corpusList, $corpusStemKey, 1, null,'desc', 'tokenSetRatio', $stopWords);
 
                 // Set the nearest stem
                 $value['spell_check_meta_data']['nearest_stem'] = "";
