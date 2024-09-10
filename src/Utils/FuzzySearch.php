@@ -176,6 +176,13 @@ class FuzzySearch
      */
     public function fuzzyMatch($dataToMatch, $searchKey, $matchKey, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio", $stopWords=[]): array
     {
+
+        $isObject = Utils::isObject($dataToMatch);
+
+        if ($isObject) {
+            $dataToMatch = [$dataToMatch];
+        }
+
         // We set the corpus
         $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $stopWords);
 
@@ -216,7 +223,7 @@ class FuzzySearch
             }
             $response[] = $responseData;
         }
-        return $response;
+        return $isObject ? $response[0] : $response;
     }
 
     /**
