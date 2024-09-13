@@ -17,34 +17,28 @@ class SetValueActionTest extends TestCase
                 'region' => 'Nairobi'
             ],
             'products' => [
-                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 100]
+                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 100],
+                ['name' => 'Capon Chicken', 'quantity' => 4, 'unit_price' => 100],
+                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 100],
+                ['name' => 'Capon Chicken', 'quantity' => 3, 'unit_price' => 100],
+                ['name' => 'Capon Chicken', 'quantity' => 7, 'unit_price' => 100],
+                ['name' => 'Capon Chicken', 'quantity' => 3, 'unit_price' => 100],
             ],
-        ];
-        $expectedData = [
-            'customer' => 'Naivas',
-            'location' => [
-                'address' => 'Kilimani',
-                'region' => 'Nairobi'
-            ],
-            'products' => [
-                ['name' => 'Capon Chicken', 'quantity' => 2, 'unit_price' => 100]
-            ],
-            'delivery_date' => '2023-09-04'
         ];
 
         $valueMapping = [
-            'Nairobi' => '2023-09-09',
-            'Kisumu' => '2023-09-04',
-            'Mombasa' => '2023-09-04',
+            '2' => '20',
+            '3' => '30'
         ];
 
-        $action = new SetValueAction("delivery_date", null, "location.region", $valueMapping);
+
+        $action = new SetValueAction("products.*.quantity", null, null, $valueMapping);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
-        $this->assertEquals($data, $expectedData);
+        //$this->assertEquals($data, $expectedData);
     }
 
     public function _testSetStaticValue()

@@ -37,6 +37,9 @@ class ConfigurationValidator
 
         $validator = new Validator();
 
+        $schema = json_decode(json_encode($schema));
+        $data = json_decode(json_encode($data));
+
         $result = $validator->validate($data, $schema);
 
         if ($result->isValid()) {
