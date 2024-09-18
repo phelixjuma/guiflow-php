@@ -1447,6 +1447,35 @@ class Utils
     }
 
     /**
+     * @param array $data
+     * @return array
+     */
+    public static function collapseData($data): array
+    {
+        if (!is_array($data)) {
+            return $data;
+        }
+
+        $collapsed = [];
+
+        if (self::isList($data)) {
+            foreach ($data as $d) {
+                $collapsed[] = self::collapseData($d);
+            }
+        } else {
+            // First, we flatten the data
+            $flattenedData = self::flattenAndExpand($data);
+
+            // We then loop through the data and build the new collapsed data
+            foreach ($flattenedData[0] as $path => $flattenedDatum) {
+                PathResolver::setValueByPath($collapsed, $path, $flattenedDatum);
+            }
+        }
+
+        return $collapsed;
+    }
+
+    /**
      * @param $data
      * @param $leftData
      * @param $rightData

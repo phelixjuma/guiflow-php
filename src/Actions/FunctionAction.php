@@ -231,6 +231,8 @@ class FunctionAction implements ActionInterface
             $newValue = Utils::expandList(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'flatten_and_expand') {
             $newValue = Utils::flattenAndExpand(...$paramValues);
+        } elseif (isset($this->function[1]) && $this->function['1'] == 'collapse') {
+            $newValue = Utils::collapseData(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'rename_object_keys') {
             $newValue = Utils::rename_object_keys(...$paramValues);
         } elseif (isset($this->function[1]) && $this->function['1'] == 'date_add_subtract_days') {

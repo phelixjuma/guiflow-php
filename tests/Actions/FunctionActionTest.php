@@ -1480,6 +1480,19 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
+    public function _testCollapseData()
+    {
+        $data = json_decode('[{"entity_name":"customer_name","exported":{"value":"C00048","description":"Chandarana Supermarket Ltd"},"final":{"value":"C00048","description":"Chandarana Supermarket Ltd"},"original_value":"CHANDARANA SUPERMARKET LTD"},{"entity_name":"delivery_location","exported":{"value":"Riverside Square","description":""},"final":{"value":"Chandarana Supermarket Ltd","description":""},"original_value":"Riverside Square"},{"entity_name":"items.0.serial_number","exported":{"value":"1","description":""},"final":{"value":"0","description":""},"original_value":"1"},{"entity_name":"items.0.description","exported":{"value":"ST001310","description":"5034624015145"},"final":{"value":"ST001310","description":"KB Counter Bk A4 HC 4Q 2.5Dz (234)"},"original_value":"KARTASI COUNTER BOOK A4 4QUIRE REF 234"},{"entity_name":"items.0.converted_units.converted_value","exported":{"value":"0.5","description":""},"final":{"value":"0.5","description":""},"original_value":"0.5"},{"entity_name":"items.1.serial_number","exported":{"value":"2","description":""},"final":{"value":"1","description":""},"original_value":"2"},{"entity_name":"items.1.description","exported":{"value":"ST016001","description":"5034624016029"},"final":{"value":"ST016001","description":"Njema Duplicate Bk Invoice A5 CB 100X2 1.25Dz (561)"},"original_value":"INVOICE BOOK NUMBERED NJEMA DUPLICATE REF 561"},{"entity_name":"items.1.converted_units.converted_value","exported":{"value":"1","description":""},"final":{"value":"1","description":""},"original_value":"1"},{"entity_name":"items.2.serial_number","exported":{"value":"3","description":""},"final":{"value":"2","description":""},"original_value":"3"},{"entity_name":"items.2.description","exported":{"value":"ST120203","description":"5034624030223"},"final":{"value":"ST120203","description":"KB Rubber Bands No.18 100Gms 48Pkts"},"original_value":"KARTASI RUBBER BAND REF 100 G"},{"entity_name":"items.2.converted_units.converted_value","exported":{"value":"0.25","description":""},"final":{"value":"0.25","description":""},"original_value":"0.25"},{"entity_name":"items.3.serial_number","exported":{"value":"4","description":""},"final":{"value":"3","description":""},"original_value":"4"},{"entity_name":"items.3.description","exported":{"value":"ST120112","description":"5034624030124"},"final":{"value":"ST120112","description":"KB Rubber Bands No.18 50Gms 72Pkts"},"original_value":"KARTASI RUBBER BANDS 50G NO18"},{"entity_name":"items.3.converted_units.converted_value","exported":{"value":"0.16667","description":""},"final":{"value":"0.1667","description":""},"original_value":"0.16667"}]', true);
+
+        $action = new FunctionAction("", [$this, 'collapse'], []);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        //$this->assertEquals($data, $expectedData);
+    }
+
     public function _testRenameObjectKeys()
     {
         $data = [
