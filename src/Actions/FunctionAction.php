@@ -276,15 +276,11 @@ class FunctionAction implements ActionInterface
         } elseif (isset($this->function[1]) && $this->function['1'] == 'user_defined_function') {
             // function name is at index 1 (index 0 is the data).
             $functionName = $paramValues[1];
-
             // We get the UDF's params which should exclude index 1 - function name).
-            $functionParams = self::resolveParam($paramValues[0], $paramValues[2]) ?? [];
-
-            $functionParams = array_merge([$paramValues[0], $functionParams]);
+            $functionParams = array_merge([$paramValues[0]], array_slice($paramValues, 2));
 
             // We call the user defined function
             $newValue = call_user_func_array([$this->function[0],$functionName], $functionParams);
-
         } elseif (isset($this->function[1]) && $this->function['1'] == 'system_defined_function') {
             // function name is at index 1 (index 0 is the data).
             $functionName = $paramValues[1];
@@ -294,7 +290,6 @@ class FunctionAction implements ActionInterface
 
             // We call the user defined function
             $newValue = call_user_func_array([$this->function[0],$functionName], $functionParams);
-
         }
         elseif (isset($this->function[1]) &&  function_exists($this->function['1'])) {
             if (in_array($this->function['1'], self::SUPPORTED_FUNCTIONS)) {
