@@ -277,7 +277,8 @@ class FunctionAction implements ActionInterface
             // function name is at index 1 (index 0 is the data).
             $functionName = $paramValues[1];
             // We get the UDF's params which should exclude index 1 - function name).
-            $functionParams = array_merge([$paramValues[0]], array_slice($paramValues, 2));
+            //$functionParams = array_merge([$paramValues[0]], array_slice($paramValues, 2));
+            $functionParams = array_merge([$paramValues[0]], self::resolveParam($paramValues[0], array_slice($paramValues, 2)));
 
             // We call the user defined function
             $newValue = call_user_func_array([$this->function[0],$functionName], $functionParams);
