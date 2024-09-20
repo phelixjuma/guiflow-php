@@ -887,7 +887,7 @@ class Utils
 
             return !$isList ? $response[0] : $response;
         }
-        return null;
+        return $choices;
     }
 
     /**
