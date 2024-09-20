@@ -2226,7 +2226,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testUDFInMap()
+    public function _testUDF()
     {
         $data = [
             "items" => [
@@ -2255,7 +2255,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'products', 'function' => 'user_defined_function', 'args' => ["function_name"=> "get_array_at_index", "index" => 1], 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
+        $action = new FunctionAction("items", [$this, 'user_defined_function'], ["function_name"=> "get_array_at_index", "index" => ["path" => ""]], '', 0, null);
 
         $action->execute($data);
 
