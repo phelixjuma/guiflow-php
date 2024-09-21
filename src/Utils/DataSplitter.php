@@ -139,7 +139,6 @@ class DataSplitter
 
                 if ($currentTotal + $splitValue <= $limit) {
                     $currentTotal += $splitValue;
-                    $item['running_total'] = $currentTotal;
                     $currentGroup[] = $item;
                     $usedItems[] = $index;
                 }
@@ -155,8 +154,12 @@ class DataSplitter
                 });
 
                 // Remove the rank key
+                $groupRunningTotal = 0;
                 foreach ($currentGroup as &$groupItem) {
                     unset($groupItem['rank']);
+                    $itemSplitValue = PathResolver::getValueByPath($groupItem, $criteriaPath);
+                    $groupRunningTotal += $itemSplitValue;
+                    $groupItem['running_total'] = $groupRunningTotal;
                 }
 
                 PathResolver::setValueByPath($dataCopy, $splitPath, $currentGroup);
