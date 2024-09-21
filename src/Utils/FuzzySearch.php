@@ -159,13 +159,16 @@ class FuzzySearch
      */
     private function getMetaData($matchedData = null) {
 
+        $search = !empty($matchedData) ? PathResolver::getValueByPath($matchedData, $this->corpusSearchKey) : null;
+        $value = !empty($matchedData) ? PathResolver::getValueByPath($matchedData, $this->corpusValueKey): null;
+
         return [
             'master_data'   => $this->masterDataType,
-            'value_key'     => $this->corpusSearchKey,
+            'value_key'     => !empty($this->corpusValueKey) ? $this->corpusValueKey : $this->corpusSearchKey,
             'id_key'        => $this->corpusIdKey,
             'id'            => !empty($matchedData) ? PathResolver::getValueByPath($matchedData, $this->corpusIdKey) : null,
-            'value'         => !empty($matchedData) ? PathResolver::getValueByPath($matchedData, $this->corpusValueKey) : null,
-            'other_details' => !empty($matchedData) ? Utils::removeKeysFromAssocArray($matchedData, [$this->corpusIdKey, $this->corpusValueKey]) : null
+            'value'         => !empty($value) ? $value : $search,
+            'other_details' => !empty($matchedData) ? Utils::removeKeysFromAssocArray($matchedData, [$this->corpusIdKey, (!empty($value) ? $this->corpusValueKey : $this->corpusSearchKey)]) : null
         ];
     }
 
