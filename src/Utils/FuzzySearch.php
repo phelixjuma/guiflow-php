@@ -227,7 +227,9 @@ class FuzzySearch
     }
 
     /**
-     * @param $searchPhrase
+     * @param $data
+     * @param $searchKey
+     * @param $matchingKey
      * @param $corpus
      * @param $corpusSearchKey
      * @param $corpusIdKey
@@ -238,11 +240,13 @@ class FuzzySearch
      * @param $stopWords
      * @return mixed
      */
-    public function fuzzySearch($searchPhrase, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio", $stopWords=[]): mixed
+    public function fuzzySearch($data, $searchKey, $matchingKey, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio", $stopWords=[]): mixed
     {
 
         // We set the corpus
         $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $stopWords);
+
+        $searchPhrase = PathResolver::getValueByPath($data, $searchKey);
 
         // matched value defaults to corpus structure with empty values
         $response =  [
@@ -269,7 +273,12 @@ class FuzzySearch
             $response['meta_data'] = $this->getMetaData($matchedData);
         }
 
-        return $response;
+        // We set the response
+        $matchingKey = !empty($matchingKey) ? $matchingKey : $searchKey;
+
+        PathResolver::setValueByPath($data, $matchingKey, $response);
+
+        return $data;
     }
 
 

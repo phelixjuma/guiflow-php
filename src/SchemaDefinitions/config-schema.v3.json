@@ -1577,6 +1577,12 @@
             "args": {
               "type": "object",
               "properties": {
+                "search_key": {
+                  "$ref": "#/definitions/valueOrPath"
+                },
+                "matching_key": {
+                  "$ref": "#/definitions/valueOrPath"
+                },
                 "corpus": {
                   "$ref": "#/definitions/valueOrPath"
                 },
