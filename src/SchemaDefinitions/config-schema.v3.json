@@ -1581,10 +1581,10 @@
                   "$ref": "#/definitions/valueOrPath"
                 },
                 "corpus_search_key": {
-                  "type": "string"
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "corpus_id_key": {
-                  "type": "string"
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "master_data_type": {
                   "type": "string"
@@ -1632,19 +1632,19 @@
               "type": "object",
               "properties": {
                 "search_key": {
-                  "type": "string"
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "matching_key": {
-                  "type": "string"
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "corpus": {
                   "$ref": "#/definitions/valueOrPath"
                 },
                 "corpus_search_key": {
-                  "type": "string"
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "corpus_id_key": {
-                  "type": "string"
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "master_data_type": {
                   "type": "string"
