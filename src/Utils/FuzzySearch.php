@@ -246,11 +246,18 @@ class FuzzySearch
         // We set the corpus
         $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $stopWords);
 
+        // Get the search phrase
         $searchPhrase = PathResolver::getValueByPath($data, $searchKey);
+
+        // Get the match key - if not provided, we use the search key
+        $matchingKey = !empty($matchingKey) ? $matchingKey : $searchKey;
+
+        // We get the match phrase - also the original value
+        $matchingPhrase = $matchingKey == $searchKey ? $searchPhrase : PathResolver::getValueByPath($data, $matchingKey);
 
         // matched value defaults to corpus structure with empty values
         $response =  [
-            "original_value"    => $searchPhrase,
+            "original_value"    => $matchingPhrase,
             "matched_value"     => '',
             "similarity"        => '',
             "meta_data"         => $this->getMetaData()
@@ -272,9 +279,6 @@ class FuzzySearch
             $response['similarity'] = $similarity;
             $response['meta_data'] = $this->getMetaData($matchedData);
         }
-
-        // We set the response
-        $matchingKey = !empty($matchingKey) ? $matchingKey : $searchKey;
 
         PathResolver::setValueByPath($data, $matchingKey, $response);
 
