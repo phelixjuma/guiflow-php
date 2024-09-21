@@ -138,8 +138,9 @@ class DataSplitter
                 $splitValue = PathResolver::getValueByPath($item, $criteriaPath);
 
                 if ($currentTotal + $splitValue <= $limit) {
-                    $currentGroup[] = $item;
                     $currentTotal += $splitValue;
+                    $item['running_total'] = $currentTotal;
+                    $currentGroup[] = $item;
                     $usedItems[] = $index;
                 }
             }
