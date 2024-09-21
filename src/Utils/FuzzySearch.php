@@ -144,7 +144,13 @@ class FuzzySearch
      * @return string
      */
     private function formatMatchedValue($matchedData) {
-        return "{$matchedData[$this->corpusSearchKey]} : {$matchedData[$this->corpusIdKey]}";
+
+        $id = PathResolver::getValueByPath($matchedData, $this->corpusIdKey);
+        $matchingValue = PathResolver::getValueByPath($matchedData, $this->corpusValueKey);
+        $searchingValue = PathResolver::getValueByPath($matchedData, $this->corpusSearchKey);
+        $value = !empty($matchingValue) ? $matchingValue : $searchingValue;
+
+        return "$value: $id";
     }
 
     /**
