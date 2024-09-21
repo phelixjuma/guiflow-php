@@ -262,7 +262,7 @@ class FuzzySearch
 
         // matched value defaults to corpus structure with empty values
         $response =  [
-            "original_value"    => $matchingPhrase,
+            "original_value"    => !empty($matchingPhrase) ? $matchingPhrase : $searchPhrase,
             "matched_value"     => '',
             "similarity"        => '',
             "meta_data"         => $this->getMetaData()
