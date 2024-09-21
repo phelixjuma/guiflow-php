@@ -1613,7 +1613,7 @@
                   "$ref": "#/definitions/valueOrPath"
                 }
               },
-              "required": ["corpus", "corpus_search_key", "corpus_id_key", "master_data_type", "similarity_threshold", "number_of_matches", "scorer", "stop_words"],
+              "required": ["search_key", "matching_key","corpus", "corpus_search_key", "corpus_id_key", "corpus_value_key", "master_data_type", "similarity_threshold", "number_of_matches", "scorer", "stop_words"],
               "additionalProperties": false
             }
           },
@@ -1676,7 +1676,7 @@
                   "$ref": "#/definitions/valueOrPath"
                 }
               },
-              "required": ["search_key", "matching_key","corpus", "corpus_search_key", "corpus_id_key", "master_data_type", "similarity_threshold", "number_of_matches", "scorer", "stop_words"],
+              "required": ["search_key", "matching_key","corpus", "corpus_search_key", "corpus_id_key", "corpus_value_key", "master_data_type", "similarity_threshold", "number_of_matches", "scorer", "stop_words"],
               "additionalProperties": false
             }
           },
