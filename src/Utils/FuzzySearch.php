@@ -11,6 +11,7 @@ class FuzzySearch
     private $corpus;
     private $corpusSearchKey;
     private $corpusIdKey;
+    private $corpusValueKey;
     private $stopWords;
 
     protected $fuzz;
@@ -28,15 +29,17 @@ class FuzzySearch
      * @param $corpus
      * @param $corpusSearchKey
      * @param $corpusIdKey
+     * @param $corpusValueKey
      * @param $masterDataType
      * @param $stopWords
      * @return $this
      */
-    public function setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $stopWords=[]): FuzzySearch
+    public function setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $corpusValueKey, $masterDataType, $stopWords=[]): FuzzySearch
     {
 
         $this->corpusSearchKey = $corpusSearchKey;
         $this->corpusIdKey = $corpusIdKey;
+        $this->corpusValueKey = $corpusValueKey;
         $this->masterDataType = $masterDataType;
         $this->corpus = $corpus;
         $this->stopWords = $stopWords;
@@ -154,9 +157,9 @@ class FuzzySearch
             'master_data'   => $this->masterDataType,
             'value_key'     => $this->corpusSearchKey,
             'id_key'        => $this->corpusIdKey,
-            'id'            => !empty($matchedData) ? $matchedData[$this->corpusIdKey] : null,
-            'value'         => !empty($matchedData) ? $matchedData[$this->corpusSearchKey] : null,
-            'other_details' => !empty($matchedData) ? Utils::removeKeysFromAssocArray($matchedData, [$this->corpusIdKey, $this->corpusSearchKey]) : null
+            'id'            => !empty($matchedData) ? PathResolver::getValueByPath($matchedData, $this->corpusIdKey) : null,
+            'value'         => !empty($matchedData) ? PathResolver::getValueByPath($matchedData, $this->corpusValueKey) : null,
+            'other_details' => !empty($matchedData) ? Utils::removeKeysFromAssocArray($matchedData, [$this->corpusIdKey, $this->corpusValueKey]) : null
         ];
     }
 
@@ -167,6 +170,7 @@ class FuzzySearch
      * @param $corpus
      * @param $corpusSearchKey
      * @param $corpusIdKey
+     * @param $corpusValueKey
      * @param $masterDataType
      * @param $similarityThreshold
      * @param $topN
@@ -174,7 +178,7 @@ class FuzzySearch
      * @param $stopWords
      * @return array
      */
-    public function fuzzyMatch($dataToMatch, $searchKey, $matchKey, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio", $stopWords=[]): array
+    public function fuzzyMatch($dataToMatch, $searchKey, $matchKey, $corpus, $corpusSearchKey, $corpusIdKey, $corpusValueKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio", $stopWords=[]): array
     {
 
         $isObject = Utils::isObject($dataToMatch);
@@ -184,7 +188,7 @@ class FuzzySearch
         }
 
         // We set the corpus
-        $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $stopWords);
+        $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $corpusValueKey, $masterDataType, $stopWords);
 
         // We set the match key to search key, if not set
         $matchKey = empty($matchKey) ? $searchKey : $matchKey;
@@ -233,6 +237,7 @@ class FuzzySearch
      * @param $corpus
      * @param $corpusSearchKey
      * @param $corpusIdKey
+     * @param $corpusValueKey
      * @param $masterDataType
      * @param $similarityThreshold
      * @param $topN
@@ -240,11 +245,11 @@ class FuzzySearch
      * @param $stopWords
      * @return mixed
      */
-    public function fuzzySearch($data, $searchKey, $matchingKey, $corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio", $stopWords=[]): mixed
+    public function fuzzySearch($data, $searchKey, $matchingKey, $corpus, $corpusSearchKey, $corpusIdKey, $corpusValueKey, $masterDataType, $similarityThreshold=50, $topN=1, $scoringMethod="tokenSetRatio", $stopWords=[]): mixed
     {
 
         // We set the corpus
-        $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $masterDataType, $stopWords);
+        $this->setCorpus($corpus, $corpusSearchKey, $corpusIdKey, $corpusValueKey, $masterDataType, $stopWords);
 
         // Get the search phrase
         $searchPhrase = PathResolver::getValueByPath($data, $searchKey);

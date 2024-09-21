@@ -1592,6 +1592,9 @@
                 "corpus_id_key": {
                   "$ref": "#/definitions/valueOrPath"
                 },
+                "corpus_value_key": {
+                  "$ref": "#/definitions/valueOrPath"
+                },
                 "master_data_type": {
                   "type": "string"
                 },
@@ -1650,6 +1653,9 @@
                   "$ref": "#/definitions/valueOrPath"
                 },
                 "corpus_id_key": {
+                  "$ref": "#/definitions/valueOrPath"
+                },
+                "corpus_value_key": {
                   "$ref": "#/definitions/valueOrPath"
                 },
                 "master_data_type": {
