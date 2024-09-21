@@ -1075,24 +1075,7 @@ class Utils
         $unitPattern = implode('|', $unitPattern);
 
         // Define the regex to extract the quantity and unit from the string
-        $pattern = '/[\sx\*](\d+(?:\.\d+)?)\s*(' . $unitPattern . ')/i';
-
-        // Search for the unit in the string
-//        if (preg_match($pattern, $string, $matches)) {
-//            $quantity = $matches[1]; // The number part (e.g., "20")
-//            $unit = strtoupper($matches[2]); // The extracted unit (e.g., "G")
-//
-//            // Normalize the unit based on the mappings
-//            foreach ($unitMappings as $standardUnit => $abbreviations) {
-//                if (in_array(strtoupper($unit), $abbreviations)) {
-//                    $unit = $standardUnit;
-//                    break;
-//                }
-//            }
-//
-//            // Return the formatted quantity with normalized unit
-//            return $quantity . $unit;
-//        }
+        $pattern = '/[\s\wx\*](\d+(?:\.\d+)?)\s*(' . $unitPattern . ')/i';
 
         // Collect all matches in case we have multiple units in the string
         preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
