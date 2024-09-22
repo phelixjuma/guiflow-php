@@ -2374,7 +2374,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("description", [$this, 'extract_unit'], ["only_include" => ["SHEETS",
+        $action = new FunctionAction("description.meta_data.id|description", [$this, 'extract_unit'], ["only_include" => ["SHEETS",
             "ROLLS",
             "BOXES",
             "G",

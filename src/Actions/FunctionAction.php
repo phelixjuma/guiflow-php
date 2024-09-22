@@ -77,7 +77,33 @@ class FunctionAction implements ActionInterface
     {
 
         // Get all values from the path.
-        $currentValues = !empty($this->path) ? PathResolver::getValueByPath($data, $this->path) : $data;
+        if (empty($this->path)) {
+            $currentValues = $data;
+        } elseif(!str_contains($this->path, "|")) {
+            $currentValues = !empty($this->path) ? PathResolver::getValueByPath($data, $this->path) : $data;
+        } else {
+
+            $paths = array_map('trim', explode('|', $this->path));
+
+            $foundPath = false;
+
+            $currentValues = null;
+
+            foreach ($paths as $path) {
+                $pathValue = PathResolver::getValueByPath($data, $path);
+                if ($pathValue !== null) {
+                    $currentValues = $pathValue;
+                    $this->path = $path;
+                    $foundPath = true;
+                    break;
+                }
+            }
+            if (!$foundPath) {
+                // We pick the last path
+                $this->path = $paths[sizeof($paths)-1];
+            }
+            $this->targetPath = !empty($this->newField) ? $this->newField : $this->path;
+        }
 
         // Prepare function parameters:  We set the current values data as the first param
         $paramValues = [$currentValues];
