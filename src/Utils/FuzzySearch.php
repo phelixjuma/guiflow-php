@@ -168,7 +168,8 @@ class FuzzySearch
             'id_key'        => $this->corpusIdKey,
             'id'            => !empty($matchedData) ? PathResolver::getValueByPath($matchedData, $this->corpusIdKey) : null,
             'value'         => !empty($value) ? $value : $search,
-            'other_details' => !empty($matchedData) ? Utils::removeKeysFromAssocArray($matchedData, [$this->corpusIdKey, (!empty($value) ? $this->corpusValueKey : $this->corpusSearchKey)]) : null
+            //'other_details' => !empty($matchedData) ? Utils::removeKeysFromAssocArray($matchedData, [$this->corpusIdKey, (!empty($value) ? $this->corpusValueKey : $this->corpusSearchKey)]) : null
+            'other_details' => $matchedData
         ];
     }
 
@@ -263,6 +264,10 @@ class FuzzySearch
         // Get the search phrase
         $searchPhrase = PathResolver::getValueByPath($data, $searchKey);
 
+        if (empty($searchKey) || empty($searchPhrase)) {
+            $searchPhrase = $data;
+        }
+
         // Get the match key - if not provided, we use the search key
         $matchingKey = !empty($matchingKey) ? $matchingKey : $searchKey;
 
@@ -279,6 +284,8 @@ class FuzzySearch
 
         // We perform search
         $searchResponse = $this->search($searchPhrase, $similarityThreshold, $topN, $scoringMethod);
+
+        print_r($searchResponse);
 
         if (!empty($searchResponse)) {
 
