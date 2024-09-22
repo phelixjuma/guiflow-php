@@ -294,12 +294,12 @@ class Utils
         $pattern = "/".self::custom_preg_escape($pattern)."/i";
 
         $newData = null;
-        if (is_array($data)) {
+        if (self::isList($data)) {
             foreach ($data as $d) {
-                $newData[] = preg_replace($pattern, $replacement, $d);
+                $newData[] = is_string($d) ? preg_replace($pattern, $replacement, $d) : $d;
             }
         } else {
-            $newData = preg_replace($pattern, $replacement, $data);
+            $newData = is_string($data) ? preg_replace($pattern, $replacement, $data) : $data;
         }
         return trim($newData);
     }
@@ -374,14 +374,13 @@ class Utils
         }
 
         $newData = null;
-        if (is_array($data)) {
+        if (self::isList($data)) {
             foreach ($data as $d) {
                 $newData[] = self::regex_mapper_multiple($d, $mappers);
             }
         } else {
 
             $newData = $data;
-
 
             foreach ($mappers as $mapper) {
 
@@ -1289,7 +1288,7 @@ class Utils
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
                     $replace = str_ireplace("[space]", " ", $replace);
 
-                    if (!empty($value)) {
+                    if (!empty($value) && is_string($value)) {
                         $value = preg_replace($pattern, $replace, $value);
                     }
 
@@ -1553,7 +1552,7 @@ class Utils
                     // pattern
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($stemmingPattern)) . '/i';
                     // set the stem key
-                    $value[$stemKey] = self::removeExtraSpaces(preg_replace($pattern, "", $value[$stemKey]));
+                    $value[$stemKey] = !empty($value[$stemKey]) && is_string($value[$stemKey]) ? self::removeExtraSpaces(preg_replace($pattern, "", $value[$stemKey])) : $value[$stemKey];
 
                     if (preg_last_error() !== PREG_NO_ERROR) {
                         //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
@@ -1574,7 +1573,7 @@ class Utils
                     // pattern
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($stemmingPattern)) . '/i';
                     // set the stem key
-                    $value['spell_check_meta_data'][$stemKey] = self::removeExtraSpaces(preg_replace($pattern, "", $value['spell_check_meta_data'][$stemKey]));
+                    $value['spell_check_meta_data'][$stemKey] = is_string($value['spell_check_meta_data'][$stemKey]) ? self::removeExtraSpaces(preg_replace($pattern, "", $value['spell_check_meta_data'][$stemKey])) : $value['spell_check_meta_data'][$stemKey];
 
                     if (preg_last_error() !== PREG_NO_ERROR) {
                         //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
@@ -1596,7 +1595,7 @@ class Utils
 
                 // We perform spell correction
                 if (!empty($value['spell_check_meta_data']['nearest_stem'])) {
-                    $value[$searchKey] = self::removeExtraSpaces(preg_replace("/{$value['spell_check_meta_data'][$stemKey]}/i", $value['spell_check_meta_data']['nearest_stem'], $value[$searchKey]));
+                    $value[$searchKey] = is_string($value[$searchKey]) ? self::removeExtraSpaces(preg_replace("/{$value['spell_check_meta_data'][$stemKey]}/i", $value['spell_check_meta_data']['nearest_stem'], $value[$searchKey])) : $value[$searchKey];
                 }
 
             }
