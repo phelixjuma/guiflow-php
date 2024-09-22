@@ -303,11 +303,7 @@ class FuzzySearch
             return $response;
         } else {
 
-            print_r($response);
-            print "\nSetting on $matchingKey\n";
-
             PathResolver::setValueByPath($data, $matchingKey, $response);
-            print_r($data);
             return $data;
         }
     }
