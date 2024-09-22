@@ -168,8 +168,7 @@ class FuzzySearch
             'id_key'        => $this->corpusIdKey,
             'id'            => !empty($matchedData) ? PathResolver::getValueByPath($matchedData, $this->corpusIdKey) : null,
             'value'         => !empty($value) ? $value : $search,
-            //'other_details' => !empty($matchedData) ? Utils::removeKeysFromAssocArray($matchedData, [$this->corpusIdKey, (!empty($value) ? $this->corpusValueKey : $this->corpusSearchKey)]) : null
-            'other_details' => $matchedData
+            'other_details' => !empty($matchedData) ? Utils::removeKeysFromAssocArray($matchedData, [$this->corpusIdKey, (!empty($value) ? $this->corpusValueKey : $this->corpusSearchKey)]) : null
         ];
     }
 
@@ -235,7 +234,7 @@ class FuzzySearch
                     $responseData[$matchKey]['meta_data'] = $this->getMetaData($matchedData);
                 }
             }
-            $response[] = $responseData;
+            $response[] = !empty($responseData[$matchKey]['matched_value']) ? $responseData : $searchDatum;
         }
         return $isObject ? $response[0] : $response;
     }
@@ -299,13 +298,20 @@ class FuzzySearch
             $response['meta_data'] = $this->getMetaData($matchedData);
         }
 
+        // No match found, return original data
+        if(empty($response['matched_value'])) {
+           return $data;
+        }
+
+        // Return the response as a string
         if (is_string($data) && empty($searchKey)) {
             return $response;
-        } else {
-
-            PathResolver::setValueByPath($data, $matchingKey, $response);
-            return $data;
         }
+
+        // Return the repose as an object
+        PathResolver::setValueByPath($data, $matchingKey, $response);
+        return $data;
+
     }
 
 
