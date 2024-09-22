@@ -285,8 +285,6 @@ class FuzzySearch
         // We perform search
         $searchResponse = $this->search($searchPhrase, $similarityThreshold, $topN, $scoringMethod);
 
-        print_r($searchResponse);
-
         if (!empty($searchResponse)) {
 
             // We get the top match.
@@ -301,9 +299,17 @@ class FuzzySearch
             $response['meta_data'] = $this->getMetaData($matchedData);
         }
 
-        PathResolver::setValueByPath($data, $matchingKey, $response);
+        if (is_string($data) && empty($searchKey)) {
+            return $response;
+        } else {
 
-        return $data;
+            print_r($response);
+            print "\nSetting on $matchingKey\n";
+
+            PathResolver::setValueByPath($data, $matchingKey, $response);
+            print_r($data);
+            return $data;
+        }
     }
 
 
