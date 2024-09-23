@@ -235,6 +235,7 @@ class FuzzySearch
                 }
             }
             $response[] = !empty($responseData[$matchKey]['matched_value']) ? $responseData : $searchDatum;
+
         }
         return $isObject ? $response[0] : $response;
     }

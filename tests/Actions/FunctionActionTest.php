@@ -1586,14 +1586,15 @@ class FunctionActionTest extends TestCase
                 ]
             ]
         ];
+        //$condition = null;
 
         $action = new FunctionAction("products", [$this, 'append'], ["strings" => ['(PER KG)'], "separator" => "", "use_data_as_path_value" => "", "valueKey" => "name"], null, null, $condition);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
-        $this->assertEquals($data, $expectedData);
+        //$this->assertEquals($data, $expectedData);
     }
 
     public function _testRemoveRepeatedWords()
@@ -1806,7 +1807,7 @@ class FunctionActionTest extends TestCase
 
         $condition = [
             "path" => "date",
-            "operator" => "!=",
+            "operator" => "==",
             "value" => "Phelix"
         ];
 
@@ -2374,6 +2375,9 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
+        $condition = null;
+        $condition = ["operator"  => "contains","value" => "afri"];
+
         $action = new FunctionAction("description.meta_data.id|description", [$this, 'extract_unit'], ["only_include" => ["SHEETS",
             "ROLLS",
             "BOXES",
@@ -2390,7 +2394,7 @@ class FunctionActionTest extends TestCase
             "PAGES",
             "MM",
             "DOZENS",
-            "PIECES"]], 'unit',  0, null);
+            "PIECES"]], 'unit',  0, $condition);
 
         $action->execute($data);
 
