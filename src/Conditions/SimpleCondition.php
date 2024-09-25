@@ -74,9 +74,23 @@ class SimpleCondition implements ConditionInterface
     {
         $fuzz = new Fuzz();
 
-        // lowercase
-        $pathValue = is_string($pathValue) ? Utils::cleanText($pathValue) : $pathValue;
-        $value = is_string($value) ? Utils::cleanText($value)  : $value;
+        // clean path value
+        if (is_string($pathValue)) {
+            $pathValue = Utils::cleanText($pathValue);
+        } elseif(is_array($pathValue) && is_string($pathValue[0])) {
+            array_walk($pathValue, function (&$v, $k) {
+               $v = Utils::cleanText($v);
+            });
+        }
+
+        // clean value
+        if (is_string($value)) {
+            $value = Utils::cleanText($value);
+        } elseif(is_array($value) && is_string($value[0])) {
+            array_walk($value, function (&$v, $k) {
+                $v = Utils::cleanText($v);
+            });
+        }
 
         // The existing switch case logic...
         try {

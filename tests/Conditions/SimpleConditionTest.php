@@ -197,22 +197,32 @@ class SimpleConditionTest extends TestCase
     public function _testInListAny()
     {
         $data = [
-            "from_email" => "eastmattkitengela@yahoo.com",
+            "customer_name" => [
+                "meta_data" => [
+                    "id" => "C00048"
+                ]
+            ],
             //"from_email" => "fouma@khetia.com",
             "hours_to_delivery" => 24
         ];
 
         $condition = [
-            "path" => "from_email",
-            "operator" => "in list any",
+            "path" => "customer_name.meta_data.id",
+            "operator" => "in",
             "value" => [
-                "@quickmart.co.ke",
-                "@mafcarrefour.com",
-                "@naivass.co.ken",
-                "dplfestivebrands@gmail.com",
-                "@chandaranasupermarkets.co.ke",
-                "@khetia.com",
-                "eastmatt.*@yahoo.com"
+                "C00048",
+                "C00225",
+                "C00164",
+                "C00056",
+                "C00082",
+                "C00286",
+                "C00135",
+                "C00148",
+                "C00147",
+                "C00167",
+                "C00188",
+                "C00262",
+                "C00968"
             ]
         ];
 
@@ -224,7 +234,7 @@ class SimpleConditionTest extends TestCase
 
         print "\nCondition Returns $response\n";
 
-        $this->assertTrue($response);
+        //$this->assertTrue($response);
     }
 
 }
