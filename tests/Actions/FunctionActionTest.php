@@ -2128,20 +2128,12 @@ class FunctionActionTest extends TestCase
     public function _testFilterInArray()
     {
         $data = [
-            "items" => [
+            "products_list" => [
                 [
-                    "description" => [
-                        "original_value" => "Item 1",
-                        "similarity"    => 89
-                    ],
-                    "quantity" => 10
+                    "product_code" => "EX00100600"
                 ],
                 [
-                    "description" => [
-                        "original_value" => "Item 2",
-                        "similarity"    => 35
-                    ],
-                    "quantity" => 5
+                    "product_code" => "EX00100601"
                 ],
 
             ]
@@ -2151,10 +2143,10 @@ class FunctionActionTest extends TestCase
             "operator" => "AND",
             "conditions" => [
                 [
-                    'term' => "50",
-                    "mode" => "lte",
-                    "key" => "description.similarity",
-                    'threshold' => "50",
+                    'term' => ["EX00100600"],
+                    "mode" => "not in",
+                    "key" => "product_code",
+                    'threshold' => "",
                     "term_exclusion_pattern" => "",
                     "value_exclusion_pattern" => ""
                 ]
@@ -2163,7 +2155,7 @@ class FunctionActionTest extends TestCase
 
         $expectedData = [];
 
-        $action = new FunctionAction("items", [$this, 'filter'], ["filter_criteria" => $filterCriteria], '', 0, null);
+        $action = new FunctionAction("products_list", [$this, 'filter'], ["filter_criteria" => $filterCriteria], '', 0, null);
 
         $action->execute($data);
 

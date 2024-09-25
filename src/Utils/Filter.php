@@ -56,13 +56,13 @@ class Filter
      * @param $value
      * @param $term
      * @param $mode
-     * @param int $similarityThreshold
+     * @param $similarityThreshold
      * @param $termExclusionPattern
      * @param $valueExclusionPattern
      * @return bool|int
      * @throws \Exception
      */
-    private static function matchValueAgainstFilter($value, $term, $mode, int $similarityThreshold=self::DEFAULT_THRESHOLD, $termExclusionPattern = null, $valueExclusionPattern=null): bool|int
+    private static function matchValueAgainstFilter($value, $term, $mode, $similarityThreshold=self::DEFAULT_THRESHOLD, $termExclusionPattern = null, $valueExclusionPattern=null): bool|int
     {
         if (is_null($value)) {
             return false;
@@ -118,19 +118,19 @@ class Filter
             $keyIsNestedPath = !empty($filters['key']) && str_contains($filters['key'], ".");
 
             // For an associative array, we get value based on key, if not nested
-            if (Utils::isObject($value) && !$keyIsNestedPath) {
-                if (!isset($value[$filters['key']])) {
-                    $value = null;
-                } else {
-                    $value = $value[$filters['key']];
-                }
-            }
-            // For an array where key is nested path
-            elseif (is_array($value) && $keyIsNestedPath) {
-                $value = PathResolver::getValueByPath($value, $filters['key']);
-            }
+//            if (Utils::isObject($value) && !$keyIsNestedPath) {
+//                if (!isset($value[$filters['key']])) {
+//                    $value = null;
+//                } else {
+//                    $value = $value[$filters['key']];
+//                }
+//            }
+//            // For an array where key is nested path
+//            elseif (is_array($value) && $keyIsNestedPath) {
+//                $value = PathResolver::getValueByPath($value, $filters['key']);
+//            }
 
-            //$value = PathResolver::getValueByPath($value, $filters['key']);
+            $value = PathResolver::getValueByPath($value, $filters['key']);
 
             if ($value === null) {
                 // null value indicates the key does not exist and so the filter returns true ie no filter is done
