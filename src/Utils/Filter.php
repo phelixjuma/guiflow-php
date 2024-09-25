@@ -118,13 +118,20 @@ class Filter
             $keyIsNestedPath = !empty($filters['key']) && str_contains($filters['key'], ".");
 
             // For an associative array, we get value based on key, if not nested
-            if (is_array($value) && array_keys($value) !== range(0, count($value) - 1) && !$keyIsNestedPath) {
-                $value = !empty($filters['key']) && isset($value[$filters['key']]) ? $value[$filters['key']] : "";
-            }
+//            if (is_array($value) && array_keys($value) !== range(0, count($value) - 1) && !$keyIsNestedPath) {
+//                $value = !empty($filters['key']) && isset($value[$filters['key']]) ? $value[$filters['key']] : "";
+//            }
+//
+//            // For an array where key is nested path
+//            if (is_array($value) && $keyIsNestedPath) {
+//                $value = PathResolver::getValueByPath($value, $filters['key']);
+//            }
 
-            // For an array where key is nested path
-            if (is_array($value) && $keyIsNestedPath) {
-                $value = PathResolver::getValueByPath($value, $filters['key']);
+            $value = PathResolver::getValueByPath($value, $filters['key']);
+
+            if ($value === null) {
+                // null value indicates the key does not exist and so the filter returns true ie no filter is done
+                return true;
             }
 
             return self::matchValueAgainstFilter($value,

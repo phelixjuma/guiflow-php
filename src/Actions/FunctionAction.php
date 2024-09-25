@@ -80,7 +80,7 @@ class FunctionAction implements ActionInterface
         if (empty($this->path)) {
             $currentValues = $data;
         } elseif(!str_contains($this->path, "|")) {
-            $currentValues = !empty($this->path) ? PathResolver::getValueByPath($data, $this->path) : $data;
+            $currentValues = PathResolver::getValueByPath($data, $this->path);
         } else {
 
             $paths = array_map('trim', explode('|', $this->path));

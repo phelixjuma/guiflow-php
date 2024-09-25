@@ -232,21 +232,15 @@ class FilterTest extends TestCase
 
     public function _testFilterListByPath()
     {
-        $data = [
+        $data =
             [
-                'order_date' => 'today',
-                'products' => [
-                    ['name' => "Oranges"],
-                    ['name' => "Lemons"]
+                "products" => [
+                    "name" => "Mangoes"
                 ]
-            ],
-            [
-                'order_date' => 'today',
-                'products' => []
-            ]
-        ];
+            ];
 
-        $conditions = ['term' => '', 'mode' => Filter::NOT_EMPTY, 'key' => 'products'];
+
+        $conditions = ['term' => ['mangoes', 'lemons'], 'mode' => 'not in list all', 'key' => 'name'];
 
         $data = Filter::filterArray($data, $conditions);
 
