@@ -168,7 +168,7 @@ class FuzzySearch
             'id_key'        => $this->corpusIdKey,
             'id'            => !empty($matchedData) ? PathResolver::getValueByPath($matchedData, $this->corpusIdKey) : null,
             'value'         => !empty($value) ? $value : $search,
-            'other_details' => !empty($matchedData) ? Utils::removeKeysFromAssocArray($matchedData, [$this->corpusIdKey, (!empty($value) ? $this->corpusValueKey : $this->corpusSearchKey)]) : null
+            'other_details' => $matchedData
         ];
     }
 
