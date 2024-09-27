@@ -234,13 +234,31 @@ class FilterTest extends TestCase
     {
         $data =
             [
-                "products" => [
-                    "name" => "Mangoes"
+                "items" => [
+                    [
+                        "description" => [
+                            "name" => "Product A",
+                            "similarity" => "88"
+                        ]
+                    ],
+                    [
+                        "description" => [
+                            "name" => "Product B",
+                            "similarity" => "100"
+                        ]
+                    ],
+                    [
+                        "description" => [
+                            "name" => "Product B",
+                            "similarity" => "20"
+                        ]
+                    ]
                 ]
             ];
 
 
-        $conditions = ['term' => ['mangoes', 'lemons'], 'mode' => 'not in list all', 'key' => 'name'];
+        $conditions = ['term' => "50", 'mode' => '>=', 'key' => 'description.similarity', "similarity_threshold" => "",
+              "term_exclusion_pattern" => "", "value_exclusion_pattern" => ""];
 
         $data = Filter::filterArray($data, $conditions);
 

@@ -168,6 +168,7 @@ class FuzzySearch
             'id_key'        => $this->corpusIdKey,
             'id'            => !empty($matchedData) ? PathResolver::getValueByPath($matchedData, $this->corpusIdKey) : null,
             'value'         => !empty($value) ? $value : $search,
+            'matcher'       => 'fuzzy_search',
             'other_details' => $matchedData
         ];
     }
