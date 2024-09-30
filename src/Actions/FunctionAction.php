@@ -275,7 +275,6 @@ class FunctionAction implements ActionInterface
             } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit_multi') {
                 $newValue = UnitConverter::convert_multiple(...$paramValues);
             }  elseif (isset($this->function[1]) && $this->function['1'] == 'convert_units_v2') {
-                print_r($paramValues);
                 $newValue = UnitConverter::convert_units_v2(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'get_metric_conversion_table') {
                 $newValue = UnitConverter::get_metric_conversion_table();
@@ -309,7 +308,6 @@ class FunctionAction implements ActionInterface
                 // function name is at index 1 (index 0 is the data).
                 $functionName = $paramValues[1];
                 // We get the UDF's params which should exclude index 1 - function name).
-                //$functionParams = array_merge([$paramValues[0]], array_slice($paramValues, 2));
                 $functionParams = array_merge([$paramValues[0]], self::resolveParam($paramValues[0], array_slice($paramValues, 2)));
 
                 // We call the user defined function
@@ -317,9 +315,11 @@ class FunctionAction implements ActionInterface
             } elseif (isset($this->function[1]) && $this->function['1'] == 'system_defined_function') {
                 // function name is at index 1 (index 0 is the data).
                 $functionName = $paramValues[1];
-
                 // We get the function params
                 $functionParams = self::resolveParam($paramValues[0], $paramValues[2]) ?? [];
+
+                print "\nsystem defined function: $functionName\n";
+                print_r($functionParams);
 
                 // We call the user defined function
                 $newValue = call_user_func_array([$this->function[0],$functionName], $functionParams);
