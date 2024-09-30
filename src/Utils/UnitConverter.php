@@ -3,10 +3,90 @@
 namespace PhelixJuma\GUIFlow\Utils;
 
 
+use Exception;
+use PhelixJuma\GUIFlow\Conditions\SimpleCondition;
+
 class UnitConverter
 {
     public function __construct()
     {
+    }
+
+    /**
+     * @param $data
+     * @param $itemQuantity
+     * @param $itemUnit
+     * @param $convertToUnit
+     * @param $numberOfPiecesPerBundle
+     * @param $additionalPiecesUoMs
+     * @param $decimalHandler
+     * @param $numberOfDecimalPlaces
+     * @return array
+     * @throws Exception
+     */
+    public static function convert_units_v2($data, $itemQuantity, $itemUnit, $convertToUnit, $numberOfPiecesPerBundle, $additionalPiecesUoMs = [], $decimalHandler="up", $numberOfDecimalPlaces=0) {
+
+        $response = [
+            "original_value"    => $itemQuantity,
+            "original_unit"     => $itemUnit,
+            "converted_unit"    => $convertToUnit
+        ];
+
+        // Special conversions
+        if (preg_match("/(dozen|doz|daz)/i", $itemUnit)) {
+            // We convert dozens to pieces
+            $itemQuantity = 12 * $itemQuantity;
+            $itemUnit = 'Pieces';
+        }
+
+        // We sent pieces units
+        $piecesUoMs = [
+            "PCS", "PC", "Piece", "Each", "Packet", "PKT", "\b(?!bale/)bag\b", "BG", "KG", "KGS",
+            "G", "GM", "GMS"
+        ];
+        if (!empty($additionalPiecesUoMs)) {
+            $piecesUoMs = array_values(array_unique(array_merge($piecesUoMs, $additionalPiecesUoMs)));
+        }
+
+        $isItemUnitInPieces = SimpleCondition::compare($itemUnit, "in list any", $piecesUoMs);
+        $isConvertToUnitInPieces = SimpleCondition::compare($convertToUnit, "in list any", $piecesUoMs);
+
+        // Handle conversion to Pieces
+        if ($isConvertToUnitInPieces) {
+            if ($isItemUnitInPieces) {
+                // no conversion needed
+                $response['converted_value'] = $itemQuantity;
+            } else {
+                // Unit is in bundles; we convert to pieces
+                $convertedValue = $numberOfPiecesPerBundle * $itemQuantity;
+
+                $response['converted_value'] = match($decimalHandler) {
+                    "up" =>   ceil($convertedValue),
+                    "down" =>   floor($convertedValue),
+                    "off" =>   round($convertedValue, intval($numberOfDecimalPlaces)),
+                    default => $convertedValue
+                };
+            }
+        }
+        // Handle conversion to bundles
+        else {
+            if (!$isItemUnitInPieces) {
+                // no conversion needed since item unit is in bundles
+                $response['converted_value'] = $itemQuantity;
+            } else {
+                // Unit is not in bundles; we convert to bundles
+                $convertedValue = $itemQuantity / $numberOfPiecesPerBundle;
+
+                $response['converted_value'] = match($decimalHandler) {
+                    "up" =>   ceil($convertedValue),
+                    "down" =>   floor($convertedValue),
+                    "off" =>   round($convertedValue, intval($numberOfDecimalPlaces)),
+                    default => $convertedValue
+                };
+            }
+        }
+
+        return $response;
     }
 
     /**

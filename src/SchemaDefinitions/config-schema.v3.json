@@ -2820,6 +2820,69 @@
       ],
       "unevaluatedProperties": false
     },
+    "convertUnitsV2FunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "convert_units_v2"
+              ]
+            },
+            "args": {
+              "description": "Convert units v2 - A simplified alternative to convert_unit_multi",
+              "type": "object",
+              "properties": {
+                "item_quantity": {
+                  "$ref": "#/definitions/valueOrInItemPath"
+                },
+                "item_unit": {
+                  "$ref": "#/definitions/valueOrInItemPath"
+                },
+                "convert_to_unit": {
+                  "$ref": "#/definitions/valueOrInItemPath"
+                },
+                "pieces_per_bundle": {
+                  "$ref": "#/definitions/valueOrInItemPath"
+                },
+                "decimal_handler": {
+                  "description": "How to handle decimals ie round off, round up or round down",
+                  "type": "string",
+                  "enum": [
+                    "up",
+                    "down",
+                    "off"
+                  ],
+                  "default": "up"
+                },
+                "number_of_decimal_places": {
+                  "description": "The number of decimal places when rounding off",
+                  "type": "string",
+                  "default": "0"
+                }
+              },
+              "required": [
+                "item_quantity",
+                "item_unit",
+                "convert_to_unit",
+                "pieces_per_bundle",
+                "decimal_handler",
+                "number_of_decimal_places"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "getMetricConversionTableFunctionArgs": {
       "allOf": [
         {
@@ -4703,6 +4766,25 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_ConvertUnitsV2": {
+      "title": "Convert Unit Multi",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/convertUnitsV2FunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_GetMetricConversionTable": {
       "title": "Get Metric Conversion Table",
       "allOf": [
@@ -5089,6 +5171,9 @@
           "$ref": "#/definitions/Action_Function_ConvertUnitMulti"
         },
         {
+          "$ref": "#/definitions/Action_Function_ConvertUnitsV2"
+        },
+        {
           "$ref": "#/definitions/Action_Function_GetMetricConversionTable"
         },
         {
@@ -5286,6 +5371,10 @@
         {
           "title": "Convert Unit Multi",
           "$ref": "#/definitions/convertUnitMultiFunctionArgs"
+        },
+        {
+          "title": "Convert Units V2",
+          "$ref": "#/definitions/convertUnitsV2FunctionArgs"
         },
         {
           "title": "Get Metric Conversion Table",

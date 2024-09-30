@@ -2395,4 +2395,34 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
+    public function _testConvertUnitV2()
+    {
+        $data = [
+            "quantity"          => 2,
+            "unit"              => "Dozen",
+            "selling_unit"      => "Cartons",
+            "pieces_per_bale"   => 24
+        ];
+
+        $expectedData = [];
+
+        $args = [
+            "item_quantity" => ["path"  => "quantity"],
+            "item_unit" => ["path"  => "unit"],
+            "convert_to_unit" => ["path"  => "selling_unit"],
+            "pieces_per_bundle" => ["path"  => "pieces_per_bale"],
+            "additional_pieces_uoms" => ["Jerry\s*can"],
+            "decimal_handler" => "off",
+            "number_of_decimal_places" => 5,
+        ];
+
+        $action = new FunctionAction("", [$this, 'convert_units_v2'], $args, 'converted_units',  0, null);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        //$this->assertEquals($data, $expectedData);
+    }
+
 }

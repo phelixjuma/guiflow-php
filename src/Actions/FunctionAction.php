@@ -116,11 +116,13 @@ class FunctionAction implements ActionInterface
                     if (is_array($param) && isset($param['path'])) {
 
                         $paramPath = $param['path'];
-                        $paramValue = PathResolver::getValueByPath($data, $paramPath);
+                        //$paramValue = PathResolver::getValueByPath($data, $paramPath);
+                        $paramValue = PathResolver::getValueByPath($currentValues, $paramPath);
                         $paramValues[] = $paramValue;
 
                     } else {
-                        $paramValues[] = self::getFilterCriteria($data, $param);
+                        //$paramValues[] = self::getFilterCriteria($data, $param);
+                        $paramValues[] = self::getFilterCriteria($currentValues, $param);
                     }
                 } else {
                     $paramValues[] = $param;
@@ -272,6 +274,8 @@ class FunctionAction implements ActionInterface
                 $newValue = UnitConverter::convert(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit_multi') {
                 $newValue = UnitConverter::convert_multiple(...$paramValues);
+            }  elseif (isset($this->function[1]) && $this->function['1'] == 'convert_units_v2') {
+                $newValue = UnitConverter::convert_units_v2(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'get_metric_conversion_table') {
                 $newValue = UnitConverter::get_metric_conversion_table();
             } elseif (isset($this->function[1]) && $this->function['1'] == 'model_mapping') {
