@@ -2395,20 +2395,29 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function _testConvertUnitV2()
+    public function testConvertUnitV2()
     {
         $data = [
-            "quantity"          => 2,
-            "unit"              => "Dozen",
-            "selling_unit"      => "Cartons",
-            "pieces_per_bale"   => 24
+            "items" => [
+                [
+                    "unit_of_measure" => [
+                        [
+                            "selling_quantity" => 48,
+                            "selling_unit" => "PCS",
+                            "descriptive_quantity" => "48 PCS"
+                        ]
+                    ],
+                    "selling_unit"      => "Cartons",
+                    "pieces_per_bale"   => 24
+                ]
+            ]
         ];
 
         $expectedData = [];
 
         $args = [
-            "item_quantity" => ["path"  => "quantity"],
-            "item_unit" => ["path"  => "unit"],
+            "item_quantity" => ["path"  => "unit_of_measure.0.selling_quantity"],
+            "item_unit" => ["path"  => "unit_of_measure.0.selling_unit"],
             "convert_to_unit" => ["path"  => "selling_unit"],
             "pieces_per_bundle" => ["path"  => "pieces_per_bale"],
             "additional_pieces_uoms" => ["Jerry\s*can"],
@@ -2416,7 +2425,7 @@ class FunctionActionTest extends TestCase
             "number_of_decimal_places" => 5,
         ];
 
-        $action = new FunctionAction("", [$this, 'convert_units_v2'], $args, 'converted_units',  0, null);
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'convert_units_v2', 'args' => $args, 'newField' => "converted_units", 'strict' => 0, 'condition' => null], "");
 
         $action->execute($data);
 

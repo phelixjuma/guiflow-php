@@ -86,6 +86,8 @@ class UnitConverter
             }
         }
 
+        print_r($response);
+
         return $response;
     }
 
