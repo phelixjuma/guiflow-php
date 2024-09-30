@@ -116,13 +116,13 @@ class FunctionAction implements ActionInterface
                     if (is_array($param) && isset($param['path'])) {
 
                         $paramPath = $param['path'];
-                        $paramValue = PathResolver::getValueByPath($data, $paramPath);
-                        //$paramValue = PathResolver::getValueByPath($currentValues, $paramPath);
+                        //$paramValue = PathResolver::getValueByPath($data, $paramPath);
+                        $paramValue = PathResolver::getValueByPath($currentValues, $paramPath);
                         $paramValues[] = $paramValue;
 
                     } else {
-                        $paramValues[] = self::getFilterCriteria($data, $param);
-                        //$paramValues[] = self::getFilterCriteria($currentValues, $param);
+                        //$paramValues[] = self::getFilterCriteria($data, $param);
+                        $paramValues[] = self::getFilterCriteria($currentValues, $param);
                     }
                 } else {
                     $paramValues[] = $param;
