@@ -2837,16 +2837,19 @@
               "type": "object",
               "properties": {
                 "item_quantity": {
-                  "$ref": "#/definitions/valueOrInItemPath"
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "item_unit": {
-                  "$ref": "#/definitions/valueOrInItemPath"
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "convert_to_unit": {
-                  "$ref": "#/definitions/valueOrInItemPath"
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "pieces_per_bundle": {
-                  "$ref": "#/definitions/valueOrInItemPath"
+                  "$ref": "#/definitions/valueOrPath"
+                },
+                "additional_pieces_uoms": {
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "decimal_handler": {
                   "description": "How to handle decimals ie round off, round up or round down",
@@ -2869,6 +2872,7 @@
                 "item_unit",
                 "convert_to_unit",
                 "pieces_per_bundle",
+                "additional_pieces_uoms",
                 "decimal_handler",
                 "number_of_decimal_places"
               ],
