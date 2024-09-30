@@ -1825,6 +1825,42 @@
       ],
       "unevaluatedProperties": false
     },
+    "extractPackagingDetailsFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "extract_packaging_details"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "additional_uoms": {
+                  "type": "array",
+                  "items":  {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "additional_uoms"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "getTopNRankedItemsByKeyFunctionArgs": {
       "allOf": [
         {
@@ -4390,6 +4426,25 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_ExtractPackagingDetails": {
+      "title": "Regex Extract",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/extractPackagingDetailsFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_GetTopNRankedItemsByKey": {
       "title": "Regex Extract",
       "allOf": [
@@ -5115,6 +5170,9 @@
           "$ref": "#/definitions/Action_Function_ExtractUnit"
         },
         {
+          "$ref": "#/definitions/Action_Function_ExtractPackagingDetails"
+        },
+        {
           "$ref": "#/definitions/Action_Function_GetTopNRankedItemsByKey"
         },
         {
@@ -5295,6 +5353,10 @@
         {
           "title": "Extract Unit",
           "$ref": "#/definitions/extractUnitFunctionArgs"
+        },
+        {
+          "title": "Extract Packaging Details",
+          "$ref": "#/definitions/extractPackagingDetailsFunctionArgs"
         },
         {
           "title": "Get Top N Ranked Items By Key",

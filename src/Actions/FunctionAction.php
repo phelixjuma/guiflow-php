@@ -226,6 +226,8 @@ class FunctionAction implements ActionInterface
                 $newValue = Utils::regex_extract(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'extract_unit') {
                 $newValue = Utils::extract_unit(...$paramValues);
+            } elseif (isset($this->function[1]) && $this->function['1'] == 'extract_packaging_details') {
+                $newValue = Utils::extract_packaging_details(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'get_top_n_ranked_items_by_key') {
                 $newValue = Utils::get_top_n_ranked_items_by_key(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'transform') {

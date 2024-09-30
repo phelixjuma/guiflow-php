@@ -1123,6 +1123,81 @@ class Utils
     }
 
     /**
+     * @param $string
+     * @param $additionalUoMs
+     * @return array
+     */
+    public static function extract_packaging_details($string, $additionalUoMs = [],) {
+
+        $uoms = [
+            // grammes
+            ['GRAMMES', 'GRAMS','GRAM','GRMS', 'GRM','GMS','GM','G'],
+            // kilograms
+            ['KILOGRAMS', 'KILOGRAM','KGS', 'KG', 'K'],
+            // liters
+            ['LITERS', 'LITER', 'LITRES', 'LITRE', 'LTRS','LTR', 'LTS', 'LT', 'L'],
+            // ml
+            ['ML'],
+            // rolls
+            ['ROLL', 'ROLLS', 'RLLS'],
+            // sheets
+            ['SHEET', 'SHEETS', 'SHT', 'SHTS']
+        ];
+
+        if (!empty($additionalUoMs)) {
+            $uoms[] = $additionalUoMs;
+        }
+
+        // We check if dimension exists and remove it
+        $string = preg_replace("/[\sx*](\d+(\.\d+)?\s?(MM|CM|Mts?|M)\s*x\s*\d+(\.\d+)?\s?(MM|CM|Mts?|M))/i", "", $string);
+
+        // prepare uom pattern
+        $uomPatternList = [];
+        foreach ($uoms as $uomGroup) {
+            foreach ($uomGroup as $item) {
+                $uomPatternList[] = $item;
+            }
+        }
+        $uomPattern = implode("|", $uomPatternList);
+
+        // init pack size
+        $response = [
+            "unit_count"        => 1,
+            "unit_size"         => null,
+            "unit_measurement"  => null,
+        ];
+
+        // We check the pack size of the format 24 x 100ML
+        $pattern = "(\d+(?:\.\d+)?)\s*(?:x|\*)\s*(\d+(?:\.\d+)?)\s*($uomPattern)";
+
+        if (preg_match("/$pattern/i", $string, $firstMatches)) {
+            $response['unit_count'] = $firstMatches[1] ?? 1;
+            $response['unit_size'] = $firstMatches[2] ?? null;
+            $response['unit_measurement'] = $firstMatches[3] ?? null;
+        }
+
+        // We check pack size of the format 100ML x 24
+        $pattern = "(\d+(?:\.\d+)?)\s*($uomPattern)\s*(?:x|\*)\s*(\d+(?:\.\d+)?)";
+
+        if (preg_match("/$pattern/i", $string, $secondMatches)) {
+            $response['unit_count'] = $secondMatches[3] ?? 1;
+            $response['unit_size'] = $secondMatches[1] ?? null;
+            $response['unit_measurement'] = $secondMatches[2] ?? null;
+        }
+
+        // We check pack size of the format 100ML, no unit count
+        $pattern = "^(?!.*(x|\*)).*?(\d+(?:\.\d+)?)\s*($uomPattern)\b";
+
+        if (preg_match("/$pattern/i", $string, $thirdMatches)) {
+            $response['unit_count'] = 1;
+            $response['unit_size'] = $thirdMatches[2] ?? null;
+            $response['unit_measurement'] = $thirdMatches[3] ?? null;
+        }
+
+        return $response;
+    }
+
+    /**
      * @param $text
      * @return array|string|string[]|null
      */

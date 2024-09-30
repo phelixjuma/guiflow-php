@@ -2434,4 +2434,31 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
+    public function _testExtractPackagingDetails()
+    {
+        $data = [
+            "items" => [
+                ["description"   => "D/LAND LIGHT  COMPOUND CHOCOLATE(LCC) 1*2.5KG"],
+                ["description"   => "D/LAND WHITE COMPOUND CHOCOLATE 4 X 2.5kgs"],
+                ["description"   => "D/L CHOCOLATE BUNDLE 8x(50GMS x 2)"],
+                ["description"   => "D/land Vegan Brownie 4ltr"],
+                ["description"   => "D/LAND VANILLA/STRAWBERRY 24X120ML"],
+                ["description"   => "YOGHURT Kiwi Apple (30gms x 24 pcs)"],
+                ["description"   => "Palsgaard 5934"],
+                ["description"   => "Dextrose"],
+                ["description"   => "BOHORA BLUEBERRY 12 X 250 ML"],
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'description', 'function' => 'extract_packaging_details', 'args' => ["additional_uoms" => []], 'newField' => "packaging_details", 'strict' => 0, 'condition' => null], "");
+
+        $action->execute($data);
+
+        print_r($data);
+
+        //$this->assertEquals($data, $expectedData);
+    }
+
 }
