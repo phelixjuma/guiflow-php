@@ -26,18 +26,18 @@ class UnitConverter
      */
     public static function convert_units_v2($data, $itemQuantity, $itemUnit, $convertToUnit, $numberOfPiecesPerBundle, $additionalPiecesUoMs = [], $decimalHandler="up", $numberOfDecimalPlaces=0) {
 
-        $response = [
-            "original_value"    => $itemQuantity,
-            "original_unit"     => $itemUnit,
-            "converted_unit"    => $convertToUnit
-        ];
-
         // Special conversions
         if (preg_match("/(dozen|doz|daz)/i", $itemUnit)) {
             // We convert dozens to pieces
             $itemQuantity = 12 * $itemQuantity;
             $itemUnit = 'Pieces';
         }
+
+        $response = [
+            "original_value"    => $itemQuantity,
+            "original_unit"     => $itemUnit,
+            "converted_unit"    => $convertToUnit
+        ];
 
         // We sent pieces units
         $piecesUoMs = [
