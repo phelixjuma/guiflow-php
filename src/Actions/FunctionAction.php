@@ -116,13 +116,11 @@ class FunctionAction implements ActionInterface
                     if (is_array($param) && isset($param['path'])) {
 
                         $paramPath = $param['path'];
-                        //$paramValue = PathResolver::getValueByPath($data, $paramPath);
-                        $paramValue = PathResolver::getValueByPath($currentValues, $paramPath);
+                        $paramValue = PathResolver::getValueByPath($data, $paramPath);
                         $paramValues[] = $paramValue;
 
                     } else {
-                        //$paramValues[] = self::getFilterCriteria($data, $param);
-                        $paramValues[] = self::getFilterCriteria($currentValues, $param);
+                        $paramValues[] = self::getFilterCriteria($data, $param);
                     }
                 } else {
                     $paramValues[] = $param;
@@ -317,10 +315,6 @@ class FunctionAction implements ActionInterface
                 $functionName = $paramValues[1];
                 // We get the function params
                 $functionParams = self::resolveParam($paramValues[0], $paramValues[2]) ?? [];
-
-                print "\nsystem defined function: $functionName\n";
-                print_r($functionParams);
-
                 // We call the user defined function
                 $newValue = call_user_func_array([$this->function[0],$functionName], $functionParams);
             }
