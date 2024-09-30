@@ -275,6 +275,7 @@ class FunctionAction implements ActionInterface
             } elseif (isset($this->function[1]) && $this->function['1'] == 'convert_unit_multi') {
                 $newValue = UnitConverter::convert_multiple(...$paramValues);
             }  elseif (isset($this->function[1]) && $this->function['1'] == 'convert_units_v2') {
+                print_r($paramValues);
                 $newValue = UnitConverter::convert_units_v2(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'get_metric_conversion_table') {
                 $newValue = UnitConverter::get_metric_conversion_table();
