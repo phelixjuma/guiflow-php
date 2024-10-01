@@ -2402,13 +2402,12 @@ class FunctionActionTest extends TestCase
                 [
                     "unit_of_measure" => [
                         [
-                            "selling_quantity" => 48,
-                            "selling_unit" => "PCS",
-                            "descriptive_quantity" => "48 PCS"
+                            "selling_quantity" => 30,
+                            "selling_unit" => "PCS"
                         ]
                     ],
-                    "selling_unit"      => "Cartons",
-                    "pieces_per_bale"   => 24
+                    "selling_unit"      => "BOXES",
+                    "pieces_per_bale"   => 6
                 ]
             ]
         ];
@@ -2420,7 +2419,7 @@ class FunctionActionTest extends TestCase
             "item_unit" => ["path"  => "unit_of_measure.0.selling_unit"],
             "convert_to_unit" => ["path"  => "selling_unit"],
             "pieces_per_bundle" => ["path"  => "pieces_per_bale"],
-            "additional_pieces_uoms" => ["Jerry\s*can"],
+            "additional_pieces_uoms" => [""],
             "decimal_handler" => "off",
             "number_of_decimal_places" => 5,
         ];

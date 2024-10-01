@@ -45,6 +45,8 @@ class UnitConverter
             "G", "GM", "GMS"
         ];
         if (!empty($additionalPiecesUoMs)) {
+            // remove empty values in additional uoms
+            $additionalPiecesUoMs = array_filter($additionalPiecesUoMs);
             $piecesUoMs = array_values(array_unique(array_merge($piecesUoMs, $additionalPiecesUoMs)));
         }
 
