@@ -10,15 +10,15 @@ class DataSplitter
      * @param $method
      * @param $splitPath
      * @param $criteriaPath
-     * @param $criteria
-     * @param $running_total_limit
-     * @return array|array[]
+     * @param $limit
+     * @return array|mixed
      */
-    public static function split($data, $method, $splitPath, $criteriaPath, $criteria = null, $running_total_limit=null) {
+    public static function split($data, $method, $splitPath, $criteriaPath, $limit=null) {
 
         return match ($method) {
-            'running_total' => self::splitByRunningTotal($data, $splitPath, $criteriaPath, $running_total_limit),
-            default => self::splitByPath($data, $splitPath, $criteriaPath)
+            'vertical_split'    => self::verticalSplit($data, $splitPath, $criteriaPath, $limit),
+            'horizontal_split'  => self::horizontalSplit($data, $splitPath, $criteriaPath, $limit),
+            default             => self::splitByPath($data, $splitPath, $criteriaPath)
         };
     }
 
@@ -79,7 +79,7 @@ class DataSplitter
      * @param $limit
      * @return array
      */
-    private static function splitByRunningTotal($data, $splitPath, $criteriaPath, $limit) {
+    private static function horizontalSplit($data, $splitPath, $criteriaPath, $limit) {
 
         // Get the items to split
         $items = PathResolver::getValueByPath($data, $splitPath);
@@ -170,5 +170,80 @@ class DataSplitter
         return $results;
     }
 
+    /**
+     * @param $data
+     * @param $splitPath
+     * @param $criteriaPath
+     * @param $limit
+     * @return array
+     */
+    private static function verticalSplit($data, $splitPath, $criteriaPath, $limit) {
+        // Get the items to split
+        $items = PathResolver::getValueByPath($data, $splitPath);
+
+        if (empty($items) || !is_array($items)) {
+            return [$data]; // Return the original data if there are no items to split
+        }
+
+        // Step 1: Calculate the total quantity to split
+        $totalQuantity = 0;
+        foreach ($items as $item) {
+            // Accumulate the total quantity based on the criteria path
+            $totalQuantity += PathResolver::getValueByPath($item, $criteriaPath);
+        }
+
+        // Step 2: Determine if splitting is necessary
+        if ($totalQuantity <= $limit) {
+            return [$data]; // No split needed if total quantity is within the limit
+        }
+
+        // Determine the number of splits required
+        $numSplits = ceil($totalQuantity / $limit); // Calculate how many groups are needed to keep each group within the limit
+
+        // Step 3: Create an array to hold the results, initializing empty sets
+        $results = array_fill(0, $numSplits, $data);
+        foreach ($results as &$result) {
+            // Clear the items list in each result set to prepare for splitting
+            PathResolver::setValueByPath($result, $splitPath, []);
+        }
+
+        // Step 4: Distribute quantities across each group
+        foreach ($items as $item) {
+            $originalQuantity = PathResolver::getValueByPath($item, $criteriaPath); // Get the original quantity to be split
+            $baseQuantity = floor($originalQuantity / $numSplits); // Base quantity for each group
+            $remainder = $originalQuantity % $numSplits; // Calculate the remainder to distribute among the first few groups
+
+            // Add the split items to each result set
+            for ($i = 0; $i < $numSplits; $i++) {
+                $splitItem = $item; // Create a copy of the item to modify
+
+                // We set the original value
+                PathResolver::setValueByPath($splitItem, "{$criteriaPath}_original", $originalQuantity);
+
+                // Set the split quantity for the item
+                $splitQuantity = ($i < $remainder) ? ($baseQuantity + 1) : $baseQuantity;
+
+                // Skip adding the item if the split quantity is zero
+                if ($splitQuantity > 0) {
+                    PathResolver::setValueByPath($splitItem, $criteriaPath, $splitQuantity);
+
+                    // Get the current list of items in the group
+                    $currentItems = PathResolver::getValueByPath($results[$i], $splitPath);
+                    $currentItems[] = $splitItem; // Add the split item to the list
+
+                    // Update the group with the new list of items
+                    PathResolver::setValueByPath($results[$i], $splitPath, $currentItems);
+                }
+            }
+        }
+
+        // Step 5: Remove empty groups
+        $results = array_filter($results, function($result) use ($splitPath) {
+            $items = PathResolver::getValueByPath($result, $splitPath);
+            return !empty($items); // Keep only groups that have items
+        });
+
+        return array_values($results); // Return the array of split results, re-indexed
+    }
 
 }

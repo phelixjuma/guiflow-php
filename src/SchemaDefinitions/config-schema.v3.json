@@ -920,7 +920,7 @@
                 "method": {
                   "description": "The method of splitting",
                   "type": "string",
-                  "enum": ["", "running_total"]
+                  "enum": ["", "vertical_split", "horizontal_split"]
                 },
                 "split_path": {
                   "description": "The path to the data to be split.",
@@ -930,17 +930,16 @@
                   "description": "The path that determines the criteria for splitting. Akin to 'groupBy'",
                   "type": "string"
                 },
-                "criteria": {
-                  "$ref": "#/definitions/Condition"
-                },
-                "running_total_limit": {
+                "limit": {
                   "description": "The max totals per group when doing group by running totals",
                   "type": "string"
                 }
               },
               "required": [
+                "method",
                 "split_path",
-                "criteria_path"
+                "criteria_path",
+                "limit"
               ],
               "additionalProperties": false
             }

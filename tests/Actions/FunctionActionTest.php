@@ -6,6 +6,7 @@ use Kuza\Krypton\Framework\Helpers\UtilsHelper;
 use PhelixJuma\GUIFlow\Actions\FunctionAction;
 use PhelixJuma\GUIFlow\Actions\SetValueAction;
 use PhelixJuma\GUIFlow\Utils\DataSplitter;
+use PhelixJuma\GUIFlow\Utils\EntityExtractor;
 use PhelixJuma\GUIFlow\Utils\Filter;
 use PhelixJuma\GUIFlow\Utils\Helpers;
 use PhelixJuma\GUIFlow\Utils\PathResolver;
@@ -592,28 +593,28 @@ class FunctionActionTest extends TestCase
                 [
                     'name' => 'KFC CHICKEN BREAST',
                     'unit_of_measure'   => [[
-                        'selling_quantity' => 8,
+                        'selling_quantity' => 11,
                         'scheduled_delivery_date_or_day_of_week' => 'Thursday'
                     ]],
                 ],
                 [
                     'name' => 'KFC CHICKEN BREAST FILLETS',
                     'unit_of_measure'   => [[
-                        'selling_quantity' => 3,
+                        'selling_quantity' => 15,
                         'scheduled_delivery_date_or_day_of_week' => 'Saturday'
                     ]],
                 ],
                 [
                     'name' => 'KFC CHICKEN COB 9 PIECE',
                     'unit_of_measure'   => [[
-                        'selling_quantity' => 60,
+                        'selling_quantity' => 67,
                         'scheduled_delivery_date_or_day_of_week' => 'Tuesday'
                     ]],
                 ],
                 [
                     'name' => 'KFC CHICKEN COB 6 PIECE',
                     'unit_of_measure'   => [[
-                        'selling_quantity' => 12,
+                        'selling_quantity' => 13,
                         'scheduled_delivery_date_or_day_of_week' => 'Thursday'
                     ]]
                 ],
@@ -621,7 +622,7 @@ class FunctionActionTest extends TestCase
                     'name' => 'KFC CHICKEN COB 12 PIECE',
                     'unit_of_measure'   => [
                         [
-                            'selling_quantity' => 30,
+                            'selling_quantity' => 31,
                             'scheduled_delivery_date_or_day_of_week' => 'Saturday'
                         ]
                     ],
@@ -630,7 +631,7 @@ class FunctionActionTest extends TestCase
             'total_unit_price' => 500
         ];
 
-        $action = new FunctionAction("", [$this, 'split'], ['method' => 'running_total', 'split_path' => "products", "criteria_path" => "unit_of_measure.0.selling_quantity", "criteria" => "", "running_total_limit" => "50"], '');
+        $action = new FunctionAction("", [$this, 'split'], ['method' => 'vertical_split', 'split_path' => "products", "criteria_path" => "unit_of_measure.0.selling_quantity", "limit" => 11], '');
 
         $action->execute($data);
 
@@ -2458,6 +2459,18 @@ class FunctionActionTest extends TestCase
         print_r($data);
 
         //$this->assertEquals($data, $expectedData);
+    }
+
+    public function _testGetEntities() {
+
+        $data = json_decode('[{"purchase_order_number":"019-00023157","order_date":"2024-10-03","ordered_by_name":"LEAH W CHEGE","customer_name":"QUICK MART LTD.","customer_email":"info@quickmart.co.ke","customer_phone":"+254 700 88 33 33","delivery_location":"QUICKMART EBP 2 BRANCH","delivery_date":"2024-10-10","seller_name":"DPL FESTIVE","items":[{"serial_number":"1","customer_item_code":"700004","item_bar_code":"6164000009020","description":"FD-MILL QUEEN CAKES 260G 65","unit_of_measure":[{"selling_quantity":"10","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"83","total_price":"830"},{"serial_number":"2","customer_item_code":"700279","item_bar_code":"6164000009808","description":"FD- MILL DAZ COCONUT FLAVOUR 200GMS","unit_of_measure":[{"selling_quantity":"15","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"42","total_price":"630"},{"serial_number":"3","customer_item_code":"700359","item_bar_code":"6164000009792","description":"FD-MILL DAZ HONEY FLAVOUR 200GMS","unit_of_measure":[{"selling_quantity":"15","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"42","total_price":"630"},{"serial_number":"4","customer_item_code":"700026","item_bar_code":"6164000009068","description":"FD-MILL CHOCOLATE CUP CAKE 65 300G","unit_of_measure":[{"selling_quantity":"28","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"113","total_price":"3164"},{"serial_number":"5","customer_item_code":"700332","item_bar_code":"6164000009310","description":"FD-MILL COCONUT/OAT COOKIES 200G","unit_of_measure":[{"selling_quantity":"4","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"94","total_price":"376"},{"serial_number":"6","customer_item_code":"700341","item_bar_code":"6164000009549","description":"FD-MILL COFFEE CAKE 200G","unit_of_measure":[{"selling_quantity":"4","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"70","total_price":"280"},{"serial_number":"7","customer_item_code":"700357","item_bar_code":"6164000009761","description":"FD-MILL DAZ BANANA FLAVOUR 200GMS","unit_of_measure":[{"selling_quantity":"10","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"42","total_price":"420"},{"serial_number":"8","customer_item_code":"700356","item_bar_code":"6164000009815","description":"FD-MILL DAZ GINGER FLAVOUR 200GMS","unit_of_measure":[{"selling_quantity":"10","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"42","total_price":"420"},{"serial_number":"9","customer_item_code":"700358","item_bar_code":"6164000009785","description":"FD-MILL DAZ LEMON FLAVOUR 200GMS","unit_of_measure":[{"selling_quantity":"10","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"42","total_price":"420"},{"serial_number":"10","customer_item_code":"700006","item_bar_code":"6164000009082","description":"FD-MILL ENGLISH MUFFINS 65 300G","unit_of_measure":[{"selling_quantity":"28","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"113","total_price":"3164"},{"serial_number":"11","customer_item_code":"700331","item_bar_code":"6164000009051","description":"FD-MILL FANCY CAKE 500G","unit_of_measure":[{"selling_quantity":"4","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"159","total_price":"636"},{"serial_number":"12","customer_item_code":"700171","item_bar_code":"6164000009563","description":"FD-MILL FRUITCAKE 350G [aging: PCS]","unit_of_measure":[{"selling_quantity":"4","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"138","total_price":"552"},{"serial_number":"13","customer_item_code":"700164","item_bar_code":"6164000009372","description":"FD-MILL LEMON SLICES 150G","unit_of_measure":[{"selling_quantity":"5","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"58","total_price":"290"},{"serial_number":"14","customer_item_code":"700005","item_bar_code":"6164000009075","description":"FD-MILL QUEEN CAKE 85 200G","unit_of_measure":[{"selling_quantity":"20","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"71","total_price":"1420"}],"currency":"KES","total_number_of_items":"15","total_number_of_extracted_items":"15","sub_total":"0","total_amount":"13232","vat_no":"P05 188806D"}]', true);
+
+        foreach ($data as $d) {
+            $entities = EntityExtractor::extractEntities($d);
+
+            print_r($entities);
+        }
+
     }
 
 }

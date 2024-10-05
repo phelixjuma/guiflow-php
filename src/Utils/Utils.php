@@ -1526,6 +1526,7 @@ class Utils
         return $collapsed;
     }
 
+
     /**
      * @param $data
      * @param $leftData
