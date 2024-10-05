@@ -21,9 +21,10 @@ class EntityExtractor
                 }
             } else {
                 $entities[] = [
-                    'entity_name' => $newKey,
-                    'entity_description' => self::generateEntityDescription($newKey),
-                    'entity_value' => $value
+                    'entity_name'               => $newKey,
+                    'entity_name_standardized'  => preg_replace("/\.(\d+)\./i",".*.", $newKey),
+                    'entity_description'        => self::generateEntityDescription($newKey),
+                    'entity_value'              => $value
 
                 ];
             }
