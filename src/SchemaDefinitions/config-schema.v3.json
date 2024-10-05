@@ -920,7 +920,7 @@
                 "method": {
                   "description": "The method of splitting",
                   "type": "string",
-                  "enum": ["", "vertical_split", "horizontal_split"]
+                  "enum": ["categorical", "vertical_split", "horizontal_split", ""]
                 },
                 "split_path": {
                   "description": "The path to the data to be split.",
