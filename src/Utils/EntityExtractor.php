@@ -7,11 +7,11 @@ class EntityExtractor
 
     /**
      * @param $data
-     * @param $resetMatchedEntities
      * @param $prefix
+     * @param $resetMatchedEntities
      * @return array
      */
-    public static function extractEntities($data, $resetMatchedEntities = false, $prefix = '') {
+    public static function extractEntities($data, $prefix = '', $resetMatchedEntities = false) {
 
         // return if empty
         if (empty($data)) {
@@ -31,10 +31,10 @@ class EntityExtractor
             if (is_array($value)) {
                 if (array_values($value) === $value) { // Indexed array (list in Python)
                     foreach ($value as $index => $item) {
-                        $entities = array_merge($entities, self::extractEntities($item, $newKey . '.' . $index));
+                        $entities = array_merge($entities, self::extractEntities($item,$newKey . '.' . $index, $resetMatchedEntities));
                     }
                 } else { // Associative array (dict in Python)
-                    $entities = array_merge($entities, self::extractEntities($value, $newKey));
+                    $entities = array_merge($entities, self::extractEntities($value, $newKey, $resetMatchedEntities));
                 }
             } else {
                 $entities[] = [
