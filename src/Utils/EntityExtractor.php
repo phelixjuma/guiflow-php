@@ -5,7 +5,24 @@ namespace PhelixJuma\GUIFlow\Utils;
 class EntityExtractor
 {
 
-    public static function extractEntities($data, $prefix = '') {
+    /**
+     * @param $data
+     * @param $resetMatchedEntities
+     * @param $prefix
+     * @return array
+     */
+    public static function extractEntities($data, $resetMatchedEntities = false, $prefix = '') {
+
+        // return if empty
+        if (empty($data)) {
+            return [];
+        }
+
+        // reset matched entities, if indicated so
+        if ($resetMatchedEntities) {
+            self::resetMatchedEntities($data);
+        }
+
         $entities = [];
 
         foreach ($data as $key => $value) {
@@ -63,5 +80,19 @@ class EntityExtractor
         }
 
         return $number . $suffixes[$number % 10];
+    }
+
+    private static function resetMatchedEntities(&$data) {
+        // Iterate through each key-value pair in the array
+        foreach ($data as $key => &$value) {
+            // If the value is an array and contains an "original_value" key, reset the value to "original_value"
+            if (is_array($value) && array_key_exists('original_value', $value)) {
+                $data[$key] = $value['original_value'];
+            }
+            // If the value is an array and does not contain an "original_value" key, call the function recursively
+            elseif (is_array($value)) {
+                self::resetMatchedEntities($value);
+            }
+        }
     }
 }
