@@ -101,11 +101,6 @@ class DataJoiner
             $value1 = $this->pathResolver->getValueByPath($datum1, $path);
             $value2 = $this->pathResolver->getValueByPath($datum2, $path);
 
-            // Check for empty values and ignore them
-            if (empty($value1) || empty($value2)) {
-                return false;
-            }
-
             return SimpleCondition::compare($value1, $compareOperator, $value2);
         }
 
