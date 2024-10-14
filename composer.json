@@ -7,9 +7,10 @@
     "php": ">=8.0",
     "ext-json": "*",
     "ext-ctype": "*",
+    "ext-openssl": "*",
     "wyndow/fuzzywuzzy": "^0.6.0",
     "erdalceylan/array-join": "^2.1",
-    "ext-openssl": "*",
+    "openswoole/core": "22.1.5",
     "jumaphelix/php-dag": "^2.0",
     "opis/json-schema": "^2.3"
   },

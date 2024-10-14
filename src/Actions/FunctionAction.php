@@ -170,14 +170,22 @@ class FunctionAction implements ActionInterface
 
                 $count = sizeof($currentValues);
 
+                $maxConcurrency = 1000; // Limit concurrency to 1000
+                $channel = new OpenSwoole\Coroutine\Channel($maxConcurrency); // Create a channel with a buffer size
+
                 $wg = new WaitGroup();
 
                 for ($index = 0; $index < $count; $index++) {
 
                     if (empty($this->condition) || Workflow::evaluateCondition($currentValues[$index], $this->condition)) {
+
+                        // Push a placeholder value to the channel to acquire a "permit"
+                        $channel->push(true);
+
+                        // Add to WaitGroup after acquiring the permit
                         $wg->add();
 
-                        go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg) {
+                        go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg, $channel) {
                             // execute the task
                             $dataCopy = $currentValues[$index]; // Work with a local copy
                             try {
@@ -189,6 +197,10 @@ class FunctionAction implements ActionInterface
                             }
                             // Signal completion
                             $wg->done();
+
+                            // Pop from the channel to release a "permit"
+                            $channel->pop();
+
                         });
                     }
                 }
