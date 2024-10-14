@@ -21,6 +21,7 @@ use PhelixJuma\GUIFlow\Workflow;
 use OpenSwoole\Coroutine as Co;
 use function OpenSwoole\Core\Coroutine\batch;
 use OpenSwoole\Core\Coroutine\WaitGroup;
+use OpenSwoole\Core\Coroutine\Channel;
 
 
 class FunctionAction implements ActionInterface
@@ -171,7 +172,7 @@ class FunctionAction implements ActionInterface
                 $count = sizeof($currentValues);
 
                 $maxConcurrency = 1000; // Limit concurrency to 1000
-                $channel = new OpenSwoole\Coroutine\Channel($maxConcurrency); // Create a channel with a buffer size
+                $channel = new Channel($maxConcurrency); // Create a channel with a buffer size
 
                 $wg = new WaitGroup();
 
