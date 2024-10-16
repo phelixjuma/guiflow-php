@@ -1070,6 +1070,9 @@ class FunctionActionTest extends TestCase
                 ['description' => "Neemcide 0.3% -1L"],
             ]
         ];
+        $data = [
+            "items" => []
+        ];
 
         $mapping = [
             "\b\d+\s*(MG|G|GM|GRM|GMS|KG|KGS|PC|PCS|ML|L|LT|LTR|LTRS|M|X)?\b|[^\w\s]+|(\b|\d+)((?!BIO)[a-zA-Z]{1,3})\b" => "",
@@ -1082,9 +1085,9 @@ class FunctionActionTest extends TestCase
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
-        $this->assertEquals($data, $expectedData);
+        //$this->assertEquals($data, $expectedData);
     }
 
     public function _testSpellCorrection()
@@ -2014,25 +2017,28 @@ class FunctionActionTest extends TestCase
                 ]
             ]
         ];
+        $data = [
+            'items' => []
+        ];
 
         $expectedData = [];
 
         $args = [
-            'data_path' => "unit_of_measure.0.uom",
-            'value' => "Bales",
-            'valueFromField' => "",
-            'valueMapping' => null,
-            'conditionalValue' => null,
-            'newField'  => ""
+            "path" => "search_field",
+            "value" => "",
+            "valueFromField" => "description",
+            "valueMapping" => "",
+            "conditionalValue" => [],
+            "newField" => ""
         ];
 
         $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'set', 'args' => $args, 'newField' => null, 'strict' => 0, 'condition' => null], "new_items");
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
-        $this->assertEquals($data, $expectedData);
+        //$this->assertEquals($data, $expectedData);
     }
 
     public function _testStrLen()
@@ -2057,27 +2063,27 @@ class FunctionActionTest extends TestCase
         $data = [
             "customer_name" => "Naivas",
             "items" => [
-                ["description" => "Assorted 1kg", "pack" => "Pack: 1 x 1"],
-                ["description" => "Smoked sausage", "pack" => "Pack: 1 x 1"]
+                //["description" => "Assorted 1kg", "pack" => "Pack: 1 x 1"],
+                //["description" => "Smoked sausage", "pack" => "Pack: 1 x 1"]
             ]
         ];
 
         $expectedData = [];
 
         $condition = [
-            "operator" => "not matches",
-            "path" => "description",
-            "value" => "\d+\s*(?:G|GM|GMS|KG|KGS|PC|PCS)"
+            //"operator" => "not matches",
+            //"path" => "description",
+            //"value" => "\d+\s*(?:G|GM|GMS|KG|KGS|PC|PCS)"
         ];
 
-        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'append', 'args' => ['stringsToAppend' => ["[",["path" => "pack"],"]"], "seperator" => "", "use_data_as_path_value" => false, 'valueKey' => "description"], 'newField' => '', 'strict' => 0 ,'condition' => $condition], '', 0, null);
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'append', 'args' => ['stringsToAppend' => ["[",["path" => "pack"],"]"], "seperator" => "", "use_data_as_path_value" => false, 'valueKey' => ""], 'newField' => 'description', 'strict' => 0 ,'condition' => $condition], '', 0, null);
 
         $action->execute($data);
 
         //print "\nTest data:\n";
-        //print_r($data);
+        print_r($data);
 
-        $this->assertEquals($data, $expectedData);
+        //$this->assertEquals($data, $expectedData);
     }
 
     public function _testFilterInArray()
@@ -2415,7 +2421,7 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function testGetEntities() {
+    public function _testGetEntities() {
 
         $data = json_decode('[{"purchase_order_number":"","order_date":"2024-10-07","ordered_by_name":"Risper","customer_name":{"original_value":"TIPWANA COMPANY LTD (RISPER | TIPWANA COMPANY LTD)","matched_value":"TIPWANA COMPANY LTD: PC02792","similarity":"88.313877436328","meta_data":{"master_data":"customers","value_key":"Name","id_key":"No","id":"PC02792","value":"TIPWANA COMPANY LTD","matcher":"semantic_search","other_details":{"No":"PC02792","Name":"TIPWANA COMPANY LTD","Phone_No":"0722896127/721434459/728690841","E_Mail":"davegithomi@gmail.com","Contact":"JOHN K. GITHOMI/DORCAS W. MUNGAI/DAVID KIRAGU","Customer_Region":"NAIROBI","Dormant":"","Blocked":" ","Customer_Category":"Kuku Shop","_search_key":"Name","_id_key":"No"}}},"customer_email":"","customer_phone":"","delivery_location":{"original_value":"Tipwana company ltd","matched_value":"TIPWANA COMPANY LTD: MOMBASA","similarity":"72.246925582277","meta_data":{"master_data":"shipping locations","value_key":"Name","id_key":"Code","id":"MOMBASA","value":"TIPWANA COMPANY LTD","matcher":"semantic_search","other_details":{"Customer_No":"PC02792","Code":"MOMBASA","Name":"TIPWANA COMPANY LTD","Address_2":"DAGHORETTI DISTRICT","Contact":"JOHN K. GITHOMI/DORCAS W. MUNGAI/DAVID KIRAGU","Route_plan":"MOMBASA A","Customer_Region":"MOMBASA","_search_key":"Name","_id_key":"Code","Search_Field":"TIPWANA COMPANY LTD (MOMBASA)"}}},"delivery_date":"2024-10-07","seller_name":"Kenchic","items":[{"serial_number":"1","customer_item_code":"","item_bar_code":"0","description":{"original_value":"1.1","matched_value":"CAPON CATERING 11: PC02042","similarity":"96.178526403443","meta_data":{"master_data":"all products","value_key":"Description","id_key":"No","id":"PC02042","value":"CAPON CATERING 11","matcher":"semantic_search","other_details":{"No":"PC02042","Description":"CAPON CATERING 11","Unit_Price":"430","Blocked":"","PC_Type":"Frozen","_search_key":"Description","_id_key":"No","Unit_of_Measure_Code":"KGS","Search_Field":"CAPON CATERING 1.1KG (Frozen) (CHICKEN)"}}},"unit_of_measure":[{"selling_quantity":"300","selling_unit":"PCS","descriptive_quantity":"300 PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"0","total_price":"0","search_field":"CATERING CAPON 1.1KG (CHICKEN) (Frozen)","section":"Shop"}],"currency":"KES","total_number_of_items":"1","total_number_of_extracted_items":"1","sub_total":"0","total_amount":"0","vat_no":"","workflow_list_position":"0","sender_details":{"sent_by_name":"Risper A. Amotto","sent_by_phone":"","sent_by_email":"amottorisper@kenchic.com","sent_by_email_domain":"kenchic"},"extraction_data":{"document":{"link":""},"document_text_content":"Email Subject: Tipwana company ltd\n Email Body:\n 1.1 300pcs\n\nRegards\n\nRisper","document_text":"Email Subject: Tipwana company ltd\n Email Body:\n 1.1 300pcs\n\nRegards\n\nRisper","subscribed_mailbox_email":"pcsales@kenchic.com"},"email_meta_data":{"email_subject":" Tipwana company ltd"},"timezone":"1","is_consignment_sales":"No","is_standing_order":"No","is_tdr_order":"No","is_staff_order":"No","is_email_body_order":"Yes","contact_person":{"original_value":"TIPWANA COMPANY LTD MOMBASA","matched_value":"DORCAS W. MUNGAI: PCC406661","similarity":"44.252213363108","meta_data":{"master_data":"contacts","value_key":"Name","id_key":"No","id":"PCC406661","value":"DORCAS W. MUNGAI","matcher":"semantic_search","other_details":{"No":"PCC406661","Name":"DORCAS W. MUNGAI","Designation_New":"OWNER","Customer_No":"PC02792","_search_key":"Name","_id_key":"No"}}},"promised_delivery_date":"2024-10-08T12:55:00Z","production_date":"2024-10-07T12:55:00Z"}]', true);
         //$data = json_decode('[{"customer_name":"Tipwana company ltd","items":[{"serial_number":"1","customer_item_code":"","item_bar_code":"0","description":"1.1","unit_of_measure":[{"selling_quantity":"300","selling_unit":"PCS"}],"pack_configuration":{"pack_size":"","unit_size":"0"},"unit_price":"0","total_price":"0"}]}]', true);

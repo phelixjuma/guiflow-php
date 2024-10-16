@@ -142,10 +142,14 @@ class FunctionAction implements ActionInterface
                 $newValue = Utils::join(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'map') {
 
-                //list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
-                list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
+                $count = sizeof($currentValues);
 
-                if (!empty($currentValues)) {
+                if ($count == 0) {
+                    $newValue = $currentValues;
+                } else {
+
+                    list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
+
                     foreach ($currentValues as &$value) {
 
                         if (empty($this->condition) || Workflow::evaluateCondition($value, $this->condition)) {
@@ -156,59 +160,63 @@ class FunctionAction implements ActionInterface
                             }
                         }
                     }
+
+                    $newValue = $currentValues;
                 }
-                $newValue = $currentValues;
 
             } elseif (isset($this->function[1]) && $this->function['1'] == 'map_parallel') {
 
-                //list($currentData, $path, $function, $args, $newField, $strict, $condition) = $paramValues;
-                //$currentData = $paramValues[0];
-                list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
-
-                // Set function as an array with the udf object
-                $function = [$this->function[0], $function];
-
                 $count = sizeof($currentValues);
 
-                $maxConcurrency = 10000; // Concurrency Limit
-                $channel = new \OpenSwoole\Coroutine\Channel($maxConcurrency); // Create a channel with a buffer size
+                if ($count == 0) {
+                    $newValue = $currentValues;
+                } else {
 
-                $wg = new WaitGroup();
+                    list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
 
-                for ($index = 0; $index < $count; $index++) {
+                    // Set function as an array with the udf object
+                    $function = [$this->function[0], $function];
 
-                    if (empty($this->condition) || Workflow::evaluateCondition($currentValues[$index], $this->condition)) {
+                    $maxConcurrency = 10000; // Concurrency Limit
+                    $channel = new \OpenSwoole\Coroutine\Channel($maxConcurrency); // Create a channel with a buffer size
 
-                        // Push a placeholder value to the channel to acquire a "permit"
-                        $channel->push(true);
+                    $wg = new WaitGroup();
 
-                        // Add to WaitGroup after acquiring the permit
-                        $wg->add();
+                    for ($index = 0; $index < $count; $index++) {
 
-                        go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg, $channel) {
-                            // execute the task
-                            $dataCopy = $currentValues[$index]; // Work with a local copy
-                            try {
-                                // execute the function
-                                (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataCopy);
-                                // set the result back
-                                $currentValues[$index] = $dataCopy;
-                            } catch (\Exception|\Throwable $e) {
-                            }
-                            // Signal completion
-                            $wg->done();
+                        if (empty($this->condition) || Workflow::evaluateCondition($currentValues[$index], $this->condition)) {
 
-                            // Pop from the channel to release a "permit"
-                            $channel->pop();
+                            // Push a placeholder value to the channel to acquire a "permit"
+                            $channel->push(true);
 
-                        });
+                            // Add to WaitGroup after acquiring the permit
+                            $wg->add();
+
+                            go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg, $channel) {
+                                // execute the task
+                                $dataCopy = $currentValues[$index]; // Work with a local copy
+                                try {
+                                    // execute the function
+                                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataCopy);
+                                    // set the result back
+                                    $currentValues[$index] = $dataCopy;
+                                } catch (\Exception|\Throwable $e) {
+                                }
+                                // Signal completion
+                                $wg->done();
+
+                                // Pop from the channel to release a "permit"
+                                $channel->pop();
+
+                            });
+                        }
                     }
+
+                    // Wait for all tasks to complete
+                    $wg->wait();
+
+                    $newValue = $currentValues;
                 }
-
-                // Wait for all tasks to complete
-                $wg->wait();
-
-                $newValue = $currentValues;
 
             } elseif (isset($this->function[1]) && $this->function['1'] == 'set') {
 
