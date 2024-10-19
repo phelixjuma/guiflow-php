@@ -150,7 +150,6 @@ class FunctionAction implements ActionInterface
 
                     list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
 
-                    // We resolve parent data in arguments
                     $args = self::resolveParentParamInMap($data, $args);
 
                     foreach ($currentValues as &$value) {
