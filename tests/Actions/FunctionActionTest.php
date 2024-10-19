@@ -2125,21 +2125,57 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function _testFuzzyExtractTopN()
+    public function _testFuzzyExtractTopN1()
     {
         $data = [
+            "items" => [
+                [
+                    "description" => "1000ML",
+                    "pack" => "Pack: 1 x 1",
+                    "products"  => [
+                        ["description" => "1000ML", "pack" => "Pack: 1 x 1"]
+                    ],
+                    "products_attributes"  => [
+                        ["description" => "1000ML", "pack" => "Pack: 1 x 1"],
+                        ["description" => "Aquawett-100ML", "pack" => "Pack: 1 x 1"],
+                        ["description" => "PEARL x 24 x 100ml [24 x 100]", "pack" => "Pack: 1 x 1"],
+                        ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1", "similarity" => 100]
+                    ]
+                ]
+            ]
+        ];
+
+        $args = ["query" => ["path" => "description"], "choices" => ["path" => "parent.products_attributes"],"searchKey" => "description", "minScore" => 1, "n" => "2", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => []];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'products', 'function' => 'map', 'args' => ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => $args, 'newField' => 'filtered_products', 'strict' => 0 ,'condition' => null], 'newField' => '', 'strict' => 0 ,'condition' => null], '', 0, null);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        //$this->assertEquals($data, $expectedData);
+    }
+
+    public function _testFuzzyExtractTopN2()
+    {
+        $data = [
+            "items" => [
+                [
+                    "description" => "1000ML",
+                    "pack" => "Pack: 1 x 1",
+                ]
+            ],
             "products"  => [
                 ["description" => "1000ML", "pack" => "Pack: 1 x 1"],
                 ["description" => "Aquawett-100ML", "pack" => "Pack: 1 x 1"],
                 ["description" => "PEARL x 24 x 100ml [24 x 100]", "pack" => "Pack: 1 x 1"],
                 ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1", "similarity" => 100]
-            ],
-            "items" => [
-                ["description" => "1000ML", "pack" => "Pack: 1 x 1"]
             ]
         ];
 
-        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => ["query" => ["path" => "description"], "choices" => ["path" => "parent.products"],"searchKey" => "description", "minScore" => 1, "n" => "2", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => []], 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
+        $args = ["query" => ["path" => "description"], "choices" => ["path" => "parent.products"],"searchKey" => "description", "minScore" => 1, "n" => "2", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => []];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => $args, 'newField' => 'filtered_products', 'strict' => 0 ,'condition' => null], '', 0, null);
 
         $action->execute($data);
 

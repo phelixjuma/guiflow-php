@@ -151,11 +151,9 @@ class FunctionAction implements ActionInterface
                     list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
 
                     // We resolve parent paths in args, if not nested map function
-                    //print_r($args);
-                    if (!isset($args['function']) || !in_array($args['function'], ["map", "map_parallel"])) {
+                    if (!in_array($function, ["map", "map_parallel"])) {
                         $args = self::resolveParentParamInMap($data, $args);
                     }
-                    //print_r($args);
 
                     foreach ($currentValues as &$value) {
 
@@ -182,7 +180,7 @@ class FunctionAction implements ActionInterface
                     list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
 
                     // We resolve parent data in arguments
-                    if (!isset($args['function']) || !in_array($args['function'], ["map", "map_parallel"])) {
+                    if (!in_array($function, ["map", "map_parallel"])) {
                         $args = self::resolveParentParamInMap($data, $args);
                     }
 
