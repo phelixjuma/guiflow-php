@@ -150,7 +150,10 @@ class FunctionAction implements ActionInterface
 
                     list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
 
-                    $args = self::resolveParentParamInMap($data, $args);
+                    // We resolve parent paths in args, if not nested map function
+                    if (!in_array($args['function'], ["map", "map_parallel"])) {
+                        $args = self::resolveParentParamInMap($data, $args);
+                    }
 
                     foreach ($currentValues as &$value) {
 
@@ -177,7 +180,9 @@ class FunctionAction implements ActionInterface
                     list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
 
                     // We resolve parent data in arguments
-                    $args = self::resolveParentParamInMap($data, $args);
+                    if (!in_array($args['function'], ["map", "map_parallel"])) {
+                        $args = self::resolveParentParamInMap($data, $args);
+                    }
 
                     // Set function as an array with the udf object
                     $function = [$this->function[0], $function];
@@ -425,6 +430,7 @@ class FunctionAction implements ActionInterface
     protected function resolveParentParamInMap($data, $param) {
 
         if (is_array($param)) {
+            if (isset($param['']))
             if (isset($param['path']) && str_contains($param['path'], "parent.")) {
                 $paramPath = str_replace("parent.", "",$param['path']);
                 return PathResolver::getValueByPath($data, $paramPath);
