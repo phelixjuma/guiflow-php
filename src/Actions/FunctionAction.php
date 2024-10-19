@@ -111,7 +111,7 @@ class FunctionAction implements ActionInterface
         if (!empty($this->args) && !is_string($this->args)) {
             foreach ($this->args as $param) {
 
-                if (!in_array($this->function['1'], ['join', 'map', 'assoc_array_find'])) {
+                if (!in_array($this->function['1'], ['join', 'map', 'map_parallel', 'assoc_array_find'])) {
 
                     if (is_array($param) && isset($param['path'])) {
 
@@ -150,6 +150,9 @@ class FunctionAction implements ActionInterface
 
                     list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
 
+                    // We resolve parent data in arguments
+                    $args = self::resolveParentParamInMap($data, $args);
+
                     foreach ($currentValues as &$value) {
 
                         if (empty($this->condition) || Workflow::evaluateCondition($value, $this->condition)) {
@@ -173,6 +176,9 @@ class FunctionAction implements ActionInterface
                 } else {
 
                     list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
+
+                    // We resolve parent data in arguments
+                    $args = self::resolveParentParamInMap($data, $args);
 
                     // Set function as an array with the udf object
                     $function = [$this->function[0], $function];
@@ -405,6 +411,29 @@ class FunctionAction implements ActionInterface
                 $resolvedArray = [];
                 foreach ($param as $key => $value) {
                     $resolvedArray[$key] = $this->resolveParam($data, $value);
+                }
+                return $resolvedArray;
+            }
+        }
+        return $param;
+    }
+
+    /**
+     * @param $data
+     * @param $param
+     * @return array|mixed|null
+     */
+    protected function resolveParentParamInMap($data, $param) {
+
+        if (is_array($param)) {
+            if (isset($param['path']) && str_contains($param['path'], "parent.")) {
+                $paramPath = str_replace("parent.", "",$param['path']);
+                return PathResolver::getValueByPath($data, $paramPath);
+            } else {
+                // Recursively resolve each element in the array
+                $resolvedArray = [];
+                foreach ($param as $key => $value) {
+                    $resolvedArray[$key] = $this->resolveParentParamInMap($data, $value);
                 }
                 return $resolvedArray;
             }

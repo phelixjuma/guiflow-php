@@ -2128,19 +2128,20 @@ class FunctionActionTest extends TestCase
     public function _testFuzzyExtractTopN()
     {
         $data = [
+            "products"  => [
+                ["description" => "1000ML", "pack" => "Pack: 1 x 1"],
+                ["description" => "Aquawett-100ML", "pack" => "Pack: 1 x 1"],
+                ["description" => "PEARL x 24 x 100ml [24 x 100]", "pack" => "Pack: 1 x 1"],
+                ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1", "similarity" => 100]
+            ],
             "items" => [
-                ["description" => "450G", "pack" => "Pack: 1 x 1", "products"  => [
-                    ["description" => "1000ML", "pack" => "Pack: 1 x 1"],
-                    ["description" => "Aquawett-100ML", "pack" => "Pack: 1 x 1"],
-                    ["description" => "PEARL x 24 x 100ml [24 x 100]", "pack" => "Pack: 1 x 1"],
-                    ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1", "similarity" => 100]
-                ]]
+                ["description" => "450G", "pack" => "Pack: 1 x 1"]
             ]
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => ["query" => ["path" => "description"], "choices" => ["path" => "products"],"searchKey" => "description", "n" => "", "min_score" => ""], 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => ["query" => ["path" => "description"], "choices" => ["path" => "parent.products"],"searchKey" => "description", "n" => "1", "min_score" => ""], 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
 
         $action->execute($data);
 
