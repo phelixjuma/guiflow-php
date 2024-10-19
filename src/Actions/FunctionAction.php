@@ -151,9 +151,11 @@ class FunctionAction implements ActionInterface
                     list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
 
                     // We resolve parent paths in args, if not nested map function
-                    if (!in_array($args['function'], ["map", "map_parallel"])) {
+                    //print_r($args);
+                    if (!isset($args['function']) || !in_array($args['function'], ["map", "map_parallel"])) {
                         $args = self::resolveParentParamInMap($data, $args);
                     }
+                    //print_r($args);
 
                     foreach ($currentValues as &$value) {
 
@@ -161,7 +163,7 @@ class FunctionAction implements ActionInterface
                             try {
                                 (new FunctionAction($path, [$this->function[0], $function], $args, $newField, $strict, $condition))->execute($value);
                             } catch (\Exception|\Throwable $e) {
-                                //print "\nError in map function: ".$e->getMessage()."\n";
+                                //print "\nError in map function: ".$e->getMessage()." on line {$e->getLine()} of file {$e->getFile()}\n";
                             }
                         }
                     }
@@ -180,7 +182,7 @@ class FunctionAction implements ActionInterface
                     list($path, $function, $args, $newField, $strict, $condition) = array_values($this->args);
 
                     // We resolve parent data in arguments
-                    if (!in_array($args['function'], ["map", "map_parallel"])) {
+                    if (!isset($args['function']) || !in_array($args['function'], ["map", "map_parallel"])) {
                         $args = self::resolveParentParamInMap($data, $args);
                     }
 
@@ -430,7 +432,6 @@ class FunctionAction implements ActionInterface
     protected function resolveParentParamInMap($data, $param) {
 
         if (is_array($param)) {
-            if (isset($param['']))
             if (isset($param['path']) && str_contains($param['path'], "parent.")) {
                 $paramPath = str_replace("parent.", "",$param['path']);
                 return PathResolver::getValueByPath($data, $paramPath);

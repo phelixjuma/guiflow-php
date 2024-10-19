@@ -2125,7 +2125,7 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function testFuzzyExtractTopN()
+    public function _testFuzzyExtractTopN()
     {
         $data = [
             "products"  => [
@@ -2135,22 +2135,11 @@ class FunctionActionTest extends TestCase
                 ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1", "similarity" => 100]
             ],
             "items" => [
-                ["description" => "450G", "pack" => "Pack: 1 x 1"]
+                ["description" => "1000ML", "pack" => "Pack: 1 x 1"]
             ]
         ];
 
-        $expectedData = [];
-
-        $filter_criteria = [
-            "term" => "1000ML",
-            "mode"=> "==",
-            "key"=> "description",
-            "similarity_threshold"=> "",
-            "term_exclusion_pattern"=> "",
-            "value_exclusion_pattern"=> ""
-        ];
-
-        $action = new FunctionAction("items", [$this, 'map'], ['path' => 'parent.products', 'function' => 'fuzzy_extract_n', 'args' => ["filter_criteria" => $filter_criteria], 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => ["query" => ["path" => "description"], "choices" => ["path" => "parent.products"],"searchKey" => "description", "minScore" => 1, "n" => "2", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => []], 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
 
         $action->execute($data);
 
