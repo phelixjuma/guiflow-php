@@ -2399,6 +2399,43 @@
       ],
       "unevaluatedProperties": false
     },
+    "getObjectFromListFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "get_object_from_list"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "condition": {
+                  "$ref": "#/definitions/Condition"
+                },
+                "return_path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "condition",
+                "return_path"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "flattenObjectsFunctionArgs": {
       "allOf": [
         {
@@ -4653,6 +4690,25 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_GetObjectFromList": {
+      "title": "Get From Object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/getObjectFromListFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_FlattenObjects": {
       "title": "Flatten Objects",
       "allOf": [
@@ -5205,6 +5261,9 @@
           "$ref": "#/definitions/Action_Function_GetFromObject"
         },
         {
+          "$ref": "#/definitions/Action_Function_GetObjectFromList"
+        },
+        {
           "$ref": "#/definitions/Action_Function_FlattenObjects"
         },
         {
@@ -5400,6 +5459,10 @@
         {
           "title": "Get From Object",
           "$ref": "#/definitions/getFromObjectFunctionArgs"
+        },
+        {
+          "title": "Get Object From List",
+          "$ref": "#/definitions/getObjectFromListFunctionArgs"
         },
         {
           "title": "Flatten Objects",

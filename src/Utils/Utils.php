@@ -458,18 +458,18 @@ class Utils
     /**
      * @param $data
      * @param $condition
-     * @param $returnKey
-     * @return array|mixed
+     * @param $returnPath
+     * @return array|mixed|null
      */
-    public static function assoc_array_find($data, $condition, $returnKey = null)
+    public static function assoc_array_find($data, $condition, $returnPath = null)
     {
 
         if (!empty($data) && is_array($data)) {
             foreach ($data as $d) {
 
                 if (Workflow::evaluateCondition($d, $condition, true)) {
-                    if (!empty($returnKey)) {
-                        return $d[$returnKey];
+                    if (!empty($returnPath)) {
+                        return PathResolver::getValueByPath($d, $returnPath);
                     }
                     return $d;
                 }

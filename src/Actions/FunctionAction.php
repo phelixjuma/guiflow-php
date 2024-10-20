@@ -282,6 +282,8 @@ class FunctionAction implements ActionInterface
                 $newValue = Utils::assoc_array_sum_if(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'assoc_array_find') {
                 $newValue = Utils::assoc_array_find(...$paramValues);
+            } elseif (isset($this->function[1]) && $this->function['1'] == 'get_object_from_list') {
+                $newValue = Utils::assoc_array_find(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'get_from_object') {
                 $newValue = Utils::get_from_object(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'flatten_objects') {
