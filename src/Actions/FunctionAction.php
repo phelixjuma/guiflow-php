@@ -109,19 +109,21 @@ class FunctionAction implements ActionInterface
         $paramValues = [$currentValues];
 
         if (!empty($this->args) && !is_string($this->args)) {
+
             foreach ($this->args as $param) {
 
-                if (!in_array($this->function['1'], ['join', 'map', 'map_parallel', 'assoc_array_find'])) {
+                if (!in_array($this->function['1'], ['map', 'map_parallel'])) {
 
-                    if (is_array($param) && isset($param['path'])) {
-
-                        $paramPath = $param['path'];
-                        $paramValue = PathResolver::getValueByPath($data, $paramPath);
-                        $paramValues[] = $paramValue;
-
-                    } else {
-                        $paramValues[] = self::getFilterCriteria($data, $param);
-                    }
+                    $paramValues[] = self::resolveParam($data, $param);
+//                    if (is_array($param) && isset($param['path'])) {
+//
+//                        $paramPath = $param['path'];
+//                        $paramValue = PathResolver::getValueByPath($data, $paramPath);
+//                        $paramValues[] = $paramValue;
+//
+//                    } else {
+//                        $paramValues[] = self::getFilterCriteria($data, $param);
+//                    }
                 } else {
                     $paramValues[] = $param;
                 }
@@ -405,15 +407,10 @@ class FunctionAction implements ActionInterface
         return $criteria;
     }
 
-    /**
-     * @param $data
-     * @param $param
-     * @return array|mixed|null
-     */
     protected function resolveParam($data, $param) {
-
         if (is_array($param)) {
-            if (isset($param['path'])) {
+            // Check if the array contains only the 'path' key
+            if (count($param) === 1 && isset($param['path'])) {
                 $paramPath = $param['path'];
                 return PathResolver::getValueByPath($data, $paramPath);
             } else {
@@ -425,6 +422,7 @@ class FunctionAction implements ActionInterface
                 return $resolvedArray;
             }
         }
+        // If param is not an array, return it as-is
         return $param;
     }
 

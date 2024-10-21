@@ -467,7 +467,7 @@ class Utils
         if (!empty($data) && is_array($data)) {
             foreach ($data as $d) {
 
-                if (Workflow::evaluateCondition($d, $condition, true)) {
+                if (Workflow::evaluateCondition($d, $condition)) {
                     if (!empty($returnPath)) {
                         return PathResolver::getValueByPath($d, $returnPath);
                     }

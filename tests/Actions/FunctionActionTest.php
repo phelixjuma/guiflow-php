@@ -2184,6 +2184,40 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
+    public function _testGetObjectFromList()
+    {
+        $data = [
+            "items" => [
+                [
+                    "description" => "1000ML",
+                    "pack" => "Pack: 1 x 1",
+                ]
+            ],
+            "item_categories"  => [
+                ["item" => "1000ML", "category" => "Category 1"],
+                ["item" => "2000ML", "category" => "Category 2"],
+            ]
+        ];
+
+        $args = [
+            "list" => ["path" => "parent.item_categories"],
+            "condition" => [
+                "path" => "item",
+                "operator" => "==",
+                "value" => ["path" => "description"]
+            ],
+            "return_path"   => "category"
+        ];
+
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'get_object_from_list', 'args' => $args, 'newField' => 'category', 'strict' => 0 ,'condition' => null], '', 0, null);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        //$this->assertEquals($data, $expectedData);
+    }
+
     public function _testFuzzyExtractTopNCustomers()
     {
         $data = [
