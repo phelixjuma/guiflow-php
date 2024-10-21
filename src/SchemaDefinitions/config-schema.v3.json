@@ -2414,6 +2414,9 @@
             "args": {
               "type": "object",
               "properties": {
+                "list": {
+                  "$ref": "#/definitions/valueOrPath"
+                },
                 "condition": {
                   "$ref": "#/definitions/Condition"
                 },
@@ -2422,6 +2425,7 @@
                 }
               },
               "required": [
+                "list",
                 "condition",
                 "return_path"
               ],
