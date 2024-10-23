@@ -41,13 +41,18 @@ class UnitConverter
 
         // We sent pieces units
         $piecesUoMs = [
-            "PCS", "PC", "Piece", "Each", "Packet", "PKT", "KG", "KGS",
-            "G", "GM", "GMS"
+            "PCS?", "Pieces?", "Each", "Packets?", "PKTS?","KGS?",
+            "GMS?","G"
         ];
         if (!empty($additionalPiecesUoMs)) {
             // remove empty values in additional uoms
             $additionalPiecesUoMs = array_filter($additionalPiecesUoMs);
             $piecesUoMs = array_values(array_unique(array_merge($piecesUoMs, $additionalPiecesUoMs)));
+        }
+
+        // Set pcs uoms to include word boundaries
+        foreach ($piecesUoMs as &$pcsUom) {
+            $pcsUom = "\b($pcsUom)\b";
         }
 
         $isItemUnitInPieces = SimpleCondition::compare($itemUnit, "in list any", $piecesUoMs);
