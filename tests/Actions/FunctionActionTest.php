@@ -2156,26 +2156,26 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function _testFuzzyExtractTopN2()
+    public function testFuzzyExtractTopN2()
     {
         $data = [
             "items" => [
                 [
-                    "description" => "1000ML",
+                    "description" => "100ML Product 3",
                     "pack" => "Pack: 1 x 1",
+                    "products"  => [
+                        ["description" => "1000ML", "pack" => "Pack: 1 x 1"],
+                        ["description" => "Aquawett-100ML", "pack" => "Pack: 1 x 1"],
+                        ["description" => "PEARL x 24 x 100ml [24 x 100]", "pack" => "Pack: 1 x 1"],
+                        ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1", "similarity" => 100]
+                    ]
                 ]
-            ],
-            "products"  => [
-                ["description" => "1000ML", "pack" => "Pack: 1 x 1"],
-                ["description" => "Aquawett-100ML", "pack" => "Pack: 1 x 1"],
-                ["description" => "PEARL x 24 x 100ml [24 x 100]", "pack" => "Pack: 1 x 1"],
-                ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1", "similarity" => 100]
             ]
         ];
 
-        $args = ["query" => ["path" => "description"], "choices" => ["path" => "parent.products"],"searchKey" => "description", "minScore" => 1, "n" => "2", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => []];
+        $args = ["query" => ["path" => "description"], "choices" => ["path" => "products"], "searchKey" => "description", "n" => "1", "minScore" => "", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => ""];
 
-        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => $args, 'newField' => 'filtered_products', 'strict' => 0 ,'condition' => null], '', 0, null);
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => $args, 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
 
         $action->execute($data);
 
@@ -2194,8 +2194,8 @@ class FunctionActionTest extends TestCase
                 ]
             ],
             "item_categories"  => [
-                ["item" => "1000ML", "category" => "Category 1"],
-                ["item" => "2000ML", "category" => "Category 2"],
+                ["item" => "1000ML", "category" => ["name" => "Category 1"]],
+                ["item" => "2000ML", "category" => ["name" => "Category 2"]],
             ]
         ];
 
@@ -2206,7 +2206,7 @@ class FunctionActionTest extends TestCase
                 "operator" => "==",
                 "value" => ["path" => "description"]
             ],
-            "return_path"   => "category"
+            "return_path"   => "category.name"
         ];
 
         $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'get_object_from_list', 'args' => $args, 'newField' => 'category', 'strict' => 0 ,'condition' => null], '', 0, null);

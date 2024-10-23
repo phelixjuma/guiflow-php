@@ -41,7 +41,7 @@ class UnitConverter
 
         // We sent pieces units
         $piecesUoMs = [
-            "PCS", "PC", "Piece", "Each", "Packet", "PKT", "\b(?!bale/)bag\b", "BG", "KG", "KGS",
+            "PCS", "PC", "Piece", "Each", "Packet", "PKT", "KG", "KGS",
             "G", "GM", "GMS"
         ];
         if (!empty($additionalPiecesUoMs)) {
