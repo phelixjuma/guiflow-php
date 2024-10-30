@@ -79,10 +79,8 @@ class SetValueAction implements ActionInterface
                     $newValue = $valueToSet;
                 }
 
-                if (!empty($newValue)) {
-                    $targetPath = str_replace('*', $index, $this->targetPath);
-                    PathResolver::setValueByPath($data, $targetPath, $newValue);
-                }
+                $targetPath = str_replace('*', $index, $this->targetPath);
+                PathResolver::setValueByPath($data, $targetPath, $newValue);
 
             }
         } else {

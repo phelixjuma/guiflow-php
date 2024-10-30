@@ -12,7 +12,10 @@
     "erdalceylan/array-join": "^2.1",
     "openswoole/core": "22.1.5",
     "jumaphelix/php-dag": "^2.0",
-    "opis/json-schema": "^2.3"
+    "opis/json-schema": "^2.3",
+    "graphp/graph": "^0.9.3",
+    "graphp/algorithms": "^0.8.2",
+    "graphp/graphviz": "^0.2.2"
   },
   "scripts": {
     "test": "vendor/bin/phpunit",

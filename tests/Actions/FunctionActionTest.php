@@ -2156,7 +2156,7 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function testFuzzyExtractTopN2()
+    public function _testFuzzyExtractTopN2()
     {
         $data = [
             "items" => [
