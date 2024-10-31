@@ -1732,4 +1732,18 @@ class Utils
         return (new \DateTime())->setTimestamp($timestamp);
     }
 
+    /**
+     * @param $threshold
+     * @return bool
+     */
+    public static function serverMemoryTooLow($threshold) {
+
+        $totalMemory = (int)trim(shell_exec("free -b | grep Mem | awk '{print $2}'"));
+        $usedMemory = (int)trim(shell_exec("free -b | grep Mem | awk '{print $3}'"));
+
+        $memoryUsage = 100*$usedMemory/$totalMemory;
+
+        return $memoryUsage > $threshold;
+    }
+
 }

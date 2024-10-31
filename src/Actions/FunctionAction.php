@@ -190,6 +190,7 @@ class FunctionAction implements ActionInterface
                     $function = [$this->function[0], $function];
 
                     $maxConcurrency = 10000; // Concurrency Limit
+                    $maxMemoryUsage = 30;
                     $channel = new \OpenSwoole\Coroutine\Channel($maxConcurrency); // Create a channel with a buffer size
 
                     $wg = new WaitGroup();
@@ -204,8 +205,20 @@ class FunctionAction implements ActionInterface
                             // Add to WaitGroup after acquiring the permit
                             $wg->add();
 
-                            go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg, $channel) {
-                                // execute the task
+                            go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg, $channel, $maxMemoryUsage) {
+
+                                // We check memory usage
+                                while (true) {
+                                    if (Utils::serverMemoryTooLow($maxMemoryUsage)) {
+                                        echo "High memory usage detected. Pausing task for item {$index}...\n";
+                                        Co::sleep(0.5); // Delay the coroutine for 500ms if memory is high
+                                    } else {
+                                        break; // Exit the loop if memory usage is back under control
+                                    }
+                                }
+
+                                // memory is ok, proceed to execute the task
+
                                 $dataCopy = $currentValues[$index]; // Work with a local copy
                                 try {
                                     // execute the function
