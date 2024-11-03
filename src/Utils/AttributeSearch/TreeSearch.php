@@ -148,7 +148,7 @@ class TreeSearch
      * @param callable $nodePathConfidenceCalculatorFunction
      * @return array
      */
-    public static function search(string $searchItem, array $attributes, $attribute_tree, $corpus_with_attributes, callable $nodePathConfidenceCalculatorFunction): array
+    public static function extractMatchingAttributes(string $searchItem, array $attributes, $attribute_tree, $corpus_with_attributes, callable $nodePathConfidenceCalculatorFunction): array
     {
 
         // Instantiate the AttributeGraphBuilder
