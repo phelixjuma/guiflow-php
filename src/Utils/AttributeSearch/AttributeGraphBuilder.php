@@ -100,6 +100,112 @@ class AttributeGraphBuilder
         }
     }
 
+    /**
+     * @param array $queue
+     * @param array $output
+     * @return array
+     */
+    private static function levelOrderTraversal(array $queue, array $output = [])
+    {
+        // If the queue is empty, return the output.
+        if (count($queue) === 0) {
+            return $output;
+        }
+
+        // Take the first item from the queue and visit it.
+        $node = array_shift($queue);
+        $output[] = $node['value'];
+
+        // Add any children to the queue.
+        foreach ($node['children'] ?? [] as $child) {
+            $queue[] = $child;
+        }
+
+        // Repeat the algorithm with the rest of the queue.
+        return self::levelOrderTraversal($queue, $output);
+    }
+
+    /**
+     * @param $treeData
+     * @return array
+     */
+    public static function extractTreeNodesAndBranchingOptions($treeData) {
+
+        $queue = [$treeData];
+
+        $allNodesData = self::levelOrderTraversal($queue);
+
+        $combinedAttributes = [];
+
+        foreach ($allNodesData as $node) {
+            if ($node !== "root") {
+
+                if (!array_key_exists($node['attribute']['name'], $combinedAttributes)) {
+                    $combinedAttributes[$node['attribute']['name']] = [
+                        "attribute"    => $node['attribute']['name'],
+                        "options"       => []
+                    ];
+                }
+                if (!empty($node['value']) && !in_array($node['value'], $combinedAttributes[$node['attribute']['name']]['options'])) {
+                    $combinedAttributes[$node['attribute']['name']]['options'][] = $node['value'];
+                }
+            }
+        }
+        return array_values($combinedAttributes);
+    }
+
+    /**
+     * @param $nodeValue
+     * @param $treeWeights
+     * @return array|mixed
+     */
+    public static function addNodeWeight($nodeValue, $treeWeights) {
+
+        if ($nodeValue == "root") {
+            return $nodeValue;
+        }
+
+        if (empty($nodeValue['value'])) {
+
+            $nodeValue['scores']['confidence'] = 0;
+
+            return $nodeValue;
+        }
+
+        // We get the weights for this node's label type (attribute)
+        $attributeWeights = Utils::searchMultiArrayByKeyReturnKeys($treeWeights, "label_type", $nodeValue['attribute']['name']);
+
+        $labelScore = Utils::searchMultiArrayByKeyReturnKeys($attributeWeights['classification'], "label", $nodeValue['value']);
+
+        $nodeValue['scores']['confidence'] = $labelScore['confidence'] ?? 0;
+
+        return $nodeValue;
+    }
+
+    /**
+     * @param array $node
+     * @param $nodePathConfidences
+     * @return array
+     */
+    public static function addConfidenceScoresToTree(array $node, $nodePathConfidences) {
+
+        // Apply the weighting function to the current node's value.
+        $modifiedNode = [
+            'value' => self::addNodeWeight($node['value'], $nodePathConfidences),
+            'children' => []
+        ];
+
+        // Recursively process each child if children exist.
+        if (!empty($node['children']) && is_array($node['children'])) {
+            foreach ($node['children'] as $child) {
+                $modifiedNode['children'][] = self::addConfidenceScoresToTree($child, $nodePathConfidences);
+            }
+        }
+
+        return $modifiedNode;
+
+    }
+
 
     /**
      * Build the graph from the nested tree.
@@ -110,9 +216,6 @@ class AttributeGraphBuilder
     public function build_graph_from_tree(array $nested_tree): void
     {
         $this->add_nodes_edges($nested_tree, null, '');
-//        foreach ($nested_tree as $node) {
-//            $this->add_nodes_edges($node, null, '');
-//        }
     }
 
     /**
@@ -179,7 +282,6 @@ class AttributeGraphBuilder
     public function get_hierarchy_order() {
         return $this->hierarchy_order;
     }
-
 
     /**
      * Display the graph in ASCII format.

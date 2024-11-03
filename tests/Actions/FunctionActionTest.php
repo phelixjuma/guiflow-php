@@ -2175,7 +2175,7 @@ class FunctionActionTest extends TestCase
 
         $args = ["query" => ["path" => "description"], "choices" => ["path" => "products"], "searchKey" => "description", "n" => "1", "minScore" => "", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => ""];
 
-        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => $args, 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
+        $action = new FunctionAction("items", [$this, 'map_parallel'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => $args, 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
 
         $action->execute($data);
 
