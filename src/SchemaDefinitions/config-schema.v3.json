@@ -2427,12 +2427,12 @@
             "args": {
               "type": "object",
               "properties": {
-                "attributes": {
+                "attribute_options": {
                   "$ref": "#/definitions/itemAttributes"
                 }
               },
               "required": [
-                "attributes"
+                "attribute_options"
               ],
               "additionalProperties": false
             }
