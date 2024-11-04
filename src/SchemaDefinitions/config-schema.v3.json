@@ -90,6 +90,52 @@
         }
       ]
     },
+    "itemAttributes": {
+      "oneOf": [
+        {
+          "title": "List of Objects",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string",
+                "enum": ["primary", "secondary"]
+              },
+              "order": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name", "description", "type", "category", "order"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "title": "Value from Path",
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
     "filterConditions": {
       "title": "Filter Criteria",
       "oneOf": [
@@ -2354,6 +2400,39 @@
               "required": [
                 "sum_field",
                 "condition"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "extractAttributesFromCorpusFieldsFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "extract_attributes_from_corpus_fields"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "attributes": {
+                  "$ref": "#/definitions/itemAttributes"
+                }
+              },
+              "required": [
+                "attributes"
               ],
               "additionalProperties": false
             }
@@ -4694,6 +4773,25 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_ExtractAttributesFromCorpusFields": {
+      "title": "Get From Object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/extractAttributesFromCorpusFieldsFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_GetObjectFromList": {
       "title": "Get From Object",
       "allOf": [
@@ -5265,6 +5363,9 @@
           "$ref": "#/definitions/Action_Function_GetFromObject"
         },
         {
+          "$ref": "#/definitions/Action_Function_ExtractAttributesFromCorpusFields"
+        },
+        {
           "$ref": "#/definitions/Action_Function_GetObjectFromList"
         },
         {
@@ -5463,6 +5564,10 @@
         {
           "title": "Get From Object",
           "$ref": "#/definitions/getFromObjectFunctionArgs"
+        },
+        {
+          "title": "Extract Attributes From Corpus Fields",
+          "$ref": "#/definitions/extractAttributesFromCorpusFieldsFunctionArgs"
         },
         {
           "title": "Get Object From List",

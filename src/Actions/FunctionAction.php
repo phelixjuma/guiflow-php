@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\GUIFlow\Actions;
 
+use PhelixJuma\GUIFlow\Utils\AttributeSearch\TreeSearch;
 use PhelixJuma\GUIFlow\Utils\DataSplitter;
 use PhelixJuma\GUIFlow\Utils\DataValidator;
 use PhelixJuma\GUIFlow\Utils\FuzzySearch;
@@ -305,7 +306,9 @@ class FunctionAction implements ActionInterface
                 $newValue = Utils::assoc_array_find(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'get_from_object') {
                 $newValue = Utils::get_from_object(...$paramValues);
-            } elseif (isset($this->function[1]) && $this->function['1'] == 'flatten_objects') {
+            } elseif (isset($this->function[1]) && $this->function['1'] == 'extract_attributes_from_corpus_fields') {
+                $newValue = TreeSearch::getAttributesFromCorpusFields(...$paramValues);
+            }  elseif (isset($this->function[1]) && $this->function['1'] == 'flatten_objects') {
                 $newValue = Utils::flattenObject(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'expand_lists') {
                 $newValue = Utils::expandList(...$paramValues);

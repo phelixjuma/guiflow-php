@@ -176,4 +176,40 @@ class TreeSearch
         // We get the best path - this is the matching attributes for the search item
         return self::getBestPath($tree_with_confidence_scores, $builder->get_hierarchy_order());
     }
+
+    /**
+     * @param $corpus
+     * @param array $attributes
+     * @return array
+     */
+    public static function getAttributesFromCorpusFields($corpus, array $attributes): array
+    {
+
+        // Sort attributes by 'order'
+        usort($attributes, function($a, $b) {
+            return $a['order'] - $b['order'];
+        });
+
+        // Extract sorted attribute names for hierarchy
+        $orderedAttributeNames = array_map(function($attr) {
+            return $attr['name'];
+        }, $attributes);
+
+        foreach ($corpus as &$corpusItem) {
+            $attributes = [];
+            foreach ($orderedAttributeNames as $attributeName) {
+                if (array_key_exists($attributeName, $corpusItem)) {
+                    $attributes[$attributeName] = [
+                        "value" => $corpusItem[$attributeName],
+                        "scores"    => [
+                            "confidence"    => 1
+                        ]
+                    ];
+                }
+            }
+            $corpusItem['extracted_attributes'] = $attributes;
+        }
+
+        return $corpus;
+    }
 }
