@@ -913,7 +913,8 @@ class Utils
             foreach ($choices as $key => &$choice) {
 
                 // We remove stop words from choice
-                $choiceSearch = FuzzySearch::cleanText($choice[$searchKey], $stopWords);
+                //$choiceSearch = FuzzySearch::cleanText($choice[$searchKey], $stopWords);
+                $choiceSearch = FuzzySearch::cleanText(PathResolver::getValueByPath($choice, $searchKey), $stopWords);
 
                 if (!empty($query) && !empty($choiceSearch)) {
                     $choice['similarity'] = $fuzz->$fuzzyMethod($query, $choiceSearch);
