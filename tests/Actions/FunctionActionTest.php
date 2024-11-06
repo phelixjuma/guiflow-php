@@ -2161,21 +2161,19 @@ class FunctionActionTest extends TestCase
         $data = [
             "items" => [
                 [
-                    "description" => "100ML Product 3",
-                    "pack" => "Pack: 1 x 1",
+                    "description" => "KWV BRANDY COLA 440ML",
+                    "pack_size" => "400ML",
                     "products"  => [
-                        ["description" => "1000ML", "pack" => "Pack: 1 x 1"],
-                        ["description" => "Aquawett-100ML", "pack" => "Pack: 1 x 1"],
-                        ["description" => "PEARL x 24 x 100ml [24 x 100]", "pack" => "Pack: 1 x 1"],
-                        ["description" => "Smoked chicken sausage 6pc", "pack" => "Pack: 1 x 1", "similarity" => 100]
+                        ["description" => "KWV 10 Yrs 12x375ml", "pack_size" => "12 X 375ML"],
+                        ["description" => "KWV 10 Yrs 12x50ml", "pack_size" => "12 X 50ML"]
                     ]
                 ]
             ]
         ];
 
-        $args = ["query" => ["path" => "description"], "choices" => ["path" => "products"], "searchKey" => "description", "n" => "1", "minScore" => "", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => ""];
+        $args = ["query" => ["path" => "pack_size"], "choices" => ["path" => "products"], "searchKey" => "pack_size", "n" => "1", "minScore" => "100", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => ""];
 
-        $action = new FunctionAction("items", [$this, 'map_parallel'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => $args, 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
+        $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => $args, 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
 
         $action->execute($data);
 
