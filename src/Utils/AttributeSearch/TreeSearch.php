@@ -159,6 +159,8 @@ class TreeSearch
             $attribute_tree = $builder->build_nested_tree($corpus_with_attributes);
         }
 
+        print_r(json_encode($attribute_tree));
+
         // We get nodes and branching options
         $nodesAndBranchingOptions = AttributeGraphBuilder::extractTreeNodesAndBranchingOptions($attribute_tree);
 
