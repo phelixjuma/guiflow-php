@@ -1458,10 +1458,7 @@
               "type": "object",
               "properties": {
                 "choices": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "min_score": {
                   "type": "string"
