@@ -140,6 +140,44 @@ class TreeSearch
         return $maxPath;
     }
 
+    private static function findHighestConfidenceNodesAtEachLevel($node, &$highestConfidenceNodes, $level = 0)
+    {
+        // Calculate the confidence of the current node
+        $confidenceScore = $node["value"]["scores"]["confidence"] ?? 0;
+        $attributeName = $node["value"]["attribute"]["name"] ?? null;
+
+        // Ensure we are only adding nodes with valid attribute names
+        if ($attributeName) {
+            // If we don't have any node for this attribute at this level, initialize it
+            if (!isset($highestConfidenceNodes[$attributeName]) || $confidenceScore > $highestConfidenceNodes[$attributeName]["scores"]["confidence"]) {
+                // Update the node with the highest confidence score for this attribute
+                $highestConfidenceNodes[$attributeName] = [
+                    "value" => $node["value"]["value"] ?? "",
+                    "scores" => $node["value"]["scores"]
+                ];
+            }
+        }
+
+        // Traverse children to process the next level
+        foreach ($node["children"] as $child) {
+            self::findHighestConfidenceNodesAtEachLevel($child, $highestConfidenceNodes, $level + 1);
+        }
+    }
+
+    /**
+     * @param $treeData
+     * @return array
+     */
+    private static function getHighestConfidenceNodesByLevel($treeData)
+    {
+        $highestConfidenceNodes = [];
+
+        // Start traversal from the root node
+        self::findHighestConfidenceNodesAtEachLevel($treeData, $highestConfidenceNodes);
+
+        return $highestConfidenceNodes;
+    }
+
     /**
      * @param string $searchItem
      * @param array $attributes
@@ -174,7 +212,8 @@ class TreeSearch
         //print("Tree data for $searchItem is: ".json_encode($tree_with_confidence_scores));
 
         // We get the best path - this is the matching attributes for the search item
-        return self::getBestPath($tree_with_confidence_scores, $builder->get_hierarchy_order());
+        //return self::getBestPath($tree_with_confidence_scores, $builder->get_hierarchy_order());
+        return self::getHighestConfidenceNodesByLevel($tree_with_confidence_scores);
     }
 
     /**
