@@ -863,6 +863,9 @@ class Utils
                 // set default
                 $extracted["$key-$search"] = $defaultChoice;
 
+                // make choices unique
+                $choices = array_values(array_unique($choices));
+
                 $result = $fuzzProcess->extractOne($search, $choices, null, [$fuzz, $fuzzyMethod]);
 
                 if (!empty($result)) {
