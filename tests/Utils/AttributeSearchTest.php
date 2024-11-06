@@ -68,6 +68,34 @@ class AttributeSearchTest extends TestCase
 
         $data = json_decode($data_json, true);
 
+        $data = [
+            [
+                "description"   => "product 1",
+                "brand_name"    => "Dairyland",
+                "pack_size"     => "200ML"
+            ],
+            [
+                "description"   => "product 2",
+                "brand_name"    => "Dairyland",
+                "pack_size"     => "200ML"
+            ],
+            [
+                "description"   => "product 3",
+                "brand_name"    => "Dairyland",
+                "pack_size"     => "250ML"
+            ],
+            [
+                "description"   => "product 4",
+                "brand_name"    => "Dairyland",
+                "pack_size"     => "250ML"
+            ],
+            [
+                "description"   => "product 5",
+                "brand_name"    => "MIO",
+                "pack_size"     => "250ML"
+            ]
+        ];
+
         $searchItem = "Hazelnut 4ltr";
         //$searchItem = "DAIRYLAND WHITE COMPOUND CHOCOLATE 4 X 2.5KGS";
         //$searchItem = "DAIRYLAND BUBBLEGUM 18 X 100ML";
