@@ -19,13 +19,13 @@ class TreeSearch
      * @param $cumulativeConfidence
      * @return void
      */
-    private static function computePathCumulativeConfidence_(&$node, $numberOfLevels, $depth = 0, $cumulativeConfidence = 1)
+    private static function computePathCumulativeConfidence(&$node, $numberOfLevels, $depth = 0, $cumulativeConfidence = 1)
     {
 
         // Handle the root node separately if the value is a string (e.g., "root").
         if (is_string($node["value"])) {
             foreach ($node["children"] as &$child) {
-                self::computePathCumulativeConfidence_($child, $numberOfLevels, $depth + 1, $cumulativeConfidence);
+                self::computePathCumulativeConfidence($child, $numberOfLevels, $depth + 1, $cumulativeConfidence);
             }
             return;
         }
@@ -43,89 +43,16 @@ class TreeSearch
         $depth += 1;
 
         foreach ($node["children"] as &$child) {
-            self::computePathCumulativeConfidence_($child, $numberOfLevels, $depth, $cumulativeConfidence);
+            self::computePathCumulativeConfidence($child, $numberOfLevels, $depth, $cumulativeConfidence);
         }
     }
 
+
     /**
      * @param $node
-     * @param $numberOfLevels
      * @param $depth
-     * @param $cumulativeConfidence
-     * @return void
+     * @return int|mixed
      */
-    private static function computePathCumulativeConfidence(&$node, $numberOfLevels, $depth = 0, $cumulativeConfidence = 1)
-    {
-        // Handle root node separately if the value is a string (e.g., "root").
-        if (is_string($node["value"])) {
-            foreach ($node["children"] as &$child) {
-                self::computePathCumulativeConfidence($child, $numberOfLevels, $depth + 1, $cumulativeConfidence);
-            }
-            return;
-        }
-
-        // Calculate depth weight and initial weighted confidence for the current node.
-        $node["value"]["scores"]["depth"] = $depth;
-        $node["value"]["scores"]["depth_weight"] = 1 + ($numberOfLevels - $depth + 1) / $numberOfLevels;
-        $node["value"]["scores"]["weighted_confidence"] = pow($node["value"]["scores"]["confidence"], $node["value"]["scores"]["depth_weight"]);
-
-        // Initialize penalty tracking for the current node.
-        $penalty = 0;
-
-        // Check each child node for consistency with the current node.
-        foreach ($node["children"] as &$child) {
-            // Recursively calculate confidence for child nodes.
-            self::computePathCumulativeConfidence($child, $numberOfLevels, $depth + 1, $cumulativeConfidence);
-
-            // Check if the child value is consistent with the current node.
-            if (!self::isConsistentWithBranch($node, $child["value"]["value"])) {
-                // Calculate penalty based on child's depth and confidence.
-                $childConfidence = $child["value"]["scores"]["confidence"];
-                $childDepth = $child["value"]["scores"]["depth"];
-                // Penalize based on mismatch with lower level attribute's depth and confidence.
-                $penaltyAdjustment = (1 - $childConfidence) * ($numberOfLevels - $childDepth) / $numberOfLevels;
-                $penalty += $penaltyAdjustment;
-            }
-        }
-
-        // Apply the penalty to the current node’s confidence score.
-        $node["value"]["scores"]["penalty"] = $penalty; // Track the total penalty for this node
-        $node["value"]["scores"]["penalized_confidence"] = max(0, $node["value"]["scores"]["weighted_confidence"] - $penalty);
-
-        // Update cumulative confidence with penalized confidence.
-        $cumulativeConfidence = $cumulativeConfidence + $node["value"]["scores"]["penalized_confidence"];
-        $node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeConfidence;
-    }
-
-    /**
-     * Function to check if a child value is valid within the current node's branch
-     * @param $node
-     * @param $childValue
-     * @return bool
-     */
-    private static function isConsistentWithBranch(&$node, $childValue)
-    {
-        // Recursive function to collect all valid descendant values of a node.
-        $validValues = self::collectBranchValues($node);
-        return in_array($childValue, $validValues);
-    }
-
-    /**
-     * Recursive function to collect all descendant values from a node's branch
-     * @param $node
-     * @return array
-     */
-    private static function collectBranchValues(&$node)
-    {
-        $values = [];
-        foreach ($node["children"] as $child) {
-            $values[] = $child["value"]["value"];
-            // Recursively collect values from deeper levels in the tree
-            $values = array_merge($values, self::collectBranchValues($child));
-        }
-        return $values;
-    }
-
     private static function getTreeDepth($node, $depth = 0)
     {
         if (empty($node["children"])) {
@@ -160,7 +87,7 @@ class TreeSearch
      * @param $currentPath
      * @return void
      */
-    private static function findMostProbablePath($node, &$maxPath, &$maxCumulativeContent, $currentPath = [])
+    private static function findMostProbablePath_($node, &$maxPath, &$maxCumulativeContent, $currentPath = [])
     {
 
         // Check if the node is a leaf node (has no children)
@@ -193,17 +120,137 @@ class TreeSearch
     }
 
     /**
+     * @param $node
+     * @param $tree
+     * @param $minEditsPath
+     * @param $minEditsCount
+     * @param $currentPath
+     * @param $editsCount
+     * @param $level
+     * @param $minConfidenceThreshold
+     * @return void
+     */
+    private static function findMostProbablePath(&$node, &$tree, &$minEditsPath, &$minEditsCount, $currentPath = [], $editsCount = 0, $level = 0, $minConfidenceThreshold = 0.001)
+    {
+        // Identify the selected node at this level (highest confidence node meeting the threshold).
+        $selectedNode = self::getSelectedNodeAtLevel($tree, $level, $minConfidenceThreshold);
+
+        // If there's no valid selected node (all nodes are below the confidence threshold), skip edit counting for this level.
+        $isMatch = true; // Assume match if there's no selected node to compare against
+        if ($selectedNode !== null) {
+            $isMatch = $node["value"]["value"] === $selectedNode["value"]["value"];
+        }
+
+        // Increment edits count only if there’s a mismatch with the selected node at this level.
+        $newEditsCount = $isMatch ? $editsCount : $editsCount + 1;
+
+        // If this is a leaf node, evaluate the current path.
+        if (empty($node["children"])) {
+            if ($newEditsCount < $minEditsCount || ($newEditsCount == $minEditsCount && self::prioritizeDeeperLevels($currentPath, $minEditsPath))) {
+                $minEditsCount = $newEditsCount;
+                $minEditsPath = $currentPath;
+            }
+            return;
+        }
+
+        // Add current node to the path.
+        $attributeName = $node["value"]["attribute"]["name"] ?? null;
+        if ($attributeName) {
+            $currentPath[$attributeName] = [
+                "value" => $node["value"]["value"],
+                "scores" => $node["value"]["scores"]
+            ];
+        }
+
+        // Recurse on each child to find the minimal edit path.
+        foreach ($node["children"] as &$child) {
+            self::findMostProbablePath($child, $tree, $minEditsPath, $minEditsCount, $currentPath, $newEditsCount, $level + 1, $minConfidenceThreshold);
+        }
+
+        // Backtrack to explore alternate paths.
+        if ($attributeName) {
+            unset($currentPath[$attributeName]);
+        }
+    }
+
+    /**
+     * Helper function to get the selected node (highest confidence node) at a specific level, considering the minimum confidence threshold.
+     * @param $tree
+     * @param $level
+     * @param $minConfidenceThreshold
+     * @return mixed|null
+     */
+    private static function getSelectedNodeAtLevel(&$tree, $level, $minConfidenceThreshold)
+    {
+        // Traverse the tree to find the node with the highest confidence at the given level meeting the threshold.
+        $selectedNode = null;
+        foreach ($tree[$level] as $node) {
+            $confidence = $node["value"]["scores"]["confidence"] ?? 0;
+            if ($confidence >= $minConfidenceThreshold && ($selectedNode === null || $confidence > $selectedNode["value"]["scores"]["confidence"])) {
+                $selectedNode = $node;
+            }
+        }
+        return $selectedNode;
+    }
+
+    /**
+     * Helper function to prioritize paths with deeper level matches if edits are equal.
+     *
+     * @param $currentPath
+     * @param $minEditsPath
+     * @return bool
+     */
+    private static function prioritizeDeeperLevels($currentPath, $minEditsPath)
+    {
+        // Compare the depth or cumulative weighted score of matches in the current path and minEditsPath.
+        // Return true if the current path has more deeper level matches.
+        // Can use depth-weighted score as a fallback metric if exact match count is equal.
+        return count($currentPath) > count($minEditsPath);
+    }
+
+    /**
+     * @param $treeData
+     * @param $attributeNames
+     * @param $minConfidence
+     * @return array
+     */
+    private static function getBestPath($treeData, $attributeNames, $minConfidence = 0.1)
+    {
+        $minEditsPath = [];
+        $minEditsCount = PHP_INT_MAX; // Start with a high value to minimize
+        $currentPath = [];
+
+        // Start traversal from the root node with minimum edits count
+        self::findMostProbablePath($treeData, $treeData, $minEditsPath, $minEditsCount, $currentPath, 0, 0, $minConfidence);
+
+        // Ensure all attributes are included in the final path (default to empty if missing)
+        foreach ($attributeNames as $attribute) {
+            if (!isset($minEditsPath[$attribute])) {
+                $minEditsPath[$attribute] = [
+                    "value" => "",
+                    "scores" => [
+                        "confidence" => 0,
+                        "penalty" => 0 // Optionally add penalty if relevant for missing attributes
+                    ]
+                ];
+            }
+        }
+
+        return $minEditsPath;
+    }
+
+    /**
      * @param $treeData
      * @param $attributeNames
      * @return array
      */
-    private static function getBestPath($treeData, $attributeNames)
+    private static function getBestPath_($treeData, $attributeNames)
     {
         $maxPath = [];
         $maxCumulativeContent = 0;
 
         // Start traversal from the root node
-        self::findMostProbablePath($treeData, $maxPath, $maxCumulativeContent);
+        self::findMostProbablePath_($treeData, $maxPath, $maxCumulativeContent);
 
         foreach ($attributeNames as $attribute) {
             if (!isset($maxPath[$attribute])) {
