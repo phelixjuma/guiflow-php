@@ -403,9 +403,9 @@ class TreeSearch
         //return self::getBestPath($tree_with_confidence_scores, $builder->get_hierarchy_order());
         $allProbablePaths = self::getAllPaths($tree_with_confidence_scores, $builder->get_hierarchy_order(), $min_confidence);
 
-        print("All probable paths for $searchItem are: ".json_encode($allProbablePaths));
+        print("All probable paths for $searchItem are: ".json_encode(array_slice($allProbablePaths, 0,10)));
 
-        return !empty($allProbablePaths) ? $allProbablePaths[0] : null;
+        return !empty($allProbablePaths) ? $allProbablePaths[0]['path'] : null;
     }
 
     /**
