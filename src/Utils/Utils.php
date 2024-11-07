@@ -1749,9 +1749,12 @@ class Utils
         $totalMemory = (int)trim(shell_exec("free -b | grep Mem | awk '{print $2}'"));
         $usedMemory = (int)trim(shell_exec("free -b | grep Mem | awk '{print $3}'"));
 
-        $memoryUsage = 100*$usedMemory/$totalMemory;
+        if ($totalMemory > 0) {
+            $memoryUsage = 100*$usedMemory/$totalMemory;
 
-        return $memoryUsage > $threshold;
+            return $memoryUsage > $threshold;
+        }
+        return true;
     }
 
 }
