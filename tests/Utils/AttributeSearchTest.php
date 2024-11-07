@@ -117,7 +117,7 @@ class AttributeSearchTest extends TestCase
             ];
         };
 
-        $extracted_entities = TreeSearch::extractMatchingAttributes($searchItem, $attributes, [], $data, $nodePathConfidenceCalculatorFunction);
+        $extracted_entities = TreeSearch::extractMatchingAttributes($searchItem, $attributes, [], $data, $nodePathConfidenceCalculatorFunction, 0.1);
 
         echo "\nExtracted Entities:\n";
         echo json_encode($extracted_entities, JSON_PRETTY_PRINT);
@@ -191,6 +191,159 @@ class AttributeSearchTest extends TestCase
         echo json_encode($extracted_entities, JSON_PRETTY_PRINT);
 
         //$this->assertEquals($mergedData, $expectedData);
+    }
+
+    public function _testTreeBestPath() {
+
+        $treeData = [
+            "value" => "root",
+            "children" => [
+                [
+                    "value" => [
+                        "attribute" => ["name" => "Category"],
+                        "value" => "Chocolate",
+                        "scores" => ["confidence" => 0.9, "cumulative_weighted_confidence" => 0.85]
+                    ],
+                    "children" => [
+                        [
+                            "value" => [
+                                "attribute" => ["name" => "ProductType"],
+                                "value" => "Bars",
+                                "scores" => ["confidence" => 0.2]
+                            ],
+                            "children" => [
+                                [
+                                    "value" => [
+                                        "attribute" => ["name" => "PackSize"],
+                                        "value" => "50g",
+                                        "scores" => ["confidence" => 0.1]
+                                    ],
+                                    "children" => []
+                                ],
+                                [
+                                    "value" => [
+                                        "attribute" => ["name" => "PackSize"],
+                                        "value" => "100g",
+                                        "scores" => ["confidence" => 0.2]
+                                    ],
+                                    "children" => []
+                                ]
+                            ]
+                        ],
+                        [
+                            "value" => [
+                                "attribute" => ["name" => "ProductType"],
+                                "value" => "Cups",
+                                "scores" => ["confidence" => 0.3] // Low confidence, should be ignored if threshold > 0.3
+                            ],
+                            "children" => []
+                        ]
+                    ]
+                ],
+                [
+                    "value" => [
+                        "attribute" => ["name" => "Category"],
+                        "value" => "Ice Cream",
+                        "scores" => ["confidence" => 0.2, "depth" => 1]
+                    ],
+                    "children" => [
+                        [
+                            "value" => [
+                                "attribute" => ["name" => "ProductType"],
+                                "value" => "Fiesta",
+                                "scores" => ["confidence" => 0.85] // High confidence, could be the selected node
+                            ],
+                            "children" => [
+                                [
+                                    "value" => [
+                                        "attribute" => ["name" => "PackSize"],
+                                        "value" => "70ml",
+                                        "scores" => ["confidence" => 0.9] // Highest confidence in this level
+                                    ],
+                                    "children" => []
+                                ],
+                                [
+                                    "value" => [
+                                        "attribute" => ["name" => "PackSize"],
+                                        "value" => "100ml",
+                                        "scores" => ["confidence" => 0.4] // Low confidence, may be ignored
+                                    ],
+                                    "children" => []
+                                ]
+                            ]
+                        ],
+                        [
+                            "value" => [
+                                "attribute" => ["name" => "ProductType"],
+                                "value" => "Swirl",
+                                "scores" => ["confidence" => 0.5]
+                            ],
+                            "children" => [
+                                [
+                                    "value" => [
+                                        "attribute" => ["name" => "PackSize"],
+                                        "value" => "150ml",
+                                        "scores" => ["confidence" => 0.45]
+                                    ],
+                                    "children" => []
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    "value" => [
+                        "attribute" => ["name" => "Category"],
+                        "value" => "Yoghurt",
+                        "scores" => ["confidence" => 0.4] // Low confidence category
+                    ],
+                    "children" => [
+                        [
+                            "value" => [
+                                "attribute" => ["name" => "ProductType"],
+                                "value" => "Natural",
+                                "scores" => ["confidence" => 0.2] // Very low confidence, likely ignored with a threshold
+                            ],
+                            "children" => [
+                                [
+                                    "value" => [
+                                        "attribute" => ["name" => "PackSize"],
+                                        "value" => "200ml",
+                                        "scores" => ["confidence" => 0.3]
+                                    ],
+                                    "children" => []
+                                ]
+                            ]
+                        ],
+                        [
+                            "value" => [
+                                "attribute" => ["name" => "ProductType"],
+                                "value" => "Flavoured",
+                                "scores" => ["confidence" => 0.5]
+                            ],
+                            "children" => [
+                                [
+                                    "value" => [
+                                        "attribute" => ["name" => "PackSize"],
+                                        "value" => "250ml",
+                                        "scores" => ["confidence" => 0.6]
+                                    ],
+                                    "children" => []
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $attributeNames = [
+            "Category", "ProductType", "PackSize"
+        ];
+
+        $path = TreeSearch::getAllPaths($treeData, $attributeNames);
+
+        print_r($path);
     }
 
 }

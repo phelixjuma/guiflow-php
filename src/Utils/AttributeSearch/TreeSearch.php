@@ -112,7 +112,7 @@ class TreeSearch
                     "scores" => $child["value"]["scores"]
                 ];
                 // Recurse on the child node
-                self::findMostProbablePath($child, $maxPath, $maxCumulativeContent, $currentPath);
+                self::findMostProbablePath_($child, $maxPath, $maxCumulativeContent, $currentPath);
                 // Remove the last item to backtrack correctly
                 unset($currentPath[$attributeName]);
             }
@@ -122,36 +122,33 @@ class TreeSearch
     /**
      * @param $node
      * @param $tree
-     * @param $minEditsPath
-     * @param $minEditsCount
+     * @param $allPaths
      * @param $currentPath
      * @param $editsCount
      * @param $level
      * @param $minConfidenceThreshold
      * @return void
      */
-    private static function findMostProbablePath(&$node, &$tree, &$minEditsPath, &$minEditsCount, $currentPath = [], $editsCount = 0, $level = 0, $minConfidenceThreshold = 0.001)
+    private static function findAllProbablePaths(&$node, &$tree, &$allPaths, $currentPath = [], $editsCount = 0, $level = 0, $minConfidenceThreshold = 0.001)
     {
-        // Identify the selected node at this level (highest confidence node meeting the threshold).
-        $selectedNode = self::getSelectedNodeAtLevel($tree, $level, $minConfidenceThreshold);
-
-        // If there's no valid selected node (all nodes are below the confidence threshold), skip edit counting for this level.
-        $isMatch = true; // Assume match if there's no selected node to compare against
-        if ($selectedNode !== null) {
-            $isMatch = $node["value"]["value"] === $selectedNode["value"]["value"];
-        }
-
-        // Increment edits count only if there’s a mismatch with the selected node at this level.
-        $newEditsCount = $isMatch ? $editsCount : $editsCount + 1;
-
-        // If this is a leaf node, evaluate the current path.
-        if (empty($node["children"])) {
-            if ($newEditsCount < $minEditsCount || ($newEditsCount == $minEditsCount && self::prioritizeDeeperLevels($currentPath, $minEditsPath))) {
-                $minEditsCount = $newEditsCount;
-                $minEditsPath = $currentPath;
+        // Skip root node if it has "value" set to "root" and process children directly.
+        if ($node["value"] === "root") {
+            foreach ($node["children"] as &$child) {
+                self::findAllProbablePaths($child, $tree, $allPaths, $currentPath, $editsCount, $level, $minConfidenceThreshold);
             }
             return;
         }
+
+        // Identify the selected node at this level (highest confidence node meeting the threshold).
+        $selectedNode = self::getSelectedNodeAtLevel($tree, $level, 0, $minConfidenceThreshold);
+        $selectedNodeValue = $selectedNode["value"]["value"] ?? null;
+
+        // Add selected_node_value to current node's scores for comparison purposes
+        $node["value"]["scores"]["selected_node_value"] = $selectedNodeValue;
+
+        // Check if this node matches the selected node for continuity.
+        $isMatch = $node["value"]["value"] === $selectedNodeValue;
+        $newEditsCount = $isMatch ? $editsCount : $editsCount + 1;
 
         // Add current node to the path.
         $attributeName = $node["value"]["attribute"]["name"] ?? null;
@@ -162,9 +159,24 @@ class TreeSearch
             ];
         }
 
-        // Recurse on each child to find the minimal edit path.
+        // If this is a leaf node, save the current path with edit count and cumulative confidence.
+        if (empty($node["children"])) {
+            // Use cumulative_weighted_confidence if available, else fallback to confidence
+            $cumulativeConfidence = array_sum(array_map(function($entry) {
+                return $entry['scores']['cumulative_weighted_confidence'] ?? $entry['scores']['confidence'];
+            }, $currentPath));
+
+            $allPaths[] = [
+                "path" => $currentPath,
+                "edit_count" => $newEditsCount,
+                "cumulative_weighted_confidence" => $cumulativeConfidence
+            ];
+            return;
+        }
+
+        // Recurse on each child to build all paths
         foreach ($node["children"] as &$child) {
-            self::findMostProbablePath($child, $tree, $minEditsPath, $minEditsCount, $currentPath, $newEditsCount, $level + 1, $minConfidenceThreshold);
+            self::findAllProbablePaths($child, $tree, $allPaths, $currentPath, $newEditsCount, $level + 1, $minConfidenceThreshold);
         }
 
         // Backtrack to explore alternate paths.
@@ -174,38 +186,87 @@ class TreeSearch
     }
 
     /**
-     * Helper function to get the selected node (highest confidence node) at a specific level, considering the minimum confidence threshold.
-     * @param $tree
-     * @param $level
+     * Entry function to initiate path-finding, ranking paths by minimum edit count and then by cumulative weighted confidence
+     *
+     * @param $node
+     * @param $targetLevel
+     * @param $currentLevel
      * @param $minConfidenceThreshold
      * @return mixed|null
      */
-    private static function getSelectedNodeAtLevel(&$tree, $level, $minConfidenceThreshold)
+    private static function getSelectedNodeAtLevel(&$node, $targetLevel, $currentLevel = 0, $minConfidenceThreshold = 0.001)
     {
-        // Traverse the tree to find the node with the highest confidence at the given level meeting the threshold.
-        $selectedNode = null;
-        foreach ($tree[$level] as $node) {
+        // Skip root node if it has "value" set to "root"
+        if ($node["value"] === "root") {
+            $selectedNode = null;
+            foreach ($node["children"] as &$child) {
+                $candidateNode = self::getSelectedNodeAtLevel($child, $targetLevel, $currentLevel, $minConfidenceThreshold);
+                if ($candidateNode !== null &&
+                    ($selectedNode === null || $candidateNode["value"]["scores"]["confidence"] > $selectedNode["value"]["scores"]["confidence"])) {
+                    $selectedNode = $candidateNode;
+                }
+            }
+            return $selectedNode;
+        }
+
+        // Base case: if the current level matches the target level, check this node's confidence
+        if ($currentLevel === $targetLevel) {
             $confidence = $node["value"]["scores"]["confidence"] ?? 0;
-            if ($confidence >= $minConfidenceThreshold && ($selectedNode === null || $confidence > $selectedNode["value"]["scores"]["confidence"])) {
-                $selectedNode = $node;
+            return ($confidence >= $minConfidenceThreshold) ? $node : null;
+        }
+
+        // Recursive case: traverse children to find the selected node at the target level
+        $selectedNode = null;
+        foreach ($node["children"] as &$child) {
+            $candidateNode = self::getSelectedNodeAtLevel($child, $targetLevel, $currentLevel + 1, $minConfidenceThreshold);
+
+            // Update selectedNode if candidateNode has higher confidence and meets threshold
+            if ($candidateNode !== null &&
+                ($selectedNode === null || $candidateNode["value"]["scores"]["confidence"] > $selectedNode["value"]["scores"]["confidence"])) {
+                $selectedNode = $candidateNode;
             }
         }
+
         return $selectedNode;
     }
 
     /**
-     * Helper function to prioritize paths with deeper level matches if edits are equal.
+     * Entry function to initiate path-finding, ranking paths by minimum edit count and then by cumulative weighted confidence
      *
-     * @param $currentPath
-     * @param $minEditsPath
-     * @return bool
+     * @param $treeData
+     * @param $attributeNames
+     * @param $minConfidenceThreshold
+     * @return array
      */
-    private static function prioritizeDeeperLevels($currentPath, $minEditsPath)
+    public static function getAllPaths($treeData, $attributeNames, $minConfidenceThreshold = 0.001)
     {
-        // Compare the depth or cumulative weighted score of matches in the current path and minEditsPath.
-        // Return true if the current path has more deeper level matches.
-        // Can use depth-weighted score as a fallback metric if exact match count is equal.
-        return count($currentPath) > count($minEditsPath);
+        $allPaths = [];
+
+        // Start traversal from the root node to gather all probable paths
+        self::findAllProbablePaths($treeData, $treeData, $allPaths, [], 0, 0, $minConfidenceThreshold);
+
+        // Ensure all attributes are included in each path (default to empty if missing)
+        foreach ($allPaths as &$pathInfo) {
+            foreach ($attributeNames as $attribute) {
+                if (!isset($pathInfo["path"][$attribute])) {
+                    $pathInfo["path"][$attribute] = [
+                        "value" => "",
+                        "scores" => [
+                            "confidence" => 0,
+                            "cumulative_weighted_confidence" => 0,
+                            "selected_node_value" => null
+                        ]
+                    ];
+                }
+            }
+        }
+
+        // Sort paths first by edit count (ascending), then by cumulative weighted confidence (descending)
+        usort($allPaths, function ($a, $b) {
+            return $a['edit_count'] <=> $b['edit_count'] ?: $b['cumulative_weighted_confidence'] <=> $a['cumulative_weighted_confidence'];
+        });
+
+        return $allPaths;
     }
 
     /**
@@ -214,7 +275,7 @@ class TreeSearch
      * @param $minConfidence
      * @return array
      */
-    private static function getBestPath($treeData, $attributeNames, $minConfidence = 0.1)
+    public static function getBestPath($treeData, $attributeNames, $minConfidence = 0.1)
     {
         $minEditsPath = [];
         $minEditsCount = PHP_INT_MAX; // Start with a high value to minimize
@@ -310,9 +371,10 @@ class TreeSearch
      * @param $attribute_tree
      * @param $corpus_with_attributes
      * @param callable $nodePathConfidenceCalculatorFunction
-     * @return array
+     * @param $min_confidence
+     * @return mixed|null
      */
-    public static function extractMatchingAttributes(string $searchItem, array $attributes, $attribute_tree, $corpus_with_attributes, callable $nodePathConfidenceCalculatorFunction): array
+    public static function extractMatchingAttributes(string $searchItem, array $attributes, $attribute_tree, $corpus_with_attributes, callable $nodePathConfidenceCalculatorFunction, $min_confidence = 0.1)
     {
 
         // Instantiate the AttributeGraphBuilder
@@ -338,8 +400,12 @@ class TreeSearch
         //print("Tree data for $searchItem is: ".json_encode($tree_with_confidence_scores));
 
         // We get the best path - this is the matching attributes for the search item
-        return self::getBestPath($tree_with_confidence_scores, $builder->get_hierarchy_order());
-        //return self::getHighestConfidenceNodesByLevel($tree_with_confidence_scores);
+        //return self::getBestPath($tree_with_confidence_scores, $builder->get_hierarchy_order());
+        $allProbablePaths = self::getAllPaths($tree_with_confidence_scores, $builder->get_hierarchy_order(), $min_confidence);
+
+        print("All probable paths for $searchItem are: ".json_encode($allProbablePaths));
+
+        return !empty($allProbablePaths) ? $allProbablePaths[0] : null;
     }
 
     /**
