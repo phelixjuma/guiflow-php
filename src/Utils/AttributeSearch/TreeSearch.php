@@ -166,7 +166,7 @@ class TreeSearch
         if (empty($node["children"])) {
             // Use cumulative_weighted_confidence if available, else fallback to confidence
             $cumulativeConfidence = array_sum(array_map(function($entry) {
-                return $entry['scores']['cumulative_weighted_confidence'] ?? $entry['scores']['confidence'];
+                return $entry['scores']['weighted_confidence'] ?? $entry['scores']['confidence'];
             }, $currentPath));
 
             $allPaths[] = [
@@ -273,109 +273,13 @@ class TreeSearch
     }
 
     /**
-     * @param $treeData
-     * @param $attributeNames
-     * @param $minConfidence
-     * @return array
-     */
-    public static function getBestPath($treeData, $attributeNames, $minConfidence = 0.1)
-    {
-        $minEditsPath = [];
-        $minEditsCount = PHP_INT_MAX; // Start with a high value to minimize
-        $currentPath = [];
-
-        // Start traversal from the root node with minimum edits count
-        self::findMostProbablePath($treeData, $treeData, $minEditsPath, $minEditsCount, $currentPath, 0, 0, $minConfidence);
-
-        // Ensure all attributes are included in the final path (default to empty if missing)
-        foreach ($attributeNames as $attribute) {
-            if (!isset($minEditsPath[$attribute])) {
-                $minEditsPath[$attribute] = [
-                    "value" => "",
-                    "scores" => [
-                        "confidence" => 0,
-                        "penalty" => 0 // Optionally add penalty if relevant for missing attributes
-                    ]
-                ];
-            }
-        }
-
-        return $minEditsPath;
-    }
-
-    /**
-     * @param $treeData
-     * @param $attributeNames
-     * @return array
-     */
-    private static function getBestPath_($treeData, $attributeNames)
-    {
-        $maxPath = [];
-        $maxCumulativeContent = 0;
-
-        // Start traversal from the root node
-        self::findMostProbablePath_($treeData, $maxPath, $maxCumulativeContent);
-
-        foreach ($attributeNames as $attribute) {
-            if (!isset($maxPath[$attribute])) {
-                $maxPath[$attribute] = [
-                    "value" => "",
-                    "scores" => [
-                        "confidence" => 0
-                    ]
-                ];
-            }
-        }
-
-        return $maxPath;
-    }
-
-    private static function findHighestConfidenceNodesAtEachLevel($node, &$highestConfidenceNodes, $level = 0)
-    {
-        // Calculate the confidence of the current node
-        $confidenceScore = $node["value"]["scores"]["confidence"] ?? 0;
-        $attributeName = $node["value"]["attribute"]["name"] ?? null;
-
-        // Ensure we are only adding nodes with valid attribute names
-        if ($attributeName) {
-            // If we don't have any node for this attribute at this level, initialize it
-            if (!isset($highestConfidenceNodes[$attributeName]) || $confidenceScore > $highestConfidenceNodes[$attributeName]["scores"]["confidence"]) {
-                // Update the node with the highest confidence score for this attribute
-                $highestConfidenceNodes[$attributeName] = [
-                    "value" => $node["value"]["value"] ?? "",
-                    "scores" => $node["value"]["scores"]
-                ];
-            }
-        }
-
-        // Traverse children to process the next level
-        foreach ($node["children"] as $child) {
-            self::findHighestConfidenceNodesAtEachLevel($child, $highestConfidenceNodes, $level + 1);
-        }
-    }
-
-    /**
-     * @param $treeData
-     * @return array
-     */
-    private static function getHighestConfidenceNodesByLevel($treeData)
-    {
-        $highestConfidenceNodes = [];
-
-        // Start traversal from the root node
-        self::findHighestConfidenceNodesAtEachLevel($treeData, $highestConfidenceNodes);
-
-        return $highestConfidenceNodes;
-    }
-
-    /**
      * @param string $searchItem
      * @param array $attributes
      * @param $attribute_tree
      * @param $corpus_with_attributes
      * @param callable $nodePathConfidenceCalculatorFunction
      * @param $min_confidence
-     * @return mixed|null
+     * @return array
      */
     public static function extractMatchingAttributes(string $searchItem, array $attributes, $attribute_tree, $corpus_with_attributes, callable $nodePathConfidenceCalculatorFunction, $min_confidence = 0.1)
     {
@@ -404,11 +308,7 @@ class TreeSearch
 
         // We get the best path - this is the matching attributes for the search item
         //return self::getBestPath($tree_with_confidence_scores, $builder->get_hierarchy_order());
-        $allProbablePaths = self::getAllPaths($tree_with_confidence_scores, $builder->get_hierarchy_order(), $min_confidence);
-
-        print("All probable paths for $searchItem are: ".json_encode(array_slice($allProbablePaths, 0,10)));
-
-        return !empty($allProbablePaths) ? $allProbablePaths[0]['path'] : null;
+        return self::getAllPaths($tree_with_confidence_scores, $builder->get_hierarchy_order(), $min_confidence);
     }
 
     /**
