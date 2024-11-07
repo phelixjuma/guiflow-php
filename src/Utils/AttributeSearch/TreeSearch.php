@@ -146,9 +146,12 @@ class TreeSearch
         // Add selected_node_value to current node's scores for comparison purposes
         $node["value"]["scores"]["selected_node_value"] = $selectedNodeValue;
 
-        // Check if this node matches the selected node for continuity.
-        $isMatch = $node["value"]["value"] === $selectedNodeValue;
-        $newEditsCount = $isMatch ? $editsCount : $editsCount + 1;
+        // Check if this node matches the selected node for continuity, only if selected_node_value is not null.
+        $newEditsCount = $editsCount;
+        if ($selectedNodeValue !== null) {
+            $isMatch = $node["value"]["value"] === $selectedNodeValue;
+            $newEditsCount = $isMatch ? $editsCount : $editsCount + 1;
+        }
 
         // Add current node to the path.
         $attributeName = $node["value"]["attribute"]["name"] ?? null;
