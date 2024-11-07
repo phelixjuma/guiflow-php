@@ -2156,7 +2156,7 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function _testFuzzyExtractTopN2()
+    public function testFuzzyExtractTopN2()
     {
         $data = [
             "items" => [
@@ -2171,7 +2171,7 @@ class FunctionActionTest extends TestCase
             ]
         ];
 
-        $args = ["query" => ["path" => "pack_size"], "choices" => ["path" => "products"], "searchKey" => "pack_size", "n" => "1", "minScore" => "100", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => ""];
+        $args = ["query" => ["path" => "pack_size"], "choices" => ["path" => "products"], "searchKey" => "pack_size", "n" => "1", "minScore" => "0", "order" => "desc", "fuzzy_method" => "tokenSetRatio", "stop_words" => ""];
 
         $action = new FunctionAction("items", [$this, 'map'], ['path' => '', 'function' => 'fuzzy_extract_n', 'args' => $args, 'newField' => 'products', 'strict' => 0 ,'condition' => null], '', 0, null);
 

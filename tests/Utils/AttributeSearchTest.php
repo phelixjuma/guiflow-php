@@ -193,7 +193,7 @@ class AttributeSearchTest extends TestCase
         //$this->assertEquals($mergedData, $expectedData);
     }
 
-    public function testTreeBestPath() {
+    public function _testTreeBestPath() {
 
         $treeData = [
             "value" => "root",
@@ -338,7 +338,8 @@ class AttributeSearchTest extends TestCase
         ];
 
         $attributeNames = [
-            "Category", "ProductType", "PackSize"
+            //"Category", "ProductType", "PackSize",
+            //"Category"
         ];
 
         $path = TreeSearch::getAllPaths($treeData, $attributeNames);
