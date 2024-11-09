@@ -191,7 +191,7 @@ class FunctionAction implements ActionInterface
                     $function = [$this->function[0], $function];
 
                     $maxConcurrency = 10000; // Concurrency Limit
-                    $maxMemoryUsage = 60;
+                    $maxMemoryUsage = 80;
                     $channel = new \OpenSwoole\Coroutine\Channel($maxConcurrency); // Create a channel with a buffer size
 
                     $wg = new WaitGroup();

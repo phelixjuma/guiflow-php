@@ -923,6 +923,8 @@ class Utils
                 $choiceSearch = FuzzySearch::cleanText($choice[$searchKey], $stopWords);
                 //$choiceSearch = FuzzySearch::cleanText(PathResolver::getValueByPath($choice, $searchKey), $stopWords);
 
+                //print("\nchoice search: ".$choiceSearch."\n");
+
                 if (!empty($query) && !empty($choiceSearch)) {
                     $choice['similarity'] = $fuzz->$fuzzyMethod($query, $choiceSearch);
                 } else {

@@ -27,8 +27,6 @@ class PathResolver
                 foreach ($current as $item) {
                     $values[] = self::getValueByPath($item, implode('.', array_slice($parts, $currentPosition + 1)));
                 }
-
-//                return $acceptListReturn ? $values : $values[0];
                 return $values;
             }
 
