@@ -129,7 +129,7 @@ class AttributeSearchTest extends TestCase
         $extracted_entities = TreeSearch::extractMatchingAttributes($searchItem, $attributes, [], $data, $nodePathConfidenceCalculatorFunction, 0.1);
 
         //echo "\nExtracted Entities:\n";
-        //echo json_encode($extracted_entities, JSON_PRETTY_PRINT);
+        echo json_encode($extracted_entities, JSON_PRETTY_PRINT);
 
         //$this->assertEquals($mergedData, $expectedData);
     }

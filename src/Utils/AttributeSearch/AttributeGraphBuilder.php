@@ -183,7 +183,13 @@ class AttributeGraphBuilder
         $nodeValue['scores']['confidence'] = $labelScore['confidence'] ?? 0;
 
         // We set the selected node value as the one with the highest confidence score (index 0 for sorted classifications)
-        $nodeValue['scores']['selected_node_value'] = $attributeWeights['classification'][0]['confidence'] >= $minConfidenceScore ? $attributeWeights['classification'][0]['label'] : null;
+        $nodeValue['scores']['selected_node_value'] = null;
+        $nodeValue['scores']['selected_node_confidence'] = null;
+
+        if ($attributeWeights['classification'][0]['confidence'] >= $minConfidenceScore) {
+            $nodeValue['scores']['selected_node_value'] =  $attributeWeights['classification'][0]['label'];
+            $nodeValue['scores']['selected_node_confidence'] =  $attributeWeights['classification'][0]['confidence'];
+        }
 
         return $nodeValue;
     }
