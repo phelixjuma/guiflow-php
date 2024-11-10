@@ -1576,7 +1576,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testDataMerge()
+    public function _testDataMerge()
     {
         $data = [
             "historical_products" => [

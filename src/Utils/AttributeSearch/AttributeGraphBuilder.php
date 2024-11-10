@@ -157,9 +157,10 @@ class AttributeGraphBuilder
     /**
      * @param $nodeValue
      * @param $treeWeights
+     * @param $minConfidenceScore
      * @return array|mixed
      */
-    public static function addNodeWeight($nodeValue, $treeWeights) {
+    public static function addNodeWeight($nodeValue, $treeWeights, $minConfidenceScore = 0.001) {
 
         if ($nodeValue == "root") {
             return $nodeValue;
@@ -168,6 +169,7 @@ class AttributeGraphBuilder
         if (empty($nodeValue['value'])) {
 
             $nodeValue['scores']['confidence'] = 0;
+            $nodeValue['scores']['selected_node_value'] = null;
 
             return $nodeValue;
         }
@@ -175,9 +177,13 @@ class AttributeGraphBuilder
         // We get the weights for this node's label type (attribute)
         $attributeWeights = Utils::searchMultiArrayByKeyReturnKeys($treeWeights, "label_type", $nodeValue['attribute']['name']);
 
+        // We get the score for the specific label
         $labelScore = Utils::searchMultiArrayByKeyReturnKeys($attributeWeights['classification'], "label", $nodeValue['value']);
 
         $nodeValue['scores']['confidence'] = $labelScore['confidence'] ?? 0;
+
+        // We set the selected node value as the one with the highest confidence score (index 0 for sorted classifications)
+        $nodeValue['scores']['selected_node_value'] = $attributeWeights['classification'][0]['confidence'] >= $minConfidenceScore ? $attributeWeights['classification'][0]['label'] : null;
 
         return $nodeValue;
     }
@@ -185,20 +191,21 @@ class AttributeGraphBuilder
     /**
      * @param array $node
      * @param $nodePathConfidences
+     * @param $minConfidenceScore
      * @return array
      */
-    public static function addConfidenceScoresToTree(array $node, $nodePathConfidences) {
+    public static function addConfidenceScoresToTree(array $node, $nodePathConfidences, $minConfidenceScore = 0.001) {
 
         // Apply the weighting function to the current node's value.
         $modifiedNode = [
-            'value' => self::addNodeWeight($node['value'], $nodePathConfidences),
+            'value' => self::addNodeWeight($node['value'], $nodePathConfidences, $minConfidenceScore),
             'children' => []
         ];
 
         // Recursively process each child if children exist.
         if (!empty($node['children']) && is_array($node['children'])) {
             foreach ($node['children'] as $child) {
-                $modifiedNode['children'][] = self::addConfidenceScoresToTree($child, $nodePathConfidences);
+                $modifiedNode['children'][] = self::addConfidenceScoresToTree($child, $nodePathConfidences, $minConfidenceScore);
             }
         }
 
@@ -206,75 +213,6 @@ class AttributeGraphBuilder
 
     }
 
-
-    /**
-     * Build the graph from the nested tree.
-     *
-     * @param array $nested_tree The nested tree structure.
-     * @return void
-     */
-    public function build_graph_from_tree(array $nested_tree): void
-    {
-        $this->add_nodes_edges($nested_tree, null, '');
-    }
-
-    /**
-     * Recursively adds nodes and edges to the graph from the nested tree.
-     *
-     * @param array $node The current node in the tree.
-     * @param Vertex|null $parent_vertex The parent vertex in the graph.
-     * @param string $path The traversal path to ensure unique vertex IDs.
-     * @return void
-     */
-    private function add_nodes_edges(array $node, ?Vertex $parent_vertex, string $path): void
-    {
-        $value = $node['value']['value'] ?? "root";
-        $attribute = $node['value']['attribute'] ?? "root";
-        $attribute_name = $attribute['name'] ?? "root";
-
-        // Update the path for the current node
-        $current_path = $path === '' ? "{$attribute_name}:{$value}" : "{$path}|{$attribute_name}:{$value}";
-
-        // Create a unique vertex_id using the current path
-        $vertex_id = $current_path;
-
-        // Create or retrieve the vertex
-        if (!$this->graph->hasVertex($vertex_id)) {
-            $vertex = $this->graph->createVertex($vertex_id, true);
-            $vertex->setAttribute('attribute_name', $attribute_name);
-            $vertex->setAttribute('attribute_value', $value);
-            $vertex->setAttribute('description', $attribute['description'] ?? '');
-            $vertex->setAttribute('type', $attribute['type'] ?? '');
-            $vertex->setAttribute('category', $attribute['category'] ?? '');
-            $vertex->setAttribute('order', $attribute['order'] ?? 0);
-        } else {
-            $vertex = $this->graph->getVertex($vertex_id);
-        }
-
-        // If there is a parent, create a directed edge
-        if ($parent_vertex) {
-            if (!$parent_vertex->hasEdgeTo($vertex)) {
-                $parent_vertex->createEdgeTo($vertex);
-            }
-        }
-
-        // Recursively add children
-        if (!empty($node['children'])) {
-            foreach ($node['children'] as $child_node) {
-                $this->add_nodes_edges($child_node, $vertex, $current_path);
-            }
-        }
-    }
-
-    /**
-     * Get the graph object.
-     *
-     * @return Graph
-     */
-    public function get_graph(): Graph
-    {
-        return $this->graph;
-    }
 
     /**
      * @return array
