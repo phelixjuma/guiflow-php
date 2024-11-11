@@ -8,20 +8,35 @@ use PHPUnit\Framework\TestCase;
 
 class PathResolverTest extends TestCase
 {
-    public function _testGetArrayAtIndex()
+    public function testGetArrayAtIndex()
     {
 
         $data = [
-            "persons"=> [
-            [
-                "name" => "Phelix"
-            ],
-            [
-                "name" => "Juma"
-            ]]
+            "customers_list"=> [
+                [
+                    "shipping_locations" => ""
+                ],
+                [
+                    "shipping_locations" => [
+                        [
+                            "name" => "Nairobi"
+                        ]
+                    ]
+                ],
+                [
+                    "shipping_locations" => [
+                        [
+                            "name" => "Mombasa"
+                        ]
+                    ]
+                ],
+                [
+                    "shipping_locations" => []
+                ]
+            ]
         ];
         // validate the config
-        $response = PathResolver::getValueByPath($data, "persons.0");
+        $response = PathResolver::getValueByPath($data, "customers_list.*.shipping_locations");
 
         print_r($response);
 

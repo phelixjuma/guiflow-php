@@ -1587,6 +1587,21 @@ class Utils
         return $response;
     }
 
+    /**
+     * @param $array1
+     * @param $array2
+     * @return array
+     */
+    public static function combineLists($array1, $array2) {
+        if (empty($array1) || !is_array($array1)) {
+            $array1 = [];
+        }
+        if (empty($array2) || !is_array($array2)) {
+            $array2 = [];
+        }
+        return array_merge($array1, $array2);
+    }
+
     private static function searchMultiArrayByKey($arrayData, $searchKey, $searchValue) {
         $foundData = array();
         $size = sizeof($arrayData);

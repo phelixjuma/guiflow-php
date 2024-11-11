@@ -1106,6 +1106,39 @@
       ],
       "unevaluatedProperties": false
     },
+    "pushToListFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "push_to_list"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "$ref": "#/definitions/valueOrPath"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "setFunctionArgs": {
       "allOf": [
         {
@@ -4305,6 +4338,28 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_PushToList": {
+      "title": "Merge",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/pushToListFunctionArgs"
+            }
+          },
+          "required": [
+            "params"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_Set": {
       "title": "Set",
       "allOf": [
@@ -5288,6 +5343,9 @@
           "$ref": "#/definitions/Action_Function_Merge"
         },
         {
+          "$ref": "#/definitions/Action_Function_PushToList"
+        },
+        {
           "$ref": "#/definitions/Action_Function_Set"
         },
         {
@@ -5465,6 +5523,10 @@
         {
           "title": "Merge",
           "$ref": "#/definitions/mergeFunctionArgs"
+        },
+        {
+          "title": "Push To List",
+          "$ref": "#/definitions/pushToListFunctionArgs"
         },
         {
           "title": "Set",
