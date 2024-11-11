@@ -1120,14 +1120,6 @@
             },
             "args": {
               "type": "object",
-              "properties": {
-                "lists": {
-                  "$ref": "#/definitions/valueOrPath"
-                }
-              },
-              "required": [
-                "lists"
-              ],
               "additionalProperties": false
             }
           },
