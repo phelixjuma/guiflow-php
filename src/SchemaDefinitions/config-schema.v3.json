@@ -1106,7 +1106,7 @@
       ],
       "unevaluatedProperties": false
     },
-    "pushToListFunctionArgs": {
+    "combineListsFunctionArgs": {
       "allOf": [
         {
           "$ref": "#/definitions/actionFunctionSharedParams"
@@ -1115,18 +1115,18 @@
           "properties": {
             "function": {
               "enum": [
-                "push_to_list"
+                "combine_lists"
               ]
             },
             "args": {
               "type": "object",
               "properties": {
-                "data": {
+                "lists": {
                   "$ref": "#/definitions/valueOrPath"
                 }
               },
               "required": [
-                "data"
+                "lists"
               ],
               "additionalProperties": false
             }
@@ -4338,8 +4338,8 @@
       ],
       "unevaluatedProperties": false
     },
-    "Action_Function_PushToList": {
-      "title": "Merge",
+    "Action_Function_CombineLists": {
+      "title": "Combine Lists",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4350,7 +4350,7 @@
         {
           "properties": {
             "params": {
-              "$ref": "#/definitions/pushToListFunctionArgs"
+              "$ref": "#/definitions/combineListsFunctionArgs"
             }
           },
           "required": [
@@ -5343,7 +5343,7 @@
           "$ref": "#/definitions/Action_Function_Merge"
         },
         {
-          "$ref": "#/definitions/Action_Function_PushToList"
+          "$ref": "#/definitions/Action_Function_CombineLists"
         },
         {
           "$ref": "#/definitions/Action_Function_Set"
@@ -5525,8 +5525,8 @@
           "$ref": "#/definitions/mergeFunctionArgs"
         },
         {
-          "title": "Push To List",
-          "$ref": "#/definitions/pushToListFunctionArgs"
+          "title": "Combine List",
+          "$ref": "#/definitions/combineListsFunctionArgs"
         },
         {
           "title": "Set",

@@ -1588,18 +1588,19 @@ class Utils
     }
 
     /**
-     * @param $array1
-     * @param $array2
+     * @param $lists
      * @return array
      */
-    public static function combineLists($array1, $array2) {
-        if (empty($array1) || !is_array($array1)) {
-            $array1 = [];
+    public static function combineLists($lists) {
+
+        $newArray = [];
+
+        foreach ($lists as $list) {
+            if (is_array($list)) {
+                $newArray = array_merge($newArray, $list);
+            }
         }
-        if (empty($array2) || !is_array($array2)) {
-            $array2 = [];
-        }
-        return array_merge($array1, $array2);
+        return $newArray;
     }
 
     private static function searchMultiArrayByKey($arrayData, $searchKey, $searchValue) {
