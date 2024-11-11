@@ -255,7 +255,7 @@ class FunctionAction implements ActionInterface
             } elseif (isset($this->function[1]) && $this->function['1'] == 'join') {
                 $newValue = (new DataJoiner(...$paramValues))->mergeData();
             } elseif (isset($this->function[1]) && $this->function['1'] == 'combine_lists') {
-                $newValue = Utils::combineLists(...$paramValues);
+                $newValue = Utils::combineLists($paramValues[1]);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'reducer') {
                 $newValue = (new DataReducer(...$paramValues))->reduce();
             } elseif (isset($this->function[1]) && $this->function['1'] == 'sort_multi_by_key') {
