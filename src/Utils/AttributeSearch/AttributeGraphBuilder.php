@@ -166,21 +166,8 @@ class AttributeGraphBuilder
             return $nodeValue;
         }
 
-        if (empty($nodeValue['value'])) {
-
-            $nodeValue['scores']['confidence'] = 0;
-            $nodeValue['scores']['selected_node_value'] = null;
-
-            return $nodeValue;
-        }
-
         // We get the weights for this node's label type (attribute)
         $attributeWeights = Utils::searchMultiArrayByKeyReturnKeys($treeWeights, "label_type", $nodeValue['attribute']['name']);
-
-        // We get the score for the specific label
-        $labelScore = Utils::searchMultiArrayByKeyReturnKeys($attributeWeights['classification'], "label", $nodeValue['value']);
-
-        $nodeValue['scores']['confidence'] = $labelScore['confidence'] ?? 0;
 
         // We set the selected node value as the one with the highest confidence score (index 0 for sorted classifications)
         $nodeValue['scores']['selected_node_value'] = null;
@@ -190,6 +177,16 @@ class AttributeGraphBuilder
             $nodeValue['scores']['selected_node_value'] =  $attributeWeights['classification'][0]['label'];
             $nodeValue['scores']['selected_node_confidence'] =  $attributeWeights['classification'][0]['confidence'];
         }
+
+        if (empty($nodeValue['value'])) {
+            $nodeValue['scores']['confidence'] = 0;
+            return $nodeValue;
+        }
+
+        // We get the score for the specific label
+        $labelScore = Utils::searchMultiArrayByKeyReturnKeys($attributeWeights['classification'], "label", $nodeValue['value']);
+
+        $nodeValue['scores']['confidence'] = $labelScore['confidence'] ?? 0;
 
         return $nodeValue;
     }
