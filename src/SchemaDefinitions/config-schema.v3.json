@@ -2488,23 +2488,32 @@
               ]
             },
             "args": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "condition": {
-                    "$ref": "#/definitions/Condition"
-                  },
-                  "filter": {
-                    "$ref": "#/definitions/Condition"
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": {
+                        "$ref": "#/definitions/Condition"
+                      },
+                      "filter": {
+                        "$ref": "#/definitions/Condition"
+                      }
+                    },
+                    "required": [
+                      "condition",
+                      "filter"
+                    ],
+                    "additionalProperties": false
                   }
-                },
-                "required": [
-                  "condition",
-                  "filter"
-                ],
-                "additionalProperties": false
-              }
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
