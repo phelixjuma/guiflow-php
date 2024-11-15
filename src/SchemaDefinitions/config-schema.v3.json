@@ -2475,6 +2475,46 @@
       ],
       "unevaluatedProperties": false
     },
+    "setAttributeFiltersFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "set_attribute_filters"
+              ]
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "condition": {
+                    "$ref": "#/definitions/Condition"
+                  },
+                  "filter": {
+                    "$ref": "#/definitions/Condition"
+                  }
+                },
+                "required": [
+                  "condition",
+                  "filter"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "getFromObjectFunctionArgs": {
       "allOf": [
         {
@@ -4844,6 +4884,25 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_SetAttributeFilters": {
+      "title": "Set Attribute Filters",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/setAttributeFiltersFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_GetObjectFromList": {
       "title": "Get From Object",
       "allOf": [
@@ -5421,6 +5480,9 @@
           "$ref": "#/definitions/Action_Function_ExtractAttributesFromCorpusFields"
         },
         {
+          "$ref": "#/definitions/Action_Function_SetAttributeFilters"
+        },
+        {
           "$ref": "#/definitions/Action_Function_GetObjectFromList"
         },
         {
@@ -5627,6 +5689,10 @@
         {
           "title": "Extract Attributes From Corpus Fields",
           "$ref": "#/definitions/extractAttributesFromCorpusFieldsFunctionArgs"
+        },
+        {
+          "title": "Set Attribute Filters",
+          "$ref": "#/definitions/setAttributeFiltersFunctionArgs"
         },
         {
           "title": "Get Object From List",

@@ -1625,6 +1625,14 @@ class Utils
     }
 
     /**
+     * @param $attributeFilters
+     * @return mixed
+     */
+    public static function setAttributeFilters($attributeFilters) {
+        return $attributeFilters;
+    }
+
+    /**
      * @param $searchList
      * @param $searchKey
      * @param $corpusList
