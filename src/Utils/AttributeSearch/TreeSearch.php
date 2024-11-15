@@ -77,6 +77,7 @@ class TreeSearch
 
         // Check if this node matches the selected node for continuity, only if selected_node[value] is not null.
         $newEditsCount = $editsCount;
+        //print_r($node);
         if ($node["value"]["selected_node"]["value"] !== null) {
             $isMatch = $node["value"]["value"] === $node["value"]["selected_node"]["value"];
             $newEditsCount = $isMatch ? $editsCount : $editsCount + 1;
@@ -87,7 +88,8 @@ class TreeSearch
         if ($attributeName) {
             $currentPath[$attributeName] = [
                 "value" => $node["value"]["value"],
-                "scores" => $node["value"]["scores"]
+                "scores" => $node["value"]["scores"],
+                "selected_node" => $node["value"]["selected_node"],
             ];
         }
 

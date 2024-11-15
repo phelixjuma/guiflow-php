@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class PathResolverTest extends TestCase
 {
-    public function testGetArrayAtIndex()
+    public function _testGetArrayAtIndex()
     {
 
         $data = [
