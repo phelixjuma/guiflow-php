@@ -75,11 +75,11 @@ class TreeSearch
             return;
         }
 
-        // Check if this node matches the selected node for continuity, only if selected_node[value] is not null.
+        // Check if this node matches the selected node for continuity, only if matched[value] is not null.
         $newEditsCount = $editsCount;
         //print_r($node);
-        if ($node["value"]["selected_node"]["value"] !== null) {
-            $isMatch = $node["value"]["value"] === $node["value"]["selected_node"]["value"];
+        if ($node["value"]["matched"]["value"] !== null) {
+            $isMatch = $node["value"]["value"] === $node["value"]["matched"]["value"];
             $newEditsCount = $isMatch ? $editsCount : $editsCount + 1;
         }
 
@@ -89,7 +89,7 @@ class TreeSearch
             $currentPath[$attributeName] = [
                 "value" => $node["value"]["value"],
                 "scores" => $node["value"]["scores"],
-                "selected_node" => $node["value"]["selected_node"],
+                "matched" => $node["value"]["matched"],
             ];
         }
 
@@ -143,7 +143,7 @@ class TreeSearch
                             "confidence" => 0,
                             "cumulative_weighted_confidence" => 0
                         ],
-                        "selected_node" => [
+                        "matched" => [
                             "value"         => null,
                             "confidence"    => null
                         ]

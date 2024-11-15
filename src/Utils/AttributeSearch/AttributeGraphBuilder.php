@@ -170,14 +170,14 @@ class AttributeGraphBuilder
         $attributeWeights = Utils::searchMultiArrayByKeyReturnKeys($treeWeights, "label_type", $nodeValue['attribute']['name']);
 
         // We set the selected node value as the one with the highest confidence score (index 0 for sorted classifications)
-        $nodeValue['selected_node'] = [
+        $nodeValue['matched'] = [
             "value"         => null,
             "confidence"    => null
         ];
 
         if ($attributeWeights['classification'][0]['confidence'] >= $minConfidenceScore) {
-            $nodeValue['selected_node']['value'] =  $attributeWeights['classification'][0]['label'];
-            $nodeValue['selected_node']['confidence'] =  $attributeWeights['classification'][0]['confidence'];
+            $nodeValue['matched']['value'] =  $attributeWeights['classification'][0]['label'];
+            $nodeValue['matched']['confidence'] =  $attributeWeights['classification'][0]['confidence'];
         }
 
         if (empty($nodeValue['value'])) {
