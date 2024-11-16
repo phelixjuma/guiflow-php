@@ -361,7 +361,7 @@ class FunctionAction implements ActionInterface
             } elseif (isset($this->function[1]) && $this->function['1'] == 'correct_date') {
                 $newValue = Utils::correct_date(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'set_attribute_filters') {
-                $newValue = Utils::setAttributeFilters($paramValues[1]);
+                $newValue = Utils::setAttributeFilters(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'user_defined_function') {
                 // function name is at index 1 (index 0 is the data).
                 $functionName = $paramValues[1];

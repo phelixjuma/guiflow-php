@@ -1625,11 +1625,15 @@ class Utils
     }
 
     /**
+     * @param $data
      * @param $attributeFilters
-     * @return mixed
+     * @return array
      */
-    public static function setAttributeFilters($attributeFilters) {
-        return $attributeFilters;
+    public static function setAttributeFilters($data, $attributeFilters) {
+        if (empty($data)) {
+            $data = [];
+        }
+        return array_merge($data, $attributeFilters);
     }
 
     /**
