@@ -66,6 +66,9 @@ class DataSplitter
 
             PathResolver::setValueByPath($dataCopy, $splitPath, $filteredItems);
 
+            // Mark as split data
+            $dataCopy['has_been_split'] = 1;
+
             $results[] = $dataCopy;
         }
 
@@ -163,6 +166,10 @@ class DataSplitter
                 }
 
                 PathResolver::setValueByPath($dataCopy, $splitPath, $currentGroup);
+
+                // Mark as split data
+                $dataCopy['has_been_split'] = 1;
+
                 $results[] = $dataCopy;
             }
         }
@@ -178,6 +185,7 @@ class DataSplitter
      * @return array
      */
     private static function verticalSplit($data, $splitPath, $criteriaPath, $limit) {
+
         // Get the items to split
         $items = PathResolver::getValueByPath($data, $splitPath);
 
@@ -209,6 +217,7 @@ class DataSplitter
 
         // Step 4: Distribute quantities across each group
         foreach ($items as $item) {
+
             $originalQuantity = PathResolver::getValueByPath($item, $criteriaPath); // Get the original quantity to be split
             $baseQuantity = floor($originalQuantity / $numSplits); // Base quantity for each group
             $remainder = $originalQuantity % $numSplits; // Calculate the remainder to distribute among the first few groups
@@ -233,6 +242,9 @@ class DataSplitter
 
                     // Update the group with the new list of items
                     PathResolver::setValueByPath($results[$i], $splitPath, $currentItems);
+
+                    // Mark as split data
+                    $results[$i]['has_been_split'] = 1;
                 }
             }
         }
