@@ -41,6 +41,7 @@ class DataSplitter
 
         $results = [];
 
+        $index = 0;
         foreach ($uniqueValues as $value) {
 
             $dataCopy = $data;
@@ -68,8 +69,12 @@ class DataSplitter
 
             // Mark as split data
             $dataCopy['has_been_split'] = 1;
+            $dataCopy['workflow_list_position'] = $index;
+
 
             $results[] = $dataCopy;
+
+            $index++;
         }
 
         return $results;
@@ -129,6 +134,8 @@ class DataSplitter
         $usedItems = [];
         $itemsCount = count($newItems);
 
+        $index = 0;
+
         while (count($usedItems) < $itemsCount) {
             $currentGroup = [];
             $currentTotal = 0;
@@ -169,8 +176,11 @@ class DataSplitter
 
                 // Mark as split data
                 $dataCopy['has_been_split'] = 1;
+                $dataCopy['workflow_list_position'] = $index;
 
                 $results[] = $dataCopy;
+
+                $index++;
             }
         }
 
@@ -245,6 +255,7 @@ class DataSplitter
 
                     // Mark as split data
                     $results[$i]['has_been_split'] = 1;
+                    $results[$i]['workflow_list_position'] = $i;
                 }
             }
         }
