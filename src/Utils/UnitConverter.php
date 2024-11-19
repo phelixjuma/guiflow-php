@@ -68,9 +68,11 @@ class UnitConverter
                 $convertedValue = $numberOfPiecesPerBundle * $itemQuantity;
 
                 $response['converted_value'] = match($decimalHandler) {
-                    "up" =>   ceil($convertedValue),
-                    "down" =>   floor($convertedValue),
-                    "off" =>   round($convertedValue, intval($numberOfDecimalPlaces)),
+                    "up"                    =>   ceil($convertedValue),
+                    "down"                  =>   floor($convertedValue),
+                    "off"                   =>   round($convertedValue, intval($numberOfDecimalPlaces)),
+                    "up_to_nearest_half"    => self::round_up($convertedValue, intval($numberOfDecimalPlaces)),
+                    "down_to_nearest_half"  => self::round_down($convertedValue, intval($numberOfDecimalPlaces)),
                     default => $convertedValue
                 };
             }
@@ -85,15 +87,29 @@ class UnitConverter
                 $convertedValue = $itemQuantity / $numberOfPiecesPerBundle;
 
                 $response['converted_value'] = match($decimalHandler) {
-                    "up" =>   ceil($convertedValue),
-                    "down" =>   floor($convertedValue),
-                    "off" =>   round($convertedValue, intval($numberOfDecimalPlaces)),
+                    "up"                    =>   ceil($convertedValue),
+                    "down"                  =>   floor($convertedValue),
+                    "off"                   =>   round($convertedValue, intval($numberOfDecimalPlaces)),
+                    "up_to_nearest_half"    => self::round_up($convertedValue, intval($numberOfDecimalPlaces)),
+                    "down_to_nearest_half"  => self::round_down($convertedValue, intval($numberOfDecimalPlaces)),
                     default => $convertedValue
                 };
             }
         }
 
         return $response;
+    }
+
+    private static function round_up($number, $precision = 2) {
+        $factor = pow(10, $precision);
+        $roundedNumber = ceil($number * $factor / 5) * 5 / $factor;
+        return number_format($roundedNumber, $precision, '.', '');
+    }
+
+    private static function round_down($number, $precision = 2) {
+        $factor = pow(10, $precision);
+        $roundedNumber = floor($number * $factor / 5) * 5 / $factor;
+        return number_format($roundedNumber, $precision, '.', '');
     }
 
     /**

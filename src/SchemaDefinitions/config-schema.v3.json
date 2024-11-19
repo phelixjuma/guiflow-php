@@ -3091,7 +3091,9 @@
                   "enum": [
                     "up",
                     "down",
-                    "off"
+                    "off",
+                    "up_to_nearest_half",
+                    "down_to_nearest_half"
                   ],
                   "default": "up"
                 },
