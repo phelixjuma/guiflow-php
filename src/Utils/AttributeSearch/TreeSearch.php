@@ -12,6 +12,11 @@ use PhelixJuma\GUIFlow\Utils\Utils;
 class TreeSearch
 {
 
+    /**
+     * @param int $totalItems
+     * @param int $missingItems
+     * @return float
+     */
     private static function calculateNormalizedEntropy(int $totalItems, int $missingItems): float {
 
         // Prevent division by zero
@@ -60,7 +65,7 @@ class TreeSearch
         // Process nodes with associative array values.
         $node["value"]["scores"]["depth"] = $depth;
         $node["value"]["scores"]["depth_weight"] = 1 + ($numberOfLevels-$depth+1)/$numberOfLevels;
-        $node["value"]["scores"]["level_entropy"] = self::calculateNormalizedEntropy($node["value"]["counts"]['total'], $node["value"]["counts"]['total']);
+        $node["value"]["scores"]["level_entropy"] = self::calculateNormalizedEntropy($node["value"]["counts"]['total'], $node["value"]["counts"]['missing']);
         $node["value"]["scores"]["missing_values_penalty"] = $node["value"]["scores"]["depth_weight"] * $node["value"]["scores"]["level_entropy"];
 
         // We add weighted confidence
