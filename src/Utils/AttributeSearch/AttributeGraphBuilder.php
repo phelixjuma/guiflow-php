@@ -64,6 +64,9 @@ class AttributeGraphBuilder
             ];
         }
 
+        // We set level counts
+        self::set_tree_level_counts($tree);
+
         return $tree;
     }
 
@@ -72,6 +75,7 @@ class AttributeGraphBuilder
         if ($level >= count($this->hierarchy_order)) {
             return;
         }
+
 
         $current_attribute = $this->hierarchy_order[$level];
 
@@ -84,20 +88,23 @@ class AttributeGraphBuilder
 
         // Iterate through each group and build the tree
         foreach ($grouped as $value => $items) {
+
             $node = [
                 'value' => [
-                    'value' => $value,
-                    'attribute' => $this->attributes_map[$current_attribute]
+                    'value'                 => $value,
+                    'attribute'             => $this->attributes_map[$current_attribute]
                 ],
                 'children' => []
             ];
 
             // Recursively build the children for this node
-            $this->build_tree_recursive($items, $level + 1, $node['children']);
+            $this->build_tree_recursive($items, $level +1, $node['children']);
 
             // Append the node to the current branch
             $current_branch[] = $node;
+
         }
+
     }
 
     /**
@@ -124,6 +131,51 @@ class AttributeGraphBuilder
         // Repeat the algorithm with the rest of the queue.
         return self::levelOrderTraversal($queue, $output);
     }
+
+    private static function set_tree_level_counts(array &$tree): void
+    {
+        // Initialize the queue with the root node passed by reference
+        $queue = [&$tree];
+
+        // Traverse the tree level-by-level
+        while (!empty($queue)) {
+            // Count nodes at the current level
+            $level_size = count($queue);
+
+            // Prepare to count items and missing items for the level
+            $level_items_count = $level_size;
+            $level_missing_items_count = 0;
+
+            // Traverse all nodes in this level
+            for ($i = 0; $i < $level_size; $i++) {
+                $node = &$queue[$i]; // Use a reference for direct modification
+
+                // Increment missing items count if value is empty
+                if (empty($node['value']['value'] ?? '')) {
+                    $level_missing_items_count++;
+                }
+
+                // Add children to the queue for the next level
+                if (!empty($node['children'])) {
+                    foreach ($node['children'] as &$child) {
+                        $queue[] = &$child;
+                    }
+                }
+            }
+
+            // Update all nodes in the current level
+            for ($i = 0; $i < $level_size; $i++) {
+                if ($queue[$i]['value'] !== 'root') {
+                    $queue[$i]['value']['counts']['total'] = $level_items_count;
+                    $queue[$i]['value']['counts']['missing'] = $level_missing_items_count;
+                }
+            }
+
+            // Remove the processed nodes from the queue
+            $queue = array_slice($queue, $level_size);
+        }
+    }
+
 
     /**
      * @param $treeData

@@ -12,20 +12,47 @@ use PhelixJuma\GUIFlow\Utils\Utils;
 class TreeSearch
 {
 
+    private static function calculateNormalizedEntropy(int $totalItems, int $missingItems): float {
+
+        // Prevent division by zero
+        if ($totalItems <= 0) {
+            return 0.0; // No entropy if no items exist
+        }
+
+        // Calculate the probabilities
+        $presentItems = $totalItems - $missingItems;
+        $pPresent = $presentItems / $totalItems; // Probability of present items
+        $pMissing = $missingItems / $totalItems; // Probability of missing items
+
+        // Calculate entropy components
+        $entropy = 0.0;
+        if ($pPresent > 0) {
+            $entropy -= $pPresent * log($pPresent, 2);
+        }
+        if ($pMissing > 0) {
+            $entropy -= $pMissing * log($pMissing, 2);
+        }
+
+        // Normalize the entropy by the maximum possible entropy (log2(total outcomes))
+        $maxEntropy = log(2, 2); // log2(2) for binary outcomes (present/missing)
+
+        return $entropy / $maxEntropy;
+    }
+
     /**
      * @param $node
      * @param $numberOfLevels
      * @param $depth
-     * @param $cumulativeConfidence
+     * @param $cumulativeLog
      * @return void
      */
-    private static function computePathCumulativeConfidence(&$node, $numberOfLevels, $depth = 0, $cumulativeConfidence = 1)
+    private static function computePathCumulativeConfidence(&$node, $numberOfLevels, $depth = 0, $cumulativeLog = 0)
     {
 
         // Handle the root node separately if the value is a string (e.g., "root").
         if (is_string($node["value"])) {
             foreach ($node["children"] as &$child) {
-                self::computePathCumulativeConfidence($child, $numberOfLevels, $depth + 1, $cumulativeConfidence);
+                self::computePathCumulativeConfidence($child, $numberOfLevels, $depth + 1, $cumulativeLog);
             }
             return;
         }
@@ -33,17 +60,28 @@ class TreeSearch
         // Process nodes with associative array values.
         $node["value"]["scores"]["depth"] = $depth;
         $node["value"]["scores"]["depth_weight"] = 1 + ($numberOfLevels-$depth+1)/$numberOfLevels;
+        $node["value"]["scores"]["level_entropy"] = self::calculateNormalizedEntropy($node["value"]["counts"]['total'], $node["value"]["counts"]['total']);
+        $node["value"]["scores"]["missing_values_penalty"] = $node["value"]["scores"]["depth_weight"] * $node["value"]["scores"]["level_entropy"];
 
         // We add weighted confidence
         $node["value"]["scores"]["weighted_confidence"] = pow($node["value"]["scores"]["confidence"], $node["value"]["scores"]["depth_weight"]);
 
-        $cumulativeConfidence = $cumulativeConfidence + $node["value"]["scores"]["weighted_confidence"];
-        $node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeConfidence;
+        // We get the penalized weighted confidence
+        $node["value"]["scores"]["penalized_weighted_confidence"] = $node["value"]["scores"]["weighted_confidence"] * (1 - $node["value"]["scores"]["missing_values_penalty"]);
+
+        // We get the log of the penalized weighted confidence
+        $node["value"]["scores"]["log_penalized_weighted_confidence"] = log($node["value"]["scores"]["penalized_weighted_confidence"], 2);
+
+        //$cumulativeConfidence = $cumulativeConfidence + $node["value"]["scores"]["weighted_confidence"];
+        //$node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeConfidence;
+
+        $cumulativeLog = $cumulativeLog + $node["value"]["scores"]["log_penalized_weighted_confidence"];
+        $node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeLog;
 
         $depth += 1;
 
         foreach ($node["children"] as &$child) {
-            self::computePathCumulativeConfidence($child, $numberOfLevels, $depth, $cumulativeConfidence);
+            self::computePathCumulativeConfidence($child, $numberOfLevels, $depth, $cumulativeLog);
         }
     }
 
@@ -77,11 +115,7 @@ class TreeSearch
 
         // Check if this node matches the selected node for continuity, only if matched[value] is not null.
         $newEditsCount = $editsCount;
-        //print_r($node);
-//        if ($node["value"]["matched"]["value"] !== null) {
-//            $isMatch = $node["value"]["value"] === $node["value"]["matched"]["value"];
-//            $newEditsCount = $isMatch ? $editsCount : $editsCount + 1;
-//        }
+
         if (!empty($node["value"]["value"])) {
             $isMatch = $node["value"]["value"] === $node["value"]["matched"]["value"];
             $newEditsCount = $isMatch ? $editsCount : $editsCount + 1;
