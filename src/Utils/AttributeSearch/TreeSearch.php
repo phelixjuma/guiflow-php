@@ -55,16 +55,16 @@ class TreeSearch
      * @param $node
      * @param $numberOfLevels
      * @param $depth
-     * @param $cumulativeConfidence
+     * @param $cumulativeLog
      * @return void
      */
-    private static function computePathCumulativeConfidence(&$node, $numberOfLevels, $depth = 0, $cumulativeConfidence = 1)
+    private static function computePathCumulativeConfidence(&$node, $numberOfLevels, $depth = 0, $cumulativeLog = 0)
     {
 
         // Handle the root node separately if the value is a string (e.g., "root").
         if (is_string($node["value"])) {
             foreach ($node["children"] as &$child) {
-                self::computePathCumulativeConfidence($child, $numberOfLevels, $depth + 1, $cumulativeConfidence);
+                self::computePathCumulativeConfidence($child, $numberOfLevels, $depth + 1, $cumulativeLog);
             }
             return;
         }
@@ -74,27 +74,27 @@ class TreeSearch
         $node["value"]["scores"]["depth"] = $depth;
         $node["value"]["scores"]["depth_weight"] = 1 + ($numberOfLevels-$depth+1)/$numberOfLevels;
         $node["value"]["scores"]["level_entropy"] = self::calculateNormalizedEntropy($node["value"]["counts"]['total'], $node["value"]["counts"]['missing']);
-//        $node["value"]["scores"]["missing_values_penalty"] = $node["value"]["scores"]["depth_weight"] * $node["value"]["scores"]["level_entropy"];
-//
-//        // We add weighted confidence
-//        $node["value"]["scores"]["weighted_confidence"] = pow($node["value"]["scores"]["confidence"], $node["value"]["scores"]["depth_weight"]);
-//
-//        // We get the penalized weighted confidence
-//        $node["value"]["scores"]["penalized_weighted_confidence"] = $node["value"]["scores"]["weighted_confidence"] * (1 - $node["value"]["scores"]["missing_values_penalty"]);
-//
-//        // We get the log of the penalized weighted confidence
-//        $node["value"]["scores"]["log_penalized_weighted_confidence"] = log($node["value"]["scores"]["penalized_weighted_confidence"], 2);
-//
+        $node["value"]["scores"]["missing_values_penalty"] = $node["value"]["scores"]["depth_weight"] * $node["value"]["scores"]["level_entropy"];
+
+        // We add weighted confidence
+        $node["value"]["scores"]["weighted_confidence"] = pow($node["value"]["scores"]["confidence"], $node["value"]["scores"]["depth_weight"]);
+
+        // We get the penalized weighted confidence
+        $node["value"]["scores"]["penalized_weighted_confidence"] = $node["value"]["scores"]["weighted_confidence"] * (1 - $node["value"]["scores"]["missing_values_penalty"]);
+
+        // We get the log of the penalized weighted confidence
+        $node["value"]["scores"]["log_penalized_weighted_confidence"] = log($node["value"]["scores"]["penalized_weighted_confidence"], 2);
+
 //        $cumulativeConfidence = $cumulativeConfidence + $node["value"]["scores"]["weighted_confidence"];
 //        $node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeConfidence;
 
-//        $cumulativeLog = $cumulativeLog + $node["value"]["scores"]["log_penalized_weighted_confidence"];
-//        $node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeLog;
+        $cumulativeLog = $cumulativeLog + $node["value"]["scores"]["log_penalized_weighted_confidence"];
+        $node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeLog;
 
         $depth += 1;
 
         foreach ($node["children"] as &$child) {
-            self::computePathCumulativeConfidence($child, $numberOfLevels, $depth, $cumulativeConfidence);
+            self::computePathCumulativeConfidence($child, $numberOfLevels, $depth, $cumulativeLog);
         }
     }
 
