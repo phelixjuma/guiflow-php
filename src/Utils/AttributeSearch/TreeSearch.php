@@ -218,6 +218,8 @@ class TreeSearch
             $attribute_tree = $builder->build_nested_tree($corpus_with_attributes);
         }
 
+        print "\n$searchItem Initial Tree: ".json_encode($attribute_tree)." \n";
+
         // We get nodes and branching options
         $nodesAndBranchingOptions = AttributeGraphBuilder::extractTreeNodesAndBranchingOptions($attribute_tree);
 
@@ -232,13 +234,15 @@ class TreeSearch
         // We add "scores" to tree data
         $tree_with_confidence_scores = AttributeGraphBuilder::addConfidenceScoresToTree($attribute_tree, $nodePathConfidences, $min_confidence);
 
+        print "\n$searchItem Tree with confidence scores: ".json_encode($tree_with_confidence_scores)." \n";
+
         // We get the number of levels in the tree - the tree depth
         $numberOfLevels = sizeof($builder->get_hierarchy_order());
 
         // Calculate tree information content
         self::computeCumulativeConfidenceScores($tree_with_confidence_scores, $numberOfLevels);
 
-        //print("Tree data for $searchItem is: ".json_encode($tree_with_confidence_scores));
+        print "\n$searchItem Tree with cumulative scores: ".json_encode($tree_with_confidence_scores)." \n";
 
         // We get the best path - this is the matching attributes for the search item
         return self::getAllPaths($tree_with_confidence_scores, $builder->get_hierarchy_order());
