@@ -82,7 +82,7 @@ class TreeSearch
         $node["value"]["scores"]["penalized_weighted_confidence"] = $node["value"]["scores"]["weighted_confidence"] * (1 - $node["value"]["scores"]["missing_values_penalty"]);
 
         // We get the log of the penalized weighted confidence
-        $node["value"]["scores"]["log_penalized_weighted_confidence"] = $node["value"]["scores"]["penalized_weighted_confidence"] > 0 ? log($node["value"]["scores"]["penalized_weighted_confidence"], 2) : 0;
+        $node["value"]["scores"]["log_penalized_weighted_confidence"] = $node["value"]["scores"]["penalized_weighted_confidence"] > 0 ? -1 * log($node["value"]["scores"]["penalized_weighted_confidence"], 2) : 0;
 
         $cumulativeLog = $cumulativeLog + $node["value"]["scores"]["log_penalized_weighted_confidence"];
         $node["value"]["scores"]["cumulative_log_confidence"] = $cumulativeLog;
