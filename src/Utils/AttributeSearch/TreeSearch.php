@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\GUIFlow\Utils\AttributeSearch;
 
+use InvalidArgumentException;
 use PhelixJuma\GUIFlow\Utils\Utils;
 
 /**
@@ -13,14 +14,19 @@ class TreeSearch
 {
 
     /**
-     * @param int $totalItems
-     * @param int $missingItems
+     * @param $totalItems
+     * @param $missingItems
      * @return float
      */
-    private static function calculateNormalizedEntropy(int $totalItems, int $missingItems): float {
+    private static function calculateNormalizedEntropy($totalItems, $missingItems)
+    {
+        // Validate input: totalItems must be non-negative, missingItems must be non-negative, and missingItems <= totalItems
+        if ($totalItems < 0 || $missingItems < 0 || $missingItems > $totalItems) {
+            throw new InvalidArgumentException('Invalid input: Ensure totalItems and missingItems are non-negative, and missingItems does not exceed totalItems.');
+        }
 
         // Prevent division by zero
-        if ($totalItems <= 0) {
+        if ($totalItems === 0) {
             return 0.0; // No entropy if no items exist
         }
 
@@ -39,7 +45,8 @@ class TreeSearch
         }
 
         // Normalize the entropy by the maximum possible entropy (log2(total outcomes))
-        $maxEntropy = log(2, 2); // log2(2) for binary outcomes (present/missing)
+        // For binary outcomes (present/missing), maxEntropy is log2(2) = 1
+        $maxEntropy = 1.0;
 
         return $entropy / $maxEntropy;
     }
