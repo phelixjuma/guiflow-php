@@ -249,8 +249,6 @@ class TreeSearch
         // Calculate tree information content
         self::computeCumulativeConfidenceScores($tree_with_confidence_scores, $numberOfLevels);
 
-        print "\n$searchItem Tree with cumulative scores: ".json_encode($tree_with_confidence_scores)." \n";
-
         // We get the best path - this is the matching attributes for the search item
         return self::getAllPaths($tree_with_confidence_scores, $builder->get_hierarchy_order());
     }
