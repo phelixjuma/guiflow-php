@@ -74,7 +74,6 @@ class TreeSearch
         $node["value"]["scores"]["depth"] = $depth;
         $node["value"]["scores"]["depth_weight"] = 1 + ($numberOfLevels-$depth+1)/$numberOfLevels;
         $node["value"]["scores"]["missing_values_penalty"] = self::calculateNormalizedEntropy($node["value"]["counts"]['total'], $node["value"]["counts"]['missing']);
-        //$node["value"]["scores"]["missing_values_penalty"] = $node["value"]["scores"]["depth_weight"] * $node["value"]["scores"]["level_entropy"];
 
         // We add weighted confidence
         $node["value"]["scores"]["weighted_confidence"] = pow($node["value"]["scores"]["confidence"], $node["value"]["scores"]["depth_weight"]);
@@ -85,11 +84,8 @@ class TreeSearch
         // We get the log of the penalized weighted confidence
         $node["value"]["scores"]["log_penalized_weighted_confidence"] = $node["value"]["scores"]["penalized_weighted_confidence"] > 0 ? log($node["value"]["scores"]["penalized_weighted_confidence"], 2) : 0;
 
-//        $cumulativeLog = $cumulativeLog + $node["value"]["scores"]["weighted_confidence"];
-//        $node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeLog;
-
         $cumulativeLog = $cumulativeLog + $node["value"]["scores"]["log_penalized_weighted_confidence"];
-        $node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeLog;
+        $node["value"]["scores"]["cumulative_log_confidence"] = $cumulativeLog;
 
         $depth += 1;
 
@@ -127,12 +123,9 @@ class TreeSearch
         }
 
         // Check if this node matches the selected node for continuity, only if matched[value] is not null.
-        $newEditsCount = $editsCount;
+        $isMatch = empty($node["value"]["value"]) && is_null($node["value"]["matched"]["value"]) || ($node["value"]["value"] === $node["value"]["matched"]["value"]);
+        $newEditsCount = $isMatch ? $editsCount : $editsCount + 1;
 
-        if (!empty($node["value"]["value"])) {
-            $isMatch = $node["value"]["value"] === $node["value"]["matched"]["value"];
-            $newEditsCount = $isMatch ? $editsCount : $editsCount + 1;
-        }
 
         // Add current node to the path.
         $attributeName = $node["value"]["attribute"]["name"] ?? null;
@@ -140,21 +133,22 @@ class TreeSearch
             $currentPath[$attributeName] = [
                 "value" => $node["value"]["value"],
                 "scores" => $node["value"]["scores"],
+                "counts" => $node["value"]["counts"],
                 "matched" => $node["value"]["matched"],
             ];
         }
 
         // If this is a leaf node, save the current path with edit count and cumulative confidence.
         if (empty($node["children"])) {
-            // Use cumulative_weighted_confidence if available, else fallback to confidence
-            $cumulativeConfidence = array_sum(array_map(function($entry) {
-                return $entry['scores']['weighted_confidence'] ?? $entry['scores']['confidence'];
+            // Use cumulative_log_confidence if available, else fallback to confidence
+            $cumulativeLog = array_sum(array_map(function($entry) {
+                return $entry['scores']['log_penalized_weighted_confidence'] ?? 0;
             }, $currentPath));
 
             $allPaths[] = [
                 "path" => $currentPath,
                 "edit_count" => $newEditsCount,
-                "cumulative_weighted_confidence" => $cumulativeConfidence
+                "cumulative_log_confidence" => $cumulativeLog
             ];
             return;
         }
@@ -192,7 +186,11 @@ class TreeSearch
                         "value" => "",
                         "scores" => [
                             "confidence" => 0,
-                            "cumulative_weighted_confidence" => 0
+                            "cumulative_log_confidence" => 0
+                        ],
+                        "counts"    => [
+                            "total"     => 0,
+                            "missing"   => 0
                         ],
                         "matched" => [
                             "value"         => null,
@@ -205,7 +203,7 @@ class TreeSearch
 
         // Sort paths first by edit count (ascending), then by cumulative weighted confidence (descending)
         usort($allPaths, function ($a, $b) {
-            return $a['edit_count'] <=> $b['edit_count'] ?: $b['cumulative_weighted_confidence'] <=> $a['cumulative_weighted_confidence'];
+            return $a['edit_count'] <=> $b['edit_count'] ?: $b['cumulative_log_confidence'] <=> $a['cumulative_log_confidence'];
         });
 
         return $allPaths;
