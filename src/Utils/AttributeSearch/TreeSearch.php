@@ -62,26 +62,30 @@ class TreeSearch
             return;
         }
 
-        // Process nodes with associative array values.
-        $node["value"]["scores"]["depth"] = $depth;
-        $node["value"]["scores"]["depth_weight"] = 1 + ($numberOfLevels-$depth+1)/$numberOfLevels;
-        $node["value"]["scores"]["level_entropy"] = self::calculateNormalizedEntropy($node["value"]["counts"]['total'], $node["value"]["counts"]['missing']);
-        $node["value"]["scores"]["missing_values_penalty"] = $node["value"]["scores"]["depth_weight"] * $node["value"]["scores"]["level_entropy"];
+        try {
+            // Process nodes with associative array values.
+            $node["value"]["scores"]["depth"] = $depth;
+            $node["value"]["scores"]["depth_weight"] = 1 + ($numberOfLevels-$depth+1)/$numberOfLevels;
+            $node["value"]["scores"]["level_entropy"] = self::calculateNormalizedEntropy($node["value"]["counts"]['total'], $node["value"]["counts"]['missing']);
+            $node["value"]["scores"]["missing_values_penalty"] = $node["value"]["scores"]["depth_weight"] * $node["value"]["scores"]["level_entropy"];
 
-        // We add weighted confidence
-        $node["value"]["scores"]["weighted_confidence"] = pow($node["value"]["scores"]["confidence"], $node["value"]["scores"]["depth_weight"]);
+            // We add weighted confidence
+            $node["value"]["scores"]["weighted_confidence"] = pow($node["value"]["scores"]["confidence"], $node["value"]["scores"]["depth_weight"]);
 
-        // We get the penalized weighted confidence
-        $node["value"]["scores"]["penalized_weighted_confidence"] = $node["value"]["scores"]["weighted_confidence"] * (1 - $node["value"]["scores"]["missing_values_penalty"]);
+            // We get the penalized weighted confidence
+            $node["value"]["scores"]["penalized_weighted_confidence"] = $node["value"]["scores"]["weighted_confidence"] * (1 - $node["value"]["scores"]["missing_values_penalty"]);
 
-        // We get the log of the penalized weighted confidence
-        $node["value"]["scores"]["log_penalized_weighted_confidence"] = log($node["value"]["scores"]["penalized_weighted_confidence"], 2);
+            // We get the log of the penalized weighted confidence
+            $node["value"]["scores"]["log_penalized_weighted_confidence"] = log($node["value"]["scores"]["penalized_weighted_confidence"], 2);
 
-        //$cumulativeConfidence = $cumulativeConfidence + $node["value"]["scores"]["weighted_confidence"];
-        //$node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeConfidence;
+            //$cumulativeConfidence = $cumulativeConfidence + $node["value"]["scores"]["weighted_confidence"];
+            //$node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeConfidence;
 
-        $cumulativeLog = $cumulativeLog + $node["value"]["scores"]["log_penalized_weighted_confidence"];
-        $node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeLog;
+            $cumulativeLog = $cumulativeLog + $node["value"]["scores"]["log_penalized_weighted_confidence"];
+            $node["value"]["scores"]["cumulative_weighted_confidence"] = $cumulativeLog;
+        } catch (\Exception | \Throwable $e) {
+            print "\nError {$e->getMessage()} on node: ".json_encode($node)." \n";
+        }
 
         $depth += 1;
 
@@ -223,8 +227,6 @@ class TreeSearch
             $attribute_tree = $builder->build_nested_tree($corpus_with_attributes);
         }
 
-        print "\n$searchItem Initial Tree: ".json_encode($attribute_tree)." \n";
-
         // We get nodes and branching options
         $nodesAndBranchingOptions = AttributeGraphBuilder::extractTreeNodesAndBranchingOptions($attribute_tree);
 
@@ -238,8 +240,6 @@ class TreeSearch
 
         // We add "scores" to tree data
         $tree_with_confidence_scores = AttributeGraphBuilder::addConfidenceScoresToTree($attribute_tree, $nodePathConfidences, $min_confidence);
-
-        print "\n$searchItem Tree with confidence scores: ".json_encode($tree_with_confidence_scores)." \n";
 
         // We get the number of levels in the tree - the tree depth
         $numberOfLevels = sizeof($builder->get_hierarchy_order());
