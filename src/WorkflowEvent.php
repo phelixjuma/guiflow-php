@@ -47,7 +47,7 @@ class WorkflowEvent
         $this->event_logs[$this->name][] = [
             'event_type'    => $this->event_type,
             'event'         => $event,
-            'data_before'   => $this->dataBefore,
+            'data_before'   => null,
             'data_after'    => $dataAfter,
             'error'         => [
                 "message"   => $error_message,
