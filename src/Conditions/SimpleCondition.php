@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\GUIFlow\Conditions;
 
+use Exception;
 use FuzzyWuzzy\Fuzz;
 use PhelixJuma\GUIFlow\Exceptions\UnknownOperatorException;
 use PhelixJuma\GUIFlow\Utils\DataValidator;
@@ -22,7 +23,7 @@ class SimpleCondition implements ConditionInterface
     /**
      * @param $data
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function evaluate($data): bool
     {
@@ -68,7 +69,7 @@ class SimpleCondition implements ConditionInterface
      * @param $similarityThreshold
      * @param $tokenizeSimilarity
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public static function compare($pathValue, $operator, $value, $similarityThreshold = null, $tokenizeSimilarity = false): bool
     {
@@ -176,7 +177,7 @@ class SimpleCondition implements ConditionInterface
                                 return true;
                             }
                             if (preg_last_error() !== PREG_NO_ERROR) {
-                                throw new \Exception("Preg Error when matching ".json_encode($pathValue)." against ".json_encode($pattern)." : ".Utils::getPregError(preg_last_error()));
+                                throw new Exception("Preg Error when matching ".json_encode($pathValue)." against ".json_encode($pattern)." : ".Utils::getPregError(preg_last_error()));
                             }
                         }
                         return false;
@@ -190,7 +191,7 @@ class SimpleCondition implements ConditionInterface
                                 return true;
                             }
                             if (preg_last_error() !== PREG_NO_ERROR) {
-                                throw new \Exception("Preg Error when matching ".json_encode($pathValue)." against ".json_encode($pattern)." : ".Utils::getPregError(preg_last_error()));
+                                throw new Exception("Preg Error when matching ".json_encode($pathValue)." against ".json_encode($pattern)." : ".Utils::getPregError(preg_last_error()));
                             }
                         }
                         return false;
@@ -220,8 +221,8 @@ class SimpleCondition implements ConditionInterface
                 default:
                     throw new UnknownOperatorException("Unknown operator: $operator");
             }
-        } catch (\Exception | \Throwable $e) {
-            throw new \Exception("simple condition error on value: ".json_encode($value)." and path value: ".json_encode($pathValue).". Error says ".$e->getMessage(). ". Line: ".$e->getLine()." on file: ".$e->getFile());
+        } catch (Exception | \Throwable $e) {
+            throw new Exception("simple condition error on value: ".json_encode($value)." and path value: ".json_encode($pathValue).". Error says ".$e->getMessage(). ". Line: ".$e->getLine()." on file: ".$e->getFile());
         }
     }
 }

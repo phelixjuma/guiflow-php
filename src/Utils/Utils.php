@@ -4,6 +4,7 @@ namespace PhelixJuma\GUIFlow\Utils;
 
 use ArrayJoin\Builder;
 use ArrayJoin\On;
+use Exception;
 use FuzzyWuzzy\Fuzz;
 use FuzzyWuzzy\Process;
 use PhelixJuma\GUIFlow\Actions\FunctionAction;
@@ -34,6 +35,7 @@ class Utils
      * @param $input
      * @param $format
      * @return string
+     * @throws Exception
      */
     public static function format_date($input, $format)
     {
@@ -43,12 +45,7 @@ class Utils
             $date = new \DateTime("@$input");
         } else {
             // Otherwise, try to parse the string directly
-            try {
-                $date = !empty($input) ? new \DateTime($input) : "";
-            } catch (\Exception $e) {
-                // If an exception is caught, the date format is not recognized
-                return "Invalid date format: " . $e->getMessage();
-            }
+            $date = !empty($input) ? new \DateTime($input) : "";
         }
 
         // Format the date
@@ -363,7 +360,7 @@ class Utils
      * @param $mappers
      * @param $sortByOrder
      * @return array|mixed|string|string[]
-     * @throws \Exception
+     * @throws Exception
      */
     public static function regex_mapper_multiple($data, $mappers, $sortByOrder=false)
     {
@@ -384,49 +381,43 @@ class Utils
 
             foreach ($mappers as $mapper) {
 
-                try {
+                $pattern = $mapper['data']['pattern'];
+                $modifiers = $mapper['data']['modifiers'];
+                $replacementsMapper = $mapper['data']['replacements'];
 
-                    $pattern = $mapper['data']['pattern'];
-                    $modifiers = $mapper['data']['modifiers'];
-                    $replacementsMapper = $mapper['data']['replacements'];
+                // prepare pattern
+                $pattern = '/' . self::full_unescape($pattern) . '/'.$modifiers;
 
-                    // prepare pattern
-                    $pattern = '/' . self::full_unescape($pattern) . '/'.$modifiers;
+                $tempNewData = preg_replace_callback($pattern, function($matches) use($pattern, $newData, $replacementsMapper) {
 
-                    $tempNewData = preg_replace_callback($pattern, function($matches) use($pattern, $newData, $replacementsMapper) {
+                    $replacement = $matches[1];
 
-                        $replacement = $matches[1];
+                    foreach ($replacementsMapper as $rMapper) {
 
-                        foreach ($replacementsMapper as $rMapper) {
+                        $replacementPattern = str_ireplace("[space]", " ", $rMapper['pattern']);
 
-                            $replacementPattern = str_ireplace("[space]", " ", $rMapper['pattern']);
+                        $tempReplacement = preg_replace_callback("/(?:{$replacementPattern})/i", function($match) use ($rMapper) {
+                            return $rMapper['replacement'];
+                        }, $replacement);
 
-                            $tempReplacement = preg_replace_callback("/(?:{$replacementPattern})/i", function($match) use ($rMapper) {
-                                return $rMapper['replacement'];
-                            }, $replacement);
-
-                            if (!empty($tempReplacement)) {
-                                $replacement = $tempReplacement;
-                            }
-
+                        if (!empty($tempReplacement)) {
+                            $replacement = $tempReplacement;
                         }
 
-                        return $replacement;
-
-                    }, $newData);
-
-                    if (!empty($tempNewData)) {
-                        $newData = $tempNewData;
                     }
 
-                    if (preg_last_error() !== PREG_NO_ERROR) {
-                        throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
-                    }
+                    return $replacement;
 
-                } catch (\Exception $e) {
-                    print $e->getMessage();
-                    throw new \Exception($e->getMessage());
+                }, $newData);
+
+                if (!empty($tempNewData)) {
+                    $newData = $tempNewData;
                 }
+
+                if (preg_last_error() !== PREG_NO_ERROR) {
+                    throw new Exception("Preg Error: ".self::getPregError(preg_last_error()));
+                }
+
             }
 
         }
@@ -484,6 +475,7 @@ class Utils
      * @param $operator
      * @param $format
      * @return array
+     * @throws Exception
      */
     public static function date_add_subtract_days($data, $days, $operator, $format="Y-m-d") {
 
@@ -491,18 +483,14 @@ class Utils
 
         $response = null;
 
-        try {
-
-            if (is_array($data)) {
-                foreach ($data as $datum) {
-                    $response[] = (new \DateTime($datum))->$method(new \DateInterval("P{$days}D"))->format($format);
-                }
-            } else {
-                $response = (new \DateTime($data))->$method(new \DateInterval("P{$days}D"))->format($format);
+        if (is_array($data)) {
+            foreach ($data as $datum) {
+                $response[] = (new \DateTime($datum))->$method(new \DateInterval("P{$days}D"))->format($format);
             }
-
-        } catch (\Exception $e) {
+        } else {
+            $response = (new \DateTime($data))->$method(new \DateInterval("P{$days}D"))->format($format);
         }
+
         return $response;
     }
 
@@ -510,42 +498,39 @@ class Utils
      * @param $startDateString
      * @param $endDateString
      * @param $period
-     * @return null
+     * @return float|int|null
+     * @throws Exception
      */
     public static function date_diff($startDateString, $endDateString, $period="d") {
 
         $response = null;
 
-        try {
+        $startDate = new \DateTime($startDateString);
+        $endDate = new \DateTime($endDateString);
 
-            $startDate = new \DateTime($startDateString);
-            $endDate = new \DateTime($endDateString);
+        $diff = $startDate->diff($endDate);
 
-            $diff = $startDate->diff($endDate);
-
-            switch ($period) {
-                case  'y':
-                    $response = $diff->y;
-                    break;
-                case 'm':
-                    $response = ($diff->y*12) + $diff->m;
-                    break;
-                case 'd':
-                    $response = (365 * $diff->y) + (30 * $diff->m) + $diff->d;
-                    break;
-                case 'h':
-                    $response = (24 * 365 * $diff->y) + (24 * 30 * $diff->m) + (24 * $diff->d) + $diff->h;
-                    break;
-                case 'i':
-                    $response = (60 * 24 * 365 * $diff->y) + (60 * 24 * 30 * $diff->m) + (60 * 24 * $diff->d)  + (60 * $diff->h) + $diff->i;
-                    break;
-                case 's':
-                    $response = (60 * 60 * 24 * 365 * $diff->y) + (60 * 60 * 24 * 30 * $diff->m) + (60 * 60 * 24 * $diff->d)  + (60 * 60 * $diff->h) + $diff->s;
-                    break;
-            }
-
-        } catch (\Exception $e) {
+        switch ($period) {
+            case  'y':
+                $response = $diff->y;
+                break;
+            case 'm':
+                $response = ($diff->y*12) + $diff->m;
+                break;
+            case 'd':
+                $response = (365 * $diff->y) + (30 * $diff->m) + $diff->d;
+                break;
+            case 'h':
+                $response = (24 * 365 * $diff->y) + (24 * 30 * $diff->m) + (24 * $diff->d) + $diff->h;
+                break;
+            case 'i':
+                $response = (60 * 24 * 365 * $diff->y) + (60 * 24 * 30 * $diff->m) + (60 * 24 * $diff->d)  + (60 * $diff->h) + $diff->i;
+                break;
+            case 's':
+                $response = (60 * 60 * 24 * 365 * $diff->y) + (60 * 60 * 24 * 30 * $diff->m) + (60 * 60 * 24 * $diff->d)  + (60 * 60 * $diff->h) + $diff->s;
+                break;
         }
+
         return $response;
     }
 
@@ -553,22 +538,20 @@ class Utils
      * @param $data
      * @param $format
      * @return array|string
+     * @throws Exception
      */
     public static function date_format($data, $format="Y-m-d") {
 
         $response = null;
-        try {
 
-            if (is_array($data)) {
-                foreach ($data as $datum) {
-                    $response[] = !empty($datum) ? (new \DateTime($datum))->format($format) : "";
-                }
-            } else {
-                $response = !empty($data) ? (new \DateTime($data))->format($format) : "";
+        if (is_array($data)) {
+            foreach ($data as $datum) {
+                $response[] = !empty($datum) ? (new \DateTime($datum))->format($format) : "";
             }
-        } catch (\Exception $e) {
-
+        } else {
+            $response = !empty($data) ? (new \DateTime($data))->format($format) : "";
         }
+
         return $response;
     }
 
@@ -1556,35 +1539,26 @@ class Utils
             $rightData = PathResolver::getValueByPath($data, $rightData['path']);
         }
 
-        $response = null;
+        $instance = Builder::newInstance()
+            ->select(...$fields)
+            ->from($leftData, "left");
 
-        try {
-            $instance = Builder::newInstance()
-                ->select(...$fields)
-                ->from($leftData, "left");
-
-            if ($join['type'] == 'inner') {
-                $instance->innerJoin($rightData, "right", new On($join['on']));
-            } elseif ($join['type'] == 'left') {
-                $instance->leftJoin($rightData, "right", new On($join['on']));
-            } elseif ($join['type'] == 'right') {
-                $instance->rightJoin($rightData, "right", new On($join['on']));
-            }
-
-            if (!empty($groupBy)) {
-                $groupByFields = !is_array($groupBy)? [$groupBy] : $groupBy;
-                $instance->groupBy(...$groupByFields);
-            }
-
-            $instance->setFetchType(Builder::FETCH_TYPE_ARRAY);
-
-            $response = $instance->execute();
-
-        } catch (\Exception $e) {
-            print "Exception: ".$e->getMessage();
+        if ($join['type'] == 'inner') {
+            $instance->innerJoin($rightData, "right", new On($join['on']));
+        } elseif ($join['type'] == 'left') {
+            $instance->leftJoin($rightData, "right", new On($join['on']));
+        } elseif ($join['type'] == 'right') {
+            $instance->rightJoin($rightData, "right", new On($join['on']));
         }
 
-        return $response;
+        if (!empty($groupBy)) {
+            $groupByFields = !is_array($groupBy)? [$groupBy] : $groupBy;
+            $instance->groupBy(...$groupByFields);
+        }
+
+        $instance->setFetchType(Builder::FETCH_TYPE_ARRAY);
+
+        return $instance->execute();
     }
 
     /**

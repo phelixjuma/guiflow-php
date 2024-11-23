@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\GUIFlow\Actions;
 
+use Exception;
 use PhelixJuma\GUIFlow\Utils\AttributeSearch\TreeSearch;
 use PhelixJuma\GUIFlow\Utils\DataSplitter;
 use PhelixJuma\GUIFlow\Utils\DataValidator;
@@ -72,7 +73,7 @@ class FunctionAction implements ActionInterface
      * @param $data
      * @return void
      * @throws UnknownOperatorException
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute(&$data)
     {
@@ -161,11 +162,7 @@ class FunctionAction implements ActionInterface
                     foreach ($currentValues as &$value) {
 
                         if (empty($this->condition) || Workflow::evaluateCondition($value, $this->condition)) {
-                            try {
-                                (new FunctionAction($path, [$this->function[0], $function], $args, $newField, $strict, $condition))->execute($value);
-                            } catch (\Exception|\Throwable $e) {
-                                //print "\nError in map function: ".$e->getMessage()." on line {$e->getLine()} of file {$e->getFile()}\n";
-                            }
+                            (new FunctionAction($path, [$this->function[0], $function], $args, $newField, $strict, $condition))->execute($value);
                         }
                     }
 
@@ -221,13 +218,13 @@ class FunctionAction implements ActionInterface
                                 // memory is ok, proceed to execute the task
 
                                 $dataCopy = $currentValues[$index]; // Work with a local copy
-                                try {
-                                    // execute the function
-                                    (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataCopy);
-                                    // set the result back
-                                    $currentValues[$index] = $dataCopy;
-                                } catch (\Exception|\Throwable $e) {
-                                }
+
+                                // execute the function
+                                (new FunctionAction($path, $function, $args, $newField, $strict, $condition))->execute($dataCopy);
+
+                                // set the result back
+                                $currentValues[$index] = $dataCopy;
+
                                 // Signal completion
                                 $wg->done();
 

@@ -2,6 +2,7 @@
 
 namespace PhelixJuma\GUIFlow;
 
+use Exception;
 use JumaPhelix\DAG\DAG;
 use JumaPhelix\DAG\SharedDataManager;
 use JumaPhelix\DAG\Task;
@@ -25,10 +26,13 @@ use function OpenSwoole\Core\Coroutine\batch;
 
 class Workflow
 {
+
+
     private array $config;
     private object $functionsClass;
 
     public $errors = [];
+    public $event_logs = [];
 
     /**
      * @var DAG
@@ -40,6 +44,8 @@ class Workflow
      */
     public TaskExecutor $workflowExecutor;
 
+    protected WorkflowEvent $ruleWorkflowEvent;
+    protected WorkflowEvent $actionWorkflowEvent;
 
     public function __construct(array $config, object $functionsClass)
     {
@@ -48,6 +54,20 @@ class Workflow
 
         // Validate the configuration against the schema
         ConfigurationValidator::validate($this->config, 'v3');
+
+        $this->ruleWorkflowEvent = new WorkflowEvent();
+        $this->actionWorkflowEvent = new WorkflowEvent();
+
+    }
+
+    /**
+     * @return array
+     */
+    public function getEventLog() {
+        return [
+            "rule_logs" => $this->ruleWorkflowEvent->event_logs,
+            "action_logs" => $this->actionWorkflowEvent->event_logs,
+        ];
     }
 
     /**
@@ -70,71 +90,57 @@ class Workflow
         }
     }
 
+    /**
+     * @param $inputData
+     * @return void
+     */
     private function runWorkFlowSerial(&$inputData): void
     {
 
         // We execute within a coroutine environment to support parallelization
         co::run(function() use(&$inputData) {
-            try {
 
-                $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
+            $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 
-                foreach ($config as $rule) {
+            foreach ($config as $rule) {
 
-                    try {
+                if (Utils::isObject($inputData)) {
+                    $this->executeRuleSerial($rule, $inputData);
+                } else {
 
-                        if (Utils::isObject($inputData)) {
-                            $this->executeRuleSerial($rule, $inputData);
-                        } else {
+                    $tempData = [];
 
-                            $tempData = [];
+                    $tasks = [];
+                    foreach ($inputData as $data) {
 
-                            $tasks = [];
-                            foreach ($inputData as $data) {
+                        $tasks[] = function () use($data, $rule) {
 
-                                $tasks[] = function () use($data, $rule) {
+                            $this->executeRuleSerial($rule, $data);
 
-                                    $this->executeRuleSerial($rule, $data);
-
-                                    if (Utils::isObject($data)) {
-                                        // An object. Set to temp data
-                                        return [$data];
-                                    } else {
-                                        return $data;
-                                    }
-                                };
+                            if (Utils::isObject($data)) {
+                                // An object. Set to temp data
+                                return [$data];
+                            } else {
+                                return $data;
                             }
-                            // We fetch the results from all the tasks
-                            $results = batch($tasks);
-
-                            // Flatten the results and merge them into $tempData
-                            foreach ($results as $result) {
-                                if (is_array($result)) {
-                                    $tempData = array_merge($tempData, $result);
-                                } else {
-                                    $tempData[] = $result;
-                                }
-                            }
-
-                            // Set the temp data to input data
-                            $inputData = $tempData;
-                        }
-                    } catch (\Exception|\Throwable $e ) {
-                        $error = [
-                            'rule'  => $rule['stage'],
-                            'message' => $e->getMessage(),
-                            'trace' => $e->getTrace()
-                        ];
-                        $this->errors[] = $error;
+                        };
                     }
+                    // We fetch the results from all the tasks
+                    $results = batch($tasks);
+
+                    // Flatten the results and merge them into $tempData
+                    foreach ($results as $result) {
+                        if (is_array($result)) {
+                            $tempData = array_merge($tempData, $result);
+                        } else {
+                            $tempData[] = $result;
+                        }
+                    }
+
+                    // Set the temp data to input data
+                    $inputData = $tempData;
                 }
 
-            } catch (\Exception|\Throwable $e ) {
-                $error = [
-                    'message' => $e->getMessage(),
-                    'trace' => $e->getTrace()
-                ];
-                $this->errors[] = $error;
             }
 
         });
@@ -146,49 +152,43 @@ class Workflow
      */
     private function runWorkFlowParallel(&$inputData): void
     {
+        $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 
-        try {
+        $this->workflowDAG = new DAG();
 
-            $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
+        foreach ($config as $ruleIndex => $rule) {
 
-            $this->workflowDAG = new DAG();
+            if (Utils::isObject($inputData)) {
 
-            foreach ($config as $ruleIndex => $rule) {
+                $dataManager = new SharedDataManager($inputData);
+                $this->executeRuleParallel($rule, $ruleIndex, $dataManager);
 
-                if (Utils::isObject($inputData)) {
+            } else {
+                $tempData = [];
+                foreach ($inputData as $dataIndex => &$data) {
 
-                    $dataManager = new SharedDataManager($inputData);
+                    $data['workflow_list_position'] = $dataIndex;
+
+                    $dataManager = new SharedDataManager($data);
                     $this->executeRuleParallel($rule, $ruleIndex, $dataManager);
 
-                } else {
-                    $tempData = [];
-                    foreach ($inputData as $dataIndex => &$data) {
-
-                        $data['workflow_list_position'] = $dataIndex;
-
-                        $dataManager = new SharedDataManager($data);
-                        $this->executeRuleParallel($rule, $ruleIndex, $dataManager);
-
-                        if (Utils::isObject($data)) {
-                            $tempData[] = $data;
-                        } else {
-                            // For a split response, we flatten by adding each item to data
-                            foreach ($data as $d) {
-                                $tempData[] = $d;
-                            }
+                    if (Utils::isObject($data)) {
+                        $tempData[] = $data;
+                    } else {
+                        // For a split response, we flatten by adding each item to data
+                        foreach ($data as $d) {
+                            $tempData[] = $d;
                         }
                     }
-                    $inputData = $tempData;
                 }
+                $inputData = $tempData;
             }
-
-            // Initialize the task executor
-            $this->workflowExecutor = new TaskExecutor($this->workflowDAG);
-            $this->workflowExecutor->execute();
-
-        } catch (\Exception|\Throwable $e ) {
-            $this->errors[] = $e->getMessage();
         }
+
+        // Initialize the task executor
+        $this->workflowExecutor = new TaskExecutor($this->workflowDAG);
+        $this->workflowExecutor->execute();
+
     }
 
     /**
@@ -198,69 +198,114 @@ class Workflow
      */
     private function executeRuleSerial($rule, &$data) {
 
+        $this->ruleWorkflowEvent->init($rule['stage'], WorkflowEvent::EVENT_TYPE_RULE, $data);
+
         $skip = $rule['skip'] ?? 0;
         $condition = $rule['condition'];
         $actions = $rule['actions'];
 
         // We execute this rule if it is not skipped and the conditions are true
-        if ($skip != 1 && self::evaluateCondition($data, $condition)) {
-            // Execute the actions
-            foreach ($actions as $action) {
-                try {
+        try {
 
-                    $skipAction = $action['skip'] ?? 0;
+            if ($skip != 1 && self::evaluateCondition($data, $condition)) {
 
-                    // We execute the action, if it is not set to be skipped.
-                    if ($skipAction != 1) {
+                // Rule started
+                $this->ruleWorkflowEvent->onStarted();
 
-                        if (Utils::isObject($data)) {
-                            $this->executeAction($data, $action);
-                        } else {
+                // Execute the actions
+                foreach ($actions as $action) {
+
+                    // init action event
+                    $this->actionWorkflowEvent->init($action['stage'], WorkflowEvent::EVENT_TYPE_ACTION, $data);
+
+                    try {
+
+                        $skipAction = $action['skip'] ?? 0;
+
+                        // We execute the action, if it is not set to be skipped.
+                        if ($skipAction != 1) {
+
+                            if (Utils::isObject($data)) {
+                                $this->executeAction($data, $action);
+                            } else {
 
 
-                            // we parallelize the execution of each action for the dataset
-                            $temp = [];
-                            $tasks = [];
-                            foreach ($data as $datum) {
+                                // we parallelize the execution of each action for the dataset
+                                $temp = [];
+                                $tasks = [];
+                                foreach ($data as $datum) {
 
-                                $tasks[] = function () use ($datum, $action) {
+                                    $tasks[] = function () use ($datum, $action) {
 
-                                    $this->executeAction($datum, $action);
+                                        $this->executeAction($datum, $action);
 
-                                    if (Utils::isObject($datum)) {
-                                        return [$datum];
-                                    } else {
-                                        return $datum;
-                                    }
-                                };
-                            }
-
-                            // We fetch the results from all the tasks
-                            $results = batch($tasks);
-
-                            // Flatten the results and merge them into $tempData
-                            foreach ($results as $result) {
-                                if (is_array($result)) {
-                                    $temp = array_merge($temp, $result);
-                                } else {
-                                    $temp[] = $result;
+                                        if (Utils::isObject($datum)) {
+                                            return [$datum];
+                                        } else {
+                                            return $datum;
+                                        }
+                                    };
                                 }
+
+                                // We fetch the results from all the tasks
+                                $results = batch($tasks);
+
+                                // Flatten the results and merge them into $tempData
+                                foreach ($results as $result) {
+                                    if (is_array($result)) {
+                                        $temp = array_merge($temp, $result);
+                                    } else {
+                                        $temp[] = $result;
+                                    }
+                                }
+
+                                // Set the temp data to input data
+                                $data = $temp;
                             }
 
-                            // Set the temp data to input data
-                            $data = $temp;
+                        } else {
+                            // action skipped
+                            $this->actionWorkflowEvent->onSkipped();
                         }
-                    }
 
-                } catch (\Exception|\Throwable $e ) {
-                    $error = [
-                        'action'    => $action['stage'],
-                        'message' => "{$e->getMessage()} on line {$e->getLine()} of file {$e->getFile()}. Error code is {$e->getCode()}",
-                        'trace' => $e->getTraceAsString()
-                    ];
-                    $this->errors[] = $error;
+                    } catch (\Exception|\Throwable $e ) {
+
+                        $errorMessage = "{$e->getMessage()} on line {$e->getLine()} of file {$e->getFile()}. Error code is {$e->getCode()}";
+                        $errorTrace = $e->getTraceAsString();
+
+                        // on Action Error
+                        $this->actionWorkflowEvent->onFailed($errorMessage, $errorTrace);
+
+                        $error = [
+                            'action'    => $action['stage'],
+                            'message' => $errorMessage,
+                            'trace' => $errorTrace
+                        ];
+                        $this->errors[] = $error;
+                    }
                 }
+
+                // rule completed
+                $this->ruleWorkflowEvent->onCompleted();
+
+            } else {
+                // skipped
+                $this->ruleWorkflowEvent->onSkipped();
             }
+
+        } catch (\Exception|\Throwable $e ) {
+
+            $errorMessage = "{$e->getMessage()} on line {$e->getLine()} of file {$e->getFile()}. Error code is {$e->getCode()}";
+            $errorTrace = $e->getTraceAsString();
+
+            $this->ruleWorkflowEvent->onFailed($errorMessage, $errorTrace);
+
+            $error = [
+                'rule'    => $rule['stage'],
+                'message' => $errorMessage,
+                'trace'     => $errorTrace
+            ];
+            $this->errors[] = $error;
         }
     }
 
@@ -387,6 +432,7 @@ class Workflow
      * @param $condition
      * @param $useDataAsPathValue
      * @return mixed
+     * @throws Exception
      */
     public static function evaluateCondition($data, $condition, $useDataAsPathValue = false)
     {
@@ -435,6 +481,9 @@ class Workflow
                 throw new \InvalidArgumentException('Unknown action type: ' . $actionParams['action']);
         }
         $actionInstance->execute($data);
+
+        // completed action
+        $this->actionWorkflowEvent->onSuccess($data);
     }
 
 
