@@ -382,12 +382,10 @@ class FunctionAction implements ActionInterface
                     $newValue = "";
                 }
             } else {
-                //$newValue = call_user_func_array($this->function, $paramValues);
-                if (is_callable($this->function)) {
+                try {
                     $newValue = call_user_func_array($this->function, $paramValues);
-                } else {
-                    // Handle the case where the function does not exist or is not callable
-                    throw new Exception("The function {$this->function} is not callable.");
+                } catch (\Exception|\Throwable $e ) {
+                    print "Error executing function ".json_encode($this->function).": {$e->getMessage()}. Trace is {$e->getTraceAsString()}";
                 }
             }
 
