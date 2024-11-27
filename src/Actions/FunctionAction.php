@@ -382,7 +382,13 @@ class FunctionAction implements ActionInterface
                     $newValue = "";
                 }
             } else {
-                $newValue = call_user_func_array($this->function, $paramValues);
+                //$newValue = call_user_func_array($this->function, $paramValues);
+                if (is_callable($this->function)) {
+                    $newValue = call_user_func_array($this->function, $paramValues);
+                } else {
+                    // Handle the case where the function does not exist or is not callable
+                    throw new Exception("The function {$this->function} is not callable.");
+                }
             }
 
             // If strict is set, we only set data when new value is not empty
