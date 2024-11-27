@@ -747,7 +747,29 @@ class Utils
         return $data;
     }
 
-    private static function recursiveDivide($numbers) {
+    private static function _recursiveDivide($numbers) {
+
+        // Check if the array is empty or has only one element
+        if (count($numbers) <= 1) {
+            return count($numbers) === 1 ? $numbers[0] : 1;
+        }
+
+        // Take the first element
+        $firstElement = array_shift($numbers);
+
+        // Recursively call the function with the remaining elements
+        return $firstElement / self::_recursiveDivide($numbers);
+    }
+
+    private static function recursiveDivide($numbers)
+    {
+        // Filter to remove non-numerical and empty values
+        $numbers = array_filter($numbers, function ($value) {
+            return is_numeric($value) && $value !== null && $value !== '';
+        });
+
+        // Convert all values to float
+        $numbers = array_map('floatval', $numbers);
 
         // Check if the array is empty or has only one element
         if (count($numbers) <= 1) {
