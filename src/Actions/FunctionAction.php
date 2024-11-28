@@ -209,14 +209,14 @@ class FunctionAction implements ActionInterface
                             go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg, $channel, $maxMemoryUsage) {
 
                                 // We check memory usage
-                                while (true) {
-                                    if (Utils::serverMemoryTooLow($maxMemoryUsage)) {
-                                        echo "High memory usage detected. Pausing task for item {$index}...\n";
-                                        Co::sleep(0.5); // Delay the coroutine for 500ms if memory is high
-                                    } else {
-                                        break; // Exit the loop if memory usage is back under control
-                                    }
-                                }
+//                                while (true) {
+//                                    if (Utils::serverMemoryTooLow($maxMemoryUsage)) {
+//                                        echo "High memory usage detected. Pausing task for item {$index}...\n";
+//                                        Co::sleep(0.5); // Delay the coroutine for 500ms if memory is high
+//                                    } else {
+//                                        break; // Exit the loop if memory usage is back under control
+//                                    }
+//                                }
 
                                 // memory is ok, proceed to execute the task
 
