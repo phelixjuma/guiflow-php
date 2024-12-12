@@ -1787,4 +1787,14 @@ class Utils
         return true;
     }
 
+    public static function count_vcpus() {
+        $output = shell_exec('nproc');
+        return is_numeric($output) ? (int) $output : 0;
+    }
+
+    public static function maxConcurrency(): float
+    {
+        return ceil(0.8 * self::count_vcpus());
+    }
+
 }

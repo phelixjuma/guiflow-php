@@ -190,7 +190,7 @@ class FunctionAction implements ActionInterface
                     // Set function as an array with the udf object
                     $function = [$this->function[0], $function];
 
-                    $maxConcurrency = 10000; // Concurrency Limit
+                    $maxConcurrency = Utils::maxConcurrency(); // Concurrency Limit
                     $maxMemoryUsage = 80;
                     $channel = new \OpenSwoole\Coroutine\Channel($maxConcurrency); // Create a channel with a buffer size
 
