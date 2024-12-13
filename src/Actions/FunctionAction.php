@@ -195,13 +195,14 @@ class FunctionAction implements ActionInterface
 
                     $wg = new WaitGroup();
 
-                    print("Starting to execute $count tasks with concurrency of $maxConcurrency at time ".date("H:i:s", time()));
+                    print("Starting to execute $count tasks with concurrency of $maxConcurrency at time ".date("H:i:s", time())."\n");
+
                     for ($index = 0; $index < $count; $index++) {
 
                         if (empty($this->condition) || Workflow::evaluateCondition($currentValues[$index], $this->condition)) {
 
                             // Push a placeholder value to the channel to acquire a "permit"
-                            print("Adding task $index to channel at time ".date("H:i:s", time()));
+                            print("Adding task $index to channel at time ".date("H:i:s", time())."\n");
 
                             $channel->push(true);
 
@@ -224,7 +225,7 @@ class FunctionAction implements ActionInterface
                                 // Pop from the channel to release a "permit"
                                 $channel->pop();
 
-                                print("Completed task $index and removed from channel at time ".date("H:i:s", time()));
+                                print("Completed task $index and removed from channel at time ".date("H:i:s", time())."\n");
 
 
                             });
