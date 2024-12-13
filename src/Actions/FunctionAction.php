@@ -191,34 +191,24 @@ class FunctionAction implements ActionInterface
                     $function = [$this->function[0], $function];
 
                     $maxConcurrency = Utils::maxConcurrency(); // Concurrency Limit
-                    $maxMemoryUsage = 80;
                     $channel = new \OpenSwoole\Coroutine\Channel($maxConcurrency); // Create a channel with a buffer size
 
                     $wg = new WaitGroup();
 
+                    print("Starting to execute $count tasks with concurrency of $maxConcurrency at time ".date("H:i:s", time()));
                     for ($index = 0; $index < $count; $index++) {
 
                         if (empty($this->condition) || Workflow::evaluateCondition($currentValues[$index], $this->condition)) {
 
                             // Push a placeholder value to the channel to acquire a "permit"
+                            print("Adding task $index to channel at time ".date("H:i:s", time()));
+
                             $channel->push(true);
 
                             // Add to WaitGroup after acquiring the permit
                             $wg->add();
 
-                            go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg, $channel, $maxMemoryUsage) {
-
-                                // We check memory usage
-//                                while (true) {
-//                                    if (Utils::serverMemoryTooLow($maxMemoryUsage)) {
-//                                        echo "High memory usage detected. Pausing task for item {$index}...\n";
-//                                        Co::sleep(0.5); // Delay the coroutine for 500ms if memory is high
-//                                    } else {
-//                                        break; // Exit the loop if memory usage is back under control
-//                                    }
-//                                }
-
-                                // memory is ok, proceed to execute the task
+                            go(function () use(&$currentValues, $index, $path, $function, $args, $newField, $strict, $condition, $wg, $channel) {
 
                                 $dataCopy = $currentValues[$index]; // Work with a local copy
                                 try {
@@ -233,6 +223,9 @@ class FunctionAction implements ActionInterface
 
                                 // Pop from the channel to release a "permit"
                                 $channel->pop();
+
+                                print("Completed task $index and removed from channel at time ".date("H:i:s", time()));
+
 
                             });
                         }
