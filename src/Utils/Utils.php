@@ -1794,7 +1794,7 @@ class Utils
 
     public static function maxConcurrency(): float
     {
-        return ceil(0.8 * self::count_vcpus());
+        return ceil(0.5 * self::count_vcpus());
     }
 
 }
