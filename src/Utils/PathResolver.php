@@ -145,7 +145,9 @@ class PathResolver
 
             // If it's the last part of the path, unset it
             if ($key === count($parts) - 1) {
-                unset($current[$part]);
+                if (isset($current[$part])) {
+                    unset($current[$part]);
+                }
                 return;
             }
 
