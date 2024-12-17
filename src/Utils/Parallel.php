@@ -49,11 +49,20 @@ class Parallel {
             foreach ($taskChunks[$workerId] as $taskIndex => $task) {
                 print "\nStarting to execute task $taskIndex in worker $workerId\n";
                 try {
+
                     $result = $task();
+
+                    print "\nStarting to save Task $taskIndex to table\n";
 
                     // Store result per task using unique keys
                     $table->set("{$workerId}_{$taskIndex}", ['data' => json_encode($result)]);
+
+                    print "\nTask $taskIndex saved to table\n";
+
                 } catch (\Throwable $e) {
+
+                    print "\nError on Task $taskIndex: {$e->getMessage()}\n";
+
                     // Store error message
                     $table->set("{$workerId}_{$taskIndex}", ['data' => "Error: " . $e->getMessage()]);
                 }
