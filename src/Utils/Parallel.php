@@ -56,7 +56,7 @@ class Parallel {
         });
 
         // Graceful signal handling
-        OpenSwoole\Process::signal(SIGTERM, function () use ($pool) {
+        \OpenSwoole\Process::signal(SIGTERM, function () use ($pool) {
             $pool->shutdown();
         });
 

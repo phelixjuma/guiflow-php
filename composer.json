@@ -15,7 +15,8 @@
     "opis/json-schema": "^2.3",
     "graphp/graph": "^0.9.3",
     "graphp/algorithms": "^0.8.2",
-    "graphp/graphviz": "^0.2.2"
+    "graphp/graphviz": "^0.2.2",
+    "ext-pcntl": "*"
   },
   "scripts": {
     "test": "vendor/bin/phpunit",
