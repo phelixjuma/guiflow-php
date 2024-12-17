@@ -17,6 +17,7 @@ use PhelixJuma\GUIFlow\Actions\SubtractAction;
 use PhelixJuma\GUIFlow\Conditions\CompositeCondition;
 use PhelixJuma\GUIFlow\Conditions\SimpleCondition;
 use PhelixJuma\GUIFlow\Utils\ConfigurationValidator;
+use PhelixJuma\GUIFlow\Utils\Parallel;
 use PhelixJuma\GUIFlow\Utils\PathResolver;
 use PhelixJuma\GUIFlow\Utils\Utils;
 
@@ -105,7 +106,8 @@ class Workflow
                                 };
                             }
                             // We fetch the results from all the tasks
-                            $results = batch($tasks);
+                            //$results = batch($tasks);
+                            $results = Parallel::parallelBatch($tasks);
 
                             // Flatten the results and merge them into $tempData
                             foreach ($results as $result) {
