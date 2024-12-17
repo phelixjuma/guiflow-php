@@ -75,71 +75,68 @@ class Workflow
     {
 
         // We execute within a coroutine environment to support parallelization
-        co::run(function() use(&$inputData) {
-            try {
+        try {
 
-                $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
+            $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
 
-                foreach ($config as $rule) {
+            foreach ($config as $rule) {
 
-                    try {
+                try {
 
-                        if (Utils::isObject($inputData)) {
-                            $this->executeRuleSerial($rule, $inputData);
-                        } else {
+                    if (Utils::isObject($inputData)) {
+                        $this->executeRuleSerial($rule, $inputData);
+                    } else {
 
-                            $tempData = [];
+                        $tempData = [];
 
-                            $tasks = [];
-                            foreach ($inputData as $data) {
+                        $tasks = [];
+                        foreach ($inputData as $data) {
 
-                                $tasks[] = function () use($data, $rule) {
+                            $tasks[] = function () use($data, $rule) {
 
-                                    $this->executeRuleSerial($rule, $data);
+                                $this->executeRuleSerial($rule, $data);
 
-                                    if (Utils::isObject($data)) {
-                                        // An object. Set to temp data
-                                        return [$data];
-                                    } else {
-                                        return $data;
-                                    }
-                                };
-                            }
-                            // We fetch the results from all the tasks
-                            //$results = batch($tasks);
-                            $results = Parallel::parallelBatch($tasks);
-
-                            // Flatten the results and merge them into $tempData
-                            foreach ($results as $result) {
-                                if (is_array($result)) {
-                                    $tempData = array_merge($tempData, $result);
+                                if (Utils::isObject($data)) {
+                                    // An object. Set to temp data
+                                    return [$data];
                                 } else {
-                                    $tempData[] = $result;
+                                    return $data;
                                 }
-                            }
-
-                            // Set the temp data to input data
-                            $inputData = $tempData;
+                            };
                         }
-                    } catch (\Exception|\Throwable $e ) {
-                        $error = [
-                            'rule'  => $rule['stage'],
-                            'message' => $e->getMessage(),
-                            'trace' => $e->getTrace()
-                        ];
-                        $this->errors[] = $error;
-                    }
-                }
+                        // We fetch the results from all the tasks
+                        //$results = batch($tasks);
+                        $results = Parallel::parallelBatch($tasks);
 
-            } catch (\Exception|\Throwable $e ) {
-                $error = [
-                    'message' => $e->getMessage(),
-                    'trace' => $e->getTrace()
-                ];
-                $this->errors[] = $error;
+                        // Flatten the results and merge them into $tempData
+                        foreach ($results as $result) {
+                            if (is_array($result)) {
+                                $tempData = array_merge($tempData, $result);
+                            } else {
+                                $tempData[] = $result;
+                            }
+                        }
+
+                        // Set the temp data to input data
+                        $inputData = $tempData;
+                    }
+                } catch (\Exception|\Throwable $e ) {
+                    $error = [
+                        'rule'  => $rule['stage'],
+                        'message' => $e->getMessage(),
+                        'trace' => $e->getTrace()
+                    ];
+                    $this->errors[] = $error;
+                }
             }
 
-        });
+        } catch (\Exception|\Throwable $e ) {
+            $error = [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTrace()
+            ];
+            $this->errors[] = $error;
+        }
     }
 
     /**
