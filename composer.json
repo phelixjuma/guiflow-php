@@ -16,7 +16,8 @@
     "graphp/graph": "^0.9.3",
     "graphp/algorithms": "^0.8.2",
     "graphp/graphviz": "^0.2.2",
-    "ext-pcntl": "*"
+    "ext-pcntl": "*",
+    "spatie/async": "^1.6"
   },
   "scripts": {
     "test": "vendor/bin/phpunit",

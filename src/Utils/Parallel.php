@@ -2,9 +2,11 @@
 
 namespace PhelixJuma\GUIFlow\Utils;
 
-use OpenSwoole\Process\Pool;
-use OpenSwoole\Table;
-use OpenSwoole\Util;
+//use OpenSwoole\Process\Pool;
+//use OpenSwoole\Table;
+//use OpenSwoole\Util;
+
+use Spatie\Async\Pool;
 
 class Parallel {
 
@@ -16,7 +18,7 @@ class Parallel {
      * @param string|null $batchId
      * @return array
      */
-    public static function parallelBatch(array $tasks, int $workerNum = null, $batchId = null): array
+    public static function parallelBatch_(array $tasks, int $workerNum = null, $batchId = null): array
     {
         if (empty($tasks)) {
             return [];
@@ -94,6 +96,53 @@ class Parallel {
 
         echo "\nReturning results\n";
 
+        return $results;
+    }
+
+    /**
+     * @param array $tasks
+     * @return array
+     */
+    public static function parallelBatch(array $tasks, $batchId=null): array
+    {
+        if (empty($tasks)) {
+            return [];
+        }
+
+        // Determine the number of parallel processes
+        $workerNum = min(Utils::count_vcpus(), count($tasks));
+
+        $pool = Pool::create()->concurrency($workerNum);
+
+        echo "\n$batchId batch: Starting pool of $workerNum\n";
+
+        $results = [];
+        $errors = [];
+
+        foreach ($tasks as $index => $task) {
+            $pool->add(function () use ($task) {
+                // Execute the task and return the result
+                return $task();
+            })->then(function ($output) use (&$results, $index) {
+                // On success, store the result
+                $results[$index] = $output;
+            })->catch(function ($exception) use (&$errors, $index) {
+                // On failure, store the error
+                $errors[$index] = $exception->getMessage();
+            });
+        }
+
+        // Wait for all tasks to finish
+        $pool->wait();
+
+        echo "\n$batchId batch: Completed all pool tasks\n";
+
+        // Merge results and errors for unified output
+        foreach ($errors as $index => $error) {
+            $results[$index] = "Error: " . $error;
+        }
+
+        ksort($results); // Preserve task order
         return $results;
     }
 
