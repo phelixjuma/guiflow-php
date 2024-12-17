@@ -2,11 +2,9 @@
 
 namespace PhelixJuma\GUIFlow\Utils;
 
-//use OpenSwoole\Process\Pool;
-//use OpenSwoole\Table;
-//use OpenSwoole\Util;
-
-use Spatie\Async\Pool;
+use OpenSwoole\Process\Pool;
+use OpenSwoole\Table;
+use OpenSwoole\Util;
 
 class Parallel {
 
@@ -15,19 +13,19 @@ class Parallel {
      *
      * @param array $tasks
      * @param int|null $workerNum
-     * @param string|null $batchId
      * @return array
      */
-    public static function parallelBatch_(array $tasks, int $workerNum = null, $batchId = null): array
+    public static function parallelBatch(array $tasks, int $workerNum = null): array
     {
         if (empty($tasks)) {
             return [];
         }
 
-        // Dynamically determine the number of workers
-        $workerNum = min($workerNum ?: Util::getCPUNum(), count($tasks));
+        $batchId = Randomiser::getRandomString(5);
 
-        echo "\n$batchId Number of workers: $workerNum\n";
+        // Limit worker count to the number of tasks
+        $workerNum = min($workerNum ?: Util::getCPUNum(), count($tasks));
+        echo "\nNumber of workers in batch $batchId: $workerNum\n";
 
         // Shared memory table for inter-process communication
         $table = new Table(count($tasks));
@@ -39,49 +37,50 @@ class Parallel {
         foreach ($tasks as $index => $task) {
             $taskQueue->enqueue(['index' => $index, 'task' => $task]);
         }
-        $taskQueue->setIteratorMode(\SplQueue::IT_MODE_DELETE);
 
         // Process pool
         $pool = new Pool($workerNum);
 
-        $pool->on("WorkerStart", function (Pool $pool, int $workerId) use ($taskQueue, $table, $batchId) {
-            echo "\n$batchId Worker#{$workerId} is started\n";
+        $pool->on("WorkerStart", function ($pool, int $workerId) use ($taskQueue, $table, $batchId) {
 
+            echo "\nBatch $batchId Worker#{$workerId} started\n";
+
+            // Process tasks from the queue
             while (true) {
-                // Fetch a task from the queue
+
                 $currentTask = null;
 
-                // Synchronize access to the queue to avoid race conditions
+                // Synchronize task fetching
                 if (!$taskQueue->isEmpty()) {
                     $currentTask = $taskQueue->dequeue();
                 } else {
-                    break; // Exit if no tasks remain
+                    echo "\nCompleted. All tasks have been removed from the queue\n";
+                    break; // No more tasks
                 }
 
                 $taskIndex = $currentTask['index'];
                 $task = $currentTask['task'];
 
                 try {
-                    echo "\n$batchId Worker#{$workerId} executing task $taskIndex\n";
-                    $result = $task();
+                    //echo "\nWorker#{$workerId} executing task $taskIndex\n";
+                    $result = $task(); // Execute the task
                     $table->set("task_$taskIndex", ['data' => json_encode($result)]);
-                    echo "\n$batchId Worker#{$workerId} completed task $taskIndex\n";
+                    echo "\nBatch $batchId Worker#{$workerId} completed task $taskIndex\n";
                 } catch (\Throwable $e) {
                     $table->set("task_$taskIndex", ['data' => "Error: " . $e->getMessage()]);
-                    echo "\n$batchId Worker#{$workerId} error on task $taskIndex: {$e->getMessage()}\n";
+                    echo "\nBatch $batchId Worker#{$workerId} error on task $taskIndex: {$e->getMessage()}\n";
                 }
             }
 
-            echo "\n$batchId Worker#{$workerId} exiting\n";
-
-            // Explicitly terminate the worker process
-            exit(0);
+            echo "\nBatch $batchId Worker#{$workerId} exiting\n";
+            exit(0); // Explicitly signal worker exit
         });
 
-        $pool->on("WorkerStop", function (Pool $pool, int $workerId) use($batchId) {
-            echo "\n$batchId Worker#{$workerId} is stopped\n";
+        $pool->on("WorkerStop", function ($pool, int $workerId) use($batchId) {
+            echo "\nBatch $batchId Worker#{$workerId} stopped\n";
         });
 
+        // Start the pool
         $pool->start();
 
         // Collect results
@@ -95,55 +94,6 @@ class Parallel {
         }
 
         echo "\nReturning results\n";
-
         return $results;
     }
-
-    /**
-     * @param array $tasks
-     * @return array
-     */
-    public static function parallelBatch(array $tasks, $batchId=null): array
-    {
-        if (empty($tasks)) {
-            return [];
-        }
-
-        // Determine the number of parallel processes
-        $workerNum = min(Utils::count_vcpus(), count($tasks));
-
-        $pool = Pool::create()->concurrency($workerNum);
-
-        echo "\n$batchId batch: Starting pool of $workerNum\n";
-
-        $results = [];
-        $errors = [];
-
-        foreach ($tasks as $index => $task) {
-            $pool->add(function () use ($task) {
-                // Execute the task and return the result
-                return $task();
-            })->then(function ($output) use (&$results, $index) {
-                // On success, store the result
-                $results[$index] = $output;
-            })->catch(function ($exception) use (&$errors, $index) {
-                // On failure, store the error
-                $errors[$index] = $exception->getMessage();
-            });
-        }
-
-        // Wait for all tasks to finish
-        $pool->wait();
-
-        echo "\n$batchId batch: Completed all pool tasks\n";
-
-        // Merge results and errors for unified output
-        foreach ($errors as $index => $error) {
-            $results[$index] = "Error: " . $error;
-        }
-
-        ksort($results); // Preserve task order
-        return $results;
-    }
-
 }
