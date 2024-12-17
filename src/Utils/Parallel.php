@@ -21,81 +21,76 @@ class Parallel {
             return [];
         }
 
-        // Dynamically determine worker count based on CPU cores
-        $workerNum = $workerNum ?: Util::getCPUNum();
+        // Dynamically determine the number of workers
+        $workerNum = min($workerNum ?: Util::getCPUNum(), count($tasks));
 
-        print "\nnumber of workers: $workerNum\n";
-
-        // Split tasks evenly among workers
-        $taskChunks = array_chunk($tasks, ceil(count($tasks) / $workerNum));
-
-        print_r($taskChunks);
+        print "\nNumber of workers: $workerNum\n";
 
         // Shared memory table for inter-process communication
-        $table = new Table(4096); // Increase rows if needed
-        $table->column('data', Table::TYPE_STRING, 65536); // Larger string size for results
+        $table = new Table(count($tasks));
+        $table->column('data', Table::TYPE_STRING, 65536);
         $table->create();
+
+        // Shared task queue
+        $taskQueue = new \SplQueue();
+        foreach ($tasks as $index => $task) {
+            $taskQueue->enqueue(['index' => $index, 'task' => $task]);
+        }
+        $taskQueue->setIteratorMode(\SplQueue::IT_MODE_DELETE);
 
         // Process pool
         $pool = new Pool($workerNum);
 
-        // Worker logic
-        $pool->on("WorkerStart", function (Pool $pool, int $workerId) use ($taskChunks, $table) {
+        $pool->on("WorkerStart", function (Pool $pool, int $workerId) use ($taskQueue, $table) {
+            echo "\nWorker#{$workerId} is started\n";
 
-            if (!isset($taskChunks[$workerId])) {
-                return;
-            }
+            while (true) {
+                // Fetch a task from the queue
+                $currentTask = null;
 
-            foreach ($taskChunks[$workerId] as $taskIndex => $task) {
-                print "\nStarting to execute task $taskIndex in worker $workerId\n";
-                try {
-
-                    $result = $task();
-
-                    print "\nStarting to save Task $taskIndex to table\n";
-
-                    // Store result per task using unique keys
-                    $table->set("{$workerId}_{$taskIndex}", ['data' => json_encode($result)]);
-
-                    print "\nTask $taskIndex saved to table\n";
-
-                } catch (\Throwable $e) {
-
-                    print "\nError on Task $taskIndex: {$e->getMessage()}\n";
-
-                    // Store error message
-                    $table->set("{$workerId}_{$taskIndex}", ['data' => "Error: " . $e->getMessage()]);
+                // Synchronize access to the queue to avoid race conditions
+                if (!$taskQueue->isEmpty()) {
+                    $currentTask = $taskQueue->dequeue();
+                } else {
+                    break; // Exit if no tasks remain
                 }
-                print "\nCompleted task $taskIndex in worker $workerId\n";
+
+                $taskIndex = $currentTask['index'];
+                $task = $currentTask['task'];
+
+                try {
+                    echo "\nWorker#{$workerId} executing task $taskIndex\n";
+                    $result = $task();
+                    $table->set("task_$taskIndex", ['data' => json_encode($result)]);
+                    echo "\nWorker#{$workerId} completed task $taskIndex\n";
+                } catch (\Throwable $e) {
+                    $table->set("task_$taskIndex", ['data' => "Error: " . $e->getMessage()]);
+                    echo "\nWorker#{$workerId} error on task $taskIndex: {$e->getMessage()}\n";
+                }
             }
+
+            echo "\nWorker#{$workerId} exiting\n";
         });
 
-        // Graceful signal handling
-        \OpenSwoole\Process::signal(SIGTERM, function () use ($pool) {
-            print "\nShutting down due to SIGTERM\n";
-            $pool->shutdown();
+        $pool->on("WorkerStop", function (Pool $pool, int $workerId) {
+            echo "\nWorker#{$workerId} is stopped\n";
         });
 
         $pool->start();
 
         // Collect results
-        print "\nCollecting results\n";
+        echo "\nCollecting results\n";
         $results = [];
-        foreach (range(0, $workerNum - 1) as $workerId) {
-            foreach ($taskChunks[$workerId] as $taskIndex => $task) {
-                $data = $table->get("{$workerId}_{$taskIndex}");
-                if ($data) {
-                    $results[] = json_decode($data['data'], true);
-                }
+        foreach ($tasks as $index => $task) {
+            $data = $table->get("task_$index");
+            if ($data) {
+                $results[$index] = json_decode($data['data'], true);
             }
         }
 
-        ksort($results); // Preserve original task order
-
-        print "\nReturning results\n";
+        echo "\nReturning results\n";
 
         return $results;
     }
-
 
 }
