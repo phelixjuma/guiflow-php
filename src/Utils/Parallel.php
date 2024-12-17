@@ -21,10 +21,12 @@ class Parallel {
             return [];
         }
 
+        $batchId = Randomiser::getRandomString(6);
+
         // Dynamically determine the number of workers
         $workerNum = min($workerNum ?: Util::getCPUNum(), count($tasks));
 
-        print "\nNumber of workers: $workerNum\n";
+        echo "\n$batchId Number of workers: $workerNum\n";
 
         // Shared memory table for inter-process communication
         $table = new Table(count($tasks));
@@ -41,8 +43,8 @@ class Parallel {
         // Process pool
         $pool = new Pool($workerNum);
 
-        $pool->on("WorkerStart", function (Pool $pool, int $workerId) use ($taskQueue, $table) {
-            echo "\nWorker#{$workerId} is started\n";
+        $pool->on("WorkerStart", function (Pool $pool, int $workerId) use ($taskQueue, $table, $batchId) {
+            echo "\n$batchId Worker#{$workerId} is started\n";
 
             while (true) {
                 // Fetch a task from the queue
@@ -59,21 +61,24 @@ class Parallel {
                 $task = $currentTask['task'];
 
                 try {
-                    echo "\nWorker#{$workerId} executing task $taskIndex\n";
+                    echo "\n$batchId Worker#{$workerId} executing task $taskIndex\n";
                     $result = $task();
                     $table->set("task_$taskIndex", ['data' => json_encode($result)]);
-                    echo "\nWorker#{$workerId} completed task $taskIndex\n";
+                    echo "\n$batchId Worker#{$workerId} completed task $taskIndex\n";
                 } catch (\Throwable $e) {
                     $table->set("task_$taskIndex", ['data' => "Error: " . $e->getMessage()]);
-                    echo "\nWorker#{$workerId} error on task $taskIndex: {$e->getMessage()}\n";
+                    echo "\n$batchId Worker#{$workerId} error on task $taskIndex: {$e->getMessage()}\n";
                 }
             }
 
-            echo "\nWorker#{$workerId} exiting\n";
+            echo "\n$batchId Worker#{$workerId} exiting\n";
+
+            // Explicitly terminate the worker process
+            exit(0);
         });
 
-        $pool->on("WorkerStop", function (Pool $pool, int $workerId) {
-            echo "\nWorker#{$workerId} is stopped\n";
+        $pool->on("WorkerStop", function (Pool $pool, int $workerId) use($batchId) {
+            echo "\n$batchId Worker#{$workerId} is stopped\n";
         });
 
         $pool->start();
