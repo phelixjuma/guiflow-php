@@ -31,11 +31,9 @@ class Parallel {
 
         print_r($taskChunks);
 
-        $results = [];
-
         // Shared memory table for inter-process communication
-        $table = new Table(1024);
-        $table->column('data', Table::TYPE_STRING, 8192);
+        $table = new Table(4096); // Increase rows if needed
+        $table->column('data', Table::TYPE_STRING, 65536); // Larger string size for results
         $table->create();
 
         // Process pool
@@ -43,23 +41,24 @@ class Parallel {
 
         // Worker logic
         $pool->on("WorkerStart", function (Pool $pool, int $workerId) use ($taskChunks, $table) {
+
             if (!isset($taskChunks[$workerId])) {
                 return;
             }
 
-            $workerResults = [];
             foreach ($taskChunks[$workerId] as $taskIndex => $task) {
-                print "\nStarting to execute task $workerId\n";
+                print "\nStarting to execute task $taskIndex in worker $workerId\n";
                 try {
-                    $workerResults[$taskIndex] = $task();
-                } catch (\Throwable $e) {
-                    $workerResults[$taskIndex] = "Error: " . $e->getMessage();
-                }
-                print "\ncompleted task $workerId: ".json_encode($workerResults)."\n";
-            }
+                    $result = $task();
 
-            // Safely store results in shared table
-            $table->set((string)$workerId, ['data' => json_encode($workerResults)]);
+                    // Store result per task using unique keys
+                    $table->set("{$workerId}_{$taskIndex}", ['data' => json_encode($result)]);
+                } catch (\Throwable $e) {
+                    // Store error message
+                    $table->set("{$workerId}_{$taskIndex}", ['data' => "Error: " . $e->getMessage()]);
+                }
+                print "\nCompleted task $taskIndex in worker $workerId\n";
+            }
         });
 
         // Graceful signal handling
@@ -72,10 +71,13 @@ class Parallel {
 
         // Collect results
         print "\nCollecting results\n";
+        $results = [];
         foreach (range(0, $workerNum - 1) as $workerId) {
-            $data = $table->get((string)$workerId);
-            if ($data) {
-                $results = array_merge($results, json_decode($data['data'], true));
+            foreach ($taskChunks[$workerId] as $taskIndex => $task) {
+                $data = $table->get("{$workerId}_{$taskIndex}");
+                if ($data) {
+                    $results[] = json_decode($data['data'], true);
+                }
             }
         }
 
