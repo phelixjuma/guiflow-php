@@ -21,9 +21,6 @@ use PhelixJuma\GUIFlow\Utils\Parallel;
 use PhelixJuma\GUIFlow\Utils\PathResolver;
 use PhelixJuma\GUIFlow\Utils\Utils;
 
-use OpenSwoole\Coroutine as Co;
-use function OpenSwoole\Core\Coroutine\batch;
-
 class Workflow
 {
     private array $config;
@@ -106,7 +103,8 @@ class Workflow
                         }
                         // We fetch the results from all the tasks
                         //$results = batch($tasks);
-                        $results = Parallel::parallelBatch($tasks);
+
+                        $results = Parallel::parallelBatch($tasks, null, "Rules_".$rule['name']);
 
                         // Flatten the results and merge them into $tempData
                         foreach ($results as $result) {
@@ -235,7 +233,7 @@ class Workflow
                             }
 
                             // We fetch the results from all the tasks
-                            $results = batch($tasks);
+                            $results = Parallel::parallelBatch($tasks, null, "Actions_".$action['name']);
 
                             // Flatten the results and merge them into $tempData
                             foreach ($results as $result) {
