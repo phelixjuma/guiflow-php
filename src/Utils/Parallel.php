@@ -24,8 +24,13 @@ class Parallel {
         // Dynamically determine worker count based on CPU cores
         $workerNum = $workerNum ?: Util::getCPUNum();
 
+        print "\nnumber of workers: $workerNum\n";
+
         // Split tasks evenly among workers
         $taskChunks = array_chunk($tasks, ceil(count($tasks) / $workerNum));
+
+        print_r($taskChunks);
+
         $results = [];
 
         // Shared memory table for inter-process communication
@@ -44,11 +49,13 @@ class Parallel {
 
             $workerResults = [];
             foreach ($taskChunks[$workerId] as $taskIndex => $task) {
+                print "\nStarting to execute task $workerId\n";
                 try {
                     $workerResults[$taskIndex] = $task();
                 } catch (\Throwable $e) {
                     $workerResults[$taskIndex] = "Error: " . $e->getMessage();
                 }
+                print "\ncompleted task $workerId: ".json_encode($workerResults)."\n";
             }
 
             // Safely store results in shared table
@@ -57,12 +64,14 @@ class Parallel {
 
         // Graceful signal handling
         \OpenSwoole\Process::signal(SIGTERM, function () use ($pool) {
+            print "\nShutting down due to SIGTERM\n";
             $pool->shutdown();
         });
 
         $pool->start();
 
         // Collect results
+        print "\nCollecting results\n";
         foreach (range(0, $workerNum - 1) as $workerId) {
             $data = $table->get((string)$workerId);
             if ($data) {
@@ -71,6 +80,9 @@ class Parallel {
         }
 
         ksort($results); // Preserve original task order
+
+        print "\nReturning results\n";
+
         return $results;
     }
 
