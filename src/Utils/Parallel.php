@@ -6,7 +6,7 @@ use OpenSwoole\Process\Pool;
 use OpenSwoole\Table;
 use OpenSwoole\Util;
 use OpenSwoole\Atomic;
-use OpenSwoole\Channel;
+use OpenSwoole\Coroutine\Channel;
 
 class Parallel {
 
