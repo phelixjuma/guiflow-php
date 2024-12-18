@@ -62,8 +62,12 @@ class Parallel {
                 $task = $currentTask['task'];
 
                 try {
-                    //echo "\nWorker#{$workerId} executing task $taskIndex\n";
-                    $result = $task(); // Execute the task
+                    echo "\nWorker#{$workerId} executing task $taskIndex\n";
+
+                    #$result = $task(); // Execute the task
+
+                    $result = [$taskIndex];
+
                     $table->set("task_$taskIndex", ['data' => json_encode($result)]);
                     echo "\nBatch $batchId Worker#{$workerId} completed task $taskIndex\n";
                 } catch (\Throwable $e) {
