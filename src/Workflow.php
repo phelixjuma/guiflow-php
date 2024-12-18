@@ -215,7 +215,9 @@ class Workflow
                     if ($skipAction != 1) {
 
                         if (Utils::isObject($data)) {
+                            echo "\nRule_{$rule['stage']} Action_{$action['stage']} starting to execute action\n";
                             $this->executeAction($data, $action);
+                            echo "\nRule_{$rule['stage']} Action_{$action['stage']} completed to execute actions in parallel\n";
                         } else {
 
 
@@ -236,12 +238,8 @@ class Workflow
                                 };
                             }
 
-                            echo "\nRule_{$rule['stage']} Action_{$action['stage']} starting to execute action\n";
-
                             // We fetch the results from all the tasks
                             $results = Parallel::parallelBatch($tasks, null, "Action_".$action['stage']);
-
-                            echo "\nRule_{$rule['stage']} Action_{$action['stage']} completed to execute actions in parallel\n";
 
                             // Flatten the results and merge them into $tempData
                             foreach ($results as $result) {
@@ -255,6 +253,8 @@ class Workflow
                             // Set the temp data to input data
                             $data = $temp;
                         }
+                    } else {
+                        echo "\nRule_{$rule['stage']} Action_{$action['stage']} Action Skipped\n";
                     }
 
                 } catch (\Exception|\Throwable $e ) {
