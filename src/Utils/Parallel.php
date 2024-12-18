@@ -113,7 +113,7 @@ class Parallel {
                         ]);
 
                         $completedTasks->add(1);
-                        echo "[Batch-{$batchId}] Worker-{$i} completed task {$currentTaskIndex} successfully. " .
+                        echo "[Batch-{$batchId}] Worker-{$i} completed task {$currentTaskIndex} successfully with result as: ".json_encode($result).". " .
                             "Completed tasks: {$completedTasks->get()}/{$totalTasks}\n";
                     } catch (\Throwable $e) {
                         $resultTable->set((string)$currentTaskIndex, [
@@ -157,7 +157,7 @@ class Parallel {
             }
         }
 
-        echo "[Batch-{$batchId}] Batch processing completed\n";
+        echo "[Batch-{$batchId}] Batch processing completed with response as: ".json_encode($finalResults)." \n";
         return $finalResults;
     }
 
