@@ -217,7 +217,7 @@ class Workflow
                         if (Utils::isObject($data)) {
                             echo "\nRule_{$rule['stage']} Action_{$action['stage']} starting to execute action\n";
                             $this->executeAction($data, $action);
-                            echo "\nRule_{$rule['stage']} Action_{$action['stage']} completed to execute actions in parallel\n";
+                            echo "\nRule_{$rule['stage']} Action_{$action['stage']} completed to execute actions in parallel with data as: ".json_encode($data)."\n";
                         } else {
 
 
