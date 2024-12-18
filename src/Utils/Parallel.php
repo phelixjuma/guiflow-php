@@ -25,6 +25,7 @@ class Parallel {
 
         $batchId = $batchId ?: Randomiser::getRandomString(5);
         $workerNum = min($workerNum ?: Util::getCPUNum(), count($tasks));
+        $workerNum = 1;
         $totalTasks = count($tasks);
 
         echo "\n[Batch-{$batchId}] Starting batch processing with {$totalTasks} tasks using {$workerNum} workers\n";
