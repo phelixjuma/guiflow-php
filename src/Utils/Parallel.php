@@ -32,16 +32,22 @@ class Parallel {
         $completedTasks = new Atomic(0);
         $activeWorkers = new Atomic($workerNum);
 
+        // Create atomic locks for tasks
+        $taskLocks = [];
+        for ($i = 0; $i < count($tasks); $i++) {
+            $taskLocks[$i] = new Atomic(0); // 0 = unclaimed, 1 = claimed
+        }
+
         // Shared memory for task management
         $taskTable = new Table(count($tasks));
         $taskTable->column('index', Table::TYPE_INT, 4);
-        $taskTable->column('status', Table::TYPE_INT, 1);
-        $taskTable->column('has_error', Table::TYPE_INT, 1);
+        $taskTable->column('status', Table::TYPE_INT, 1);    // 0=pending, 1=processing, 2=completed
+        $taskTable->column('has_error', Table::TYPE_INT, 1); // 0=no error, 1=has error
         $taskTable->create();
 
         // Results table
         $resultTable = new Table(count($tasks));
-        $resultTable->column('data', Table::TYPE_STRING, 65536);
+        $resultTable->column('data', Table::TYPE_STRING, 65536); // Adjust size if needed
         $resultTable->create();
 
         echo "[Batch-{$batchId}] Initializing {$totalTasks} tasks in shared memory\n";
@@ -57,7 +63,7 @@ class Parallel {
         $pool = new Pool($workerNum);
 
         $pool->on("WorkerStart", function (Pool $pool, int $workerId)
-        use ($taskTable, $resultTable, $batchId, $completedTasks, $activeWorkers, $totalTasks, $tasks) {
+        use ($taskTable, $resultTable, $batchId, $completedTasks, $activeWorkers, $totalTasks, $tasks, $taskLocks) {
 
             echo "[Batch-{$batchId}] Worker-{$workerId} started\n";
 
@@ -65,10 +71,18 @@ class Parallel {
                 // Find and claim an unclaimed task
                 $currentTaskIndex = null;
 
-                foreach ($taskTable as $key => $row) {
-                    if ($row['status'] === 0) {
-                        if ($taskTable->cas($key, 'status', 0, 1)) {
-                            $currentTaskIndex = $row['index'];
+                // Try to claim a task using atomic operations
+                foreach ($taskLocks as $index => $lock) {
+                    // Only try to claim tasks that aren't completed
+                    if ($taskTable->get((string)$index)['status'] !== 2) {
+                        // Attempt to claim task atomically
+                        if ($lock->cmpset(0, 1)) {
+                            $currentTaskIndex = $index;
+                            $taskTable->set((string)$index, [
+                                'index' => $index,
+                                'status' => 1, // Mark as processing
+                                'has_error' => 0
+                            ]);
                             break;
                         }
                     }
@@ -99,7 +113,8 @@ class Parallel {
                     ]);
 
                     $completedTasks->add(1);
-                    echo "[Batch-{$batchId}] Worker-{$workerId} completed task {$currentTaskIndex} successfully\n";
+                    echo "[Batch-{$batchId}] Worker-{$workerId} completed task {$currentTaskIndex} successfully. " .
+                        "Completed tasks: {$completedTasks->get()}/{$totalTasks}\n";
                 } catch (\Throwable $e) {
                     $resultTable->set((string)$currentTaskIndex, [
                         'data' => serialize(['error' => $e->getMessage()])
@@ -117,10 +132,11 @@ class Parallel {
             }
 
             $activeWorkers->sub(1);
-            echo "[Batch-{$batchId}] Worker-{$workerId} finished. Active workers: {$activeWorkers->get()}\n";
+            $remainingWorkers = $activeWorkers->get();
+            echo "[Batch-{$batchId}] Worker-{$workerId} finished. Remaining workers: {$remainingWorkers}\n";
 
             // Last worker initiates shutdown
-            if ($activeWorkers->get() === 0) {
+            if ($remainingWorkers === 0) {
                 echo "[Batch-{$batchId}] All workers completed. Initiating pool shutdown\n";
                 $pool->shutdown();
             }
@@ -137,10 +153,15 @@ class Parallel {
         $finalResults = [];
         foreach ($tasks as $index => $_) {
             $data = $resultTable->get((string)$index);
-            $finalResults[$index] = unserialize($data['data']);
+            if ($data) {
+                $finalResults[$index] = unserialize($data['data']);
+            } else {
+                $finalResults[$index] = ['error' => 'Task result not found'];
+            }
         }
 
         echo "[Batch-{$batchId}] Batch processing completed\n";
         return $finalResults;
     }
+
 }
