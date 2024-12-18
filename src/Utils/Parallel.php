@@ -158,11 +158,7 @@ class Parallel {
 
         echo "[Batch-{$batchId}] Starting process pool\n";
 
-        // Start the pool in a separate process
-        $process = new Process(function() use ($pool) {
-            $pool->start();
-        });
-        $process->start();
+        $pool->start();
 
         // Wait for shutdown signal
         $shutdownCompleted->pop();
