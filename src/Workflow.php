@@ -259,6 +259,8 @@ class Workflow
                     $this->errors[] = $error;
                 }
             }
+        } else {
+            echo "\n".$rule['stage'].": Condition failed: ".json_encode($condition)." on data ".json_encode($data)."\n";
         }
     }
 
