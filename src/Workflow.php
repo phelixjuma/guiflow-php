@@ -202,6 +202,9 @@ class Workflow
 
         // We execute this rule if it is not skipped and the conditions are true
         if ($skip != 1 && self::evaluateCondition($data, $condition)) {
+
+            echo "\n".$rule['stage'].": Condition success\n";
+
             // Execute the actions
             foreach ($actions as $action) {
                 try {
@@ -233,8 +236,12 @@ class Workflow
                                 };
                             }
 
+                            echo "\nRule_{$rule['stage']} Action_{$action['stage']} starting to execute action\n";
+
                             // We fetch the results from all the tasks
                             $results = Parallel::parallelBatch($tasks, null, "Action_".$action['stage']);
+
+                            echo "\nRule_{$rule['stage']} Action_{$action['stage']} completed to execute actions in parallel\n";
 
                             // Flatten the results and merge them into $tempData
                             foreach ($results as $result) {
