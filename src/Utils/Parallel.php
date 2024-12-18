@@ -160,7 +160,8 @@ class Parallel {
             }
         }
 
-        echo "[Batch-{$batchId}] Batch processing completed\n";
+        echo "[Batch-{$batchId}] Batch processing completed with results: ".json_encode($finalResults)."\n";
+
         return $finalResults;
     }
 
