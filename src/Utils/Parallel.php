@@ -29,9 +29,11 @@ class Parallel {
 
         echo "\n[Batch-{$batchId}] Starting batch processing with {$totalTasks} tasks using {$workerNum} workers\n";
 
-        // Create atomic counters
+        // Create atomic counters and control mechanisms
         $completedTasks = new Atomic(0);
         $activeWorkers = new Atomic($workerNum);
+        $isShuttingDown = new Atomic(0);
+        $shutdownCompleted = new Channel(1);
 
         // Create atomic locks for tasks
         $taskLocks = [];
@@ -64,7 +66,14 @@ class Parallel {
         $pool = new Pool($workerNum);
 
         $pool->on("WorkerStart", function (Pool $pool, int $workerId)
-        use ($taskTable, $resultTable, $batchId, $completedTasks, $activeWorkers, $totalTasks, $tasks, $taskLocks) {
+        use ($taskTable, $resultTable, $batchId, $completedTasks, $activeWorkers, $totalTasks,
+            $tasks, $taskLocks, $isShuttingDown, $shutdownCompleted) {
+
+            // Check if we're in shutdown mode
+            if ($isShuttingDown->get() === 1) {
+                echo "[Batch-{$batchId}] Worker-{$workerId} skipped (shutdown in progress)\n";
+                exit(0);
+            }
 
             echo "[Batch-{$batchId}] Worker-{$workerId} started\n";
 
@@ -101,7 +110,6 @@ class Parallel {
 
                 try {
                     $task = $tasks[$currentTaskIndex];
-
                     $result = $task();
 
                     $resultTable->set((string)$currentTaskIndex, [
@@ -133,13 +141,14 @@ class Parallel {
                 }
             }
 
-            $activeWorkers->sub(1);
-            $remainingWorkers = $activeWorkers->get();
-            echo "[Batch-{$batchId}] Worker-{$workerId} finished. Remaining workers: {$remainingWorkers}\n";
+            // Decrement active workers
+            $remainingWorkers = $activeWorkers->sub(1);
+            echo "[Batch-{$batchId}] Worker-{$workerId} finished. Remaining workers: " . max(0, $remainingWorkers) . "\n";
 
             // Last worker initiates shutdown
-            if ($remainingWorkers === 0) {
+            if ($remainingWorkers === 0 && $isShuttingDown->cmpset(0, 1)) {
                 echo "[Batch-{$batchId}] All workers completed. Initiating pool shutdown\n";
+                $shutdownCompleted->push(true);
                 $pool->shutdown();
             }
 
@@ -147,7 +156,16 @@ class Parallel {
         });
 
         echo "[Batch-{$batchId}] Starting process pool\n";
-        $pool->start();
+
+        // Start the pool in a separate process
+        $process = new Process(function() use ($pool) {
+            $pool->start();
+        });
+        $process->start();
+
+        // Wait for shutdown signal
+        $shutdownCompleted->pop();
+
         echo "[Batch-{$batchId}] Pool has completed execution\n";
 
         // Collect results
@@ -162,8 +180,7 @@ class Parallel {
             }
         }
 
-        echo "[Batch-{$batchId}] Batch processing completed with results: ".json_encode($finalResults)."\n";
-
+        echo "[Batch-{$batchId}] Batch processing completed\n";
         return $finalResults;
     }
 
