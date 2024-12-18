@@ -67,7 +67,14 @@ class Parallel {
         use ($taskTable, $resultTable, $batchId, $completedTasks, $activeWorkers, $totalTasks, $tasks, $taskLocks) {
 
             echo "[Batch-{$batchId}] Worker-{$workerId} started\n";
-            $didWork = false;  // Track if this worker did any work
+
+            // Check if all tasks are already completed before entering the loop
+            if ($completedTasks->get() >= $totalTasks) {
+                echo "[Batch-{$batchId}] Worker-{$workerId} skipped - all tasks already completed\n";
+                exit(0);
+            }
+
+            $didWork = false;
 
             while ($completedTasks->get() < $totalTasks) {
                 // Find and claim an unclaimed task
@@ -98,7 +105,7 @@ class Parallel {
                     continue;
                 }
 
-                $didWork = true;  // Worker has claimed a task
+                $didWork = true;
                 echo "[Batch-{$batchId}] Worker-{$workerId} starting task {$currentTaskIndex}\n";
 
                 try {
@@ -172,4 +179,5 @@ class Parallel {
 
         return $finalResults;
     }
+
 }
