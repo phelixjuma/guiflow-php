@@ -2,7 +2,7 @@
 
 namespace PhelixJuma\GUIFlow\Utils;
 
-use OpenSwoole\Process\Pool;
+use OpenSwoole\Process;
 use OpenSwoole\Table;
 use OpenSwoole\Util;
 use OpenSwoole\Atomic;
@@ -10,7 +10,7 @@ use OpenSwoole\Atomic;
 class Parallel {
 
     /**
-     * Parallel batch processing using OpenSwoole's Process Pool
+     * Parallel batch processing using OpenSwoole's Process
      *
      * @param array $tasks
      * @param int|null $workerNum
@@ -31,7 +31,6 @@ class Parallel {
 
         // Create atomic counters
         $completedTasks = new Atomic(0);
-        $activeWorkers = new Atomic($workerNum);
 
         // Create atomic locks for tasks
         $taskLocks = [];
@@ -60,108 +59,91 @@ class Parallel {
             ]);
         }
 
-        // Create pool
-        $pool = new Pool($workerNum);
+        // Create and start worker processes
+        $processes = [];
+        for ($i = 0; $i < $workerNum; $i++) {
+            $process = new Process(function(Process $worker)
+            use ($taskTable, $resultTable, $batchId, $completedTasks, $totalTasks, $tasks, $taskLocks, $i) {
 
-        $pool->on("WorkerStart", function (Pool $pool, int $workerId)
-        use ($taskTable, $resultTable, $batchId, $completedTasks, $activeWorkers, $totalTasks, $tasks, $taskLocks) {
+                echo "[Batch-{$batchId}] Worker-{$i} started\n";
 
-            echo "[Batch-{$batchId}] Worker-{$workerId} started\n";
+                while ($completedTasks->get() < $totalTasks) {
+                    // Find and claim an unclaimed task
+                    $currentTaskIndex = null;
 
-            // Check if all tasks are already completed before entering the loop
-            if ($completedTasks->get() >= $totalTasks) {
-                echo "[Batch-{$batchId}] Worker-{$workerId} skipped - all tasks already completed\n";
-                exit(0);
-            }
-
-            $didWork = false;
-
-            while ($completedTasks->get() < $totalTasks) {
-                // Find and claim an unclaimed task
-                $currentTaskIndex = null;
-
-                // Try to claim a task using atomic operations
-                foreach ($taskLocks as $index => $lock) {
-                    // Only try to claim tasks that aren't completed
-                    if ($taskTable->get((string)$index)['status'] !== 2) {
-                        // Attempt to claim task atomically
-                        if ($lock->cmpset(0, 1)) {
-                            $currentTaskIndex = $index;
-                            $taskTable->set((string)$index, [
-                                'index' => $index,
-                                'status' => 1, // Mark as processing
-                                'has_error' => 0
-                            ]);
-                            break;
+                    // Try to claim a task using atomic operations
+                    foreach ($taskLocks as $index => $lock) {
+                        // Only try to claim tasks that aren't completed
+                        if ($taskTable->get((string)$index)['status'] !== 2) {
+                            // Attempt to claim task atomically
+                            if ($lock->cmpset(0, 1)) {
+                                $currentTaskIndex = $index;
+                                $taskTable->set((string)$index, [
+                                    'index' => $index,
+                                    'status' => 1, // Mark as processing
+                                    'has_error' => 0
+                                ]);
+                                break;
+                            }
                         }
                     }
-                }
 
-                if ($currentTaskIndex === null) {
-                    if ($completedTasks->get() >= $totalTasks) {
-                        break;
+                    if ($currentTaskIndex === null) {
+                        if ($completedTasks->get() >= $totalTasks) {
+                            break;
+                        }
+                        usleep(1000);
+                        continue;
                     }
-                    usleep(1000);
-                    continue;
+
+                    echo "[Batch-{$batchId}] Worker-{$i} starting task {$currentTaskIndex}\n";
+
+                    try {
+                        $task = $tasks[$currentTaskIndex];
+                        $result = $task();
+
+                        $resultTable->set((string)$currentTaskIndex, [
+                            'data' => serialize($result)
+                        ]);
+
+                        $taskTable->set((string)$currentTaskIndex, [
+                            'index' => $currentTaskIndex,
+                            'status' => 2,
+                            'has_error' => 0
+                        ]);
+
+                        $completedTasks->add(1);
+                        echo "[Batch-{$batchId}] Worker-{$i} completed task {$currentTaskIndex} successfully. " .
+                            "Completed tasks: {$completedTasks->get()}/{$totalTasks}\n";
+                    } catch (\Throwable $e) {
+                        $resultTable->set((string)$currentTaskIndex, [
+                            'data' => serialize(['error' => $e->getMessage()])
+                        ]);
+
+                        $taskTable->set((string)$currentTaskIndex, [
+                            'index' => $currentTaskIndex,
+                            'status' => 2,
+                            'has_error' => 1
+                        ]);
+
+                        $completedTasks->add(1);
+                        echo "[Batch-{$batchId}] Worker-{$i} failed task {$currentTaskIndex}: {$e->getMessage()}\n";
+                    }
                 }
 
-                $didWork = true;
-                echo "[Batch-{$batchId}] Worker-{$workerId} starting task {$currentTaskIndex}\n";
+                echo "[Batch-{$batchId}] Worker-{$i} finished\n";
+            });
 
-                try {
-                    $task = $tasks[$currentTaskIndex];
-                    $result = $task();
+            $process->start();
+            $processes[] = $process;
+        }
 
-                    $resultTable->set((string)$currentTaskIndex, [
-                        'data' => serialize($result)
-                    ]);
+        // Wait for all processes to complete
+        foreach ($processes as $process) {
+            $process->wait();
+        }
 
-                    $taskTable->set((string)$currentTaskIndex, [
-                        'index' => $currentTaskIndex,
-                        'status' => 2,
-                        'has_error' => 0
-                    ]);
-
-                    $completedTasks->add(1);
-                    echo "[Batch-{$batchId}] Worker-{$workerId} completed task {$currentTaskIndex} successfully. " .
-                        "Completed tasks: {$completedTasks->get()}/{$totalTasks}\n";
-                } catch (\Throwable $e) {
-                    $resultTable->set((string)$currentTaskIndex, [
-                        'data' => serialize(['error' => $e->getMessage()])
-                    ]);
-
-                    $taskTable->set((string)$currentTaskIndex, [
-                        'index' => $currentTaskIndex,
-                        'status' => 2,
-                        'has_error' => 1
-                    ]);
-
-                    $completedTasks->add(1);
-                    echo "[Batch-{$batchId}] Worker-{$workerId} failed task {$currentTaskIndex}: {$e->getMessage()}\n";
-                }
-            }
-
-            // Only decrement if this worker actually did work
-            if ($didWork) {
-                $activeWorkers->sub(1);
-                $remainingWorkers = $activeWorkers->get();
-                echo "[Batch-{$batchId}] Worker-{$workerId} finished. Remaining workers: {$remainingWorkers}\n";
-
-                // Last worker initiates shutdown
-                if ($remainingWorkers === 0) {
-                    echo "[Batch-{$batchId}] All workers completed. Initiating pool shutdown\n";
-                    $pool->shutdown();
-                }
-            } else {
-                echo "[Batch-{$batchId}] Worker-{$workerId} finished without processing any tasks\n";
-            }
-
-            exit(0);
-        });
-
-        echo "[Batch-{$batchId}] Starting process pool\n";
-        $pool->start();
-        echo "[Batch-{$batchId}] Pool has completed execution\n";
+        echo "[Batch-{$batchId}] All workers have completed\n";
 
         // Collect results
         echo "[Batch-{$batchId}] Collecting results\n";
@@ -175,8 +157,7 @@ class Parallel {
             }
         }
 
-        echo "[Batch-{$batchId}] Batch processing completed with results: ".json_encode($finalResults)."\n";
-
+        echo "[Batch-{$batchId}] Batch processing completed\n";
         return $finalResults;
     }
 
