@@ -14,15 +14,16 @@ class Parallel {
      *
      * @param array $tasks
      * @param int|null $workerNum
+     * @param string|null $batchId
      * @return array
      */
-    public static function parallelBatch(array $tasks, int $workerNum = null): array
+    public static function parallelBatch(array $tasks, int $workerNum = null, $batchId = null): array
     {
         if (empty($tasks)) {
             return [];
         }
 
-        $batchId = Randomiser::getRandomString(5);
+        $batchId = $batchId ?: Randomiser::getRandomString(5);
         $workerNum = min($workerNum ?: Util::getCPUNum(), count($tasks));
         $totalTasks = count($tasks);
 
@@ -100,6 +101,7 @@ class Parallel {
 
                 try {
                     $task = $tasks[$currentTaskIndex];
+
                     $result = $task();
 
                     $resultTable->set((string)$currentTaskIndex, [
