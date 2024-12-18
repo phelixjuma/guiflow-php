@@ -67,6 +67,7 @@ class Parallel {
         use ($taskTable, $resultTable, $batchId, $completedTasks, $activeWorkers, $totalTasks, $tasks, $taskLocks) {
 
             echo "[Batch-{$batchId}] Worker-{$workerId} started\n";
+            $didWork = false;  // Track if this worker did any work
 
             while ($completedTasks->get() < $totalTasks) {
                 // Find and claim an unclaimed task
@@ -97,11 +98,11 @@ class Parallel {
                     continue;
                 }
 
+                $didWork = true;  // Worker has claimed a task
                 echo "[Batch-{$batchId}] Worker-{$workerId} starting task {$currentTaskIndex}\n";
 
                 try {
                     $task = $tasks[$currentTaskIndex];
-
                     $result = $task();
 
                     $resultTable->set((string)$currentTaskIndex, [
@@ -133,17 +134,22 @@ class Parallel {
                 }
             }
 
-            $activeWorkers->sub(1);
-            $remainingWorkers = $activeWorkers->get();
-            echo "[Batch-{$batchId}] Worker-{$workerId} finished. Remaining workers: {$remainingWorkers}\n";
+            // Only decrement if this worker actually did work
+            if ($didWork) {
+                $activeWorkers->sub(1);
+                $remainingWorkers = $activeWorkers->get();
+                echo "[Batch-{$batchId}] Worker-{$workerId} finished. Remaining workers: {$remainingWorkers}\n";
 
-            // Last worker initiates shutdown
-            if ($remainingWorkers === 0) {
-                echo "[Batch-{$batchId}] All workers completed. Initiating pool shutdown\n";
-                $pool->shutdown();
+                // Last worker initiates shutdown
+                if ($remainingWorkers === 0) {
+                    echo "[Batch-{$batchId}] All workers completed. Initiating pool shutdown\n";
+                    $pool->shutdown();
+                }
+            } else {
+                echo "[Batch-{$batchId}] Worker-{$workerId} finished without processing any tasks\n";
             }
 
-            //exit(0);
+            exit(0);
         });
 
         echo "[Batch-{$batchId}] Starting process pool\n";
@@ -166,5 +172,4 @@ class Parallel {
 
         return $finalResults;
     }
-
 }
