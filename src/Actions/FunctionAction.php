@@ -379,6 +379,8 @@ class FunctionAction implements ActionInterface
                 $newValue = call_user_func_array($this->function, $paramValues);
             }
 
+            print "\nCompleted function {$this->function[1]} with result as ".json_encode($newValue)."\n";
+
             // If strict is set, we only set data when new value is not empty
             if (!$this->strict || (!empty($newValue))) {
 

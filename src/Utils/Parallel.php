@@ -99,7 +99,10 @@ class Parallel {
                     echo "[Batch-{$batchId}] Worker-{$i} starting task {$currentTaskIndex}\n";
 
                     try {
+
                         $task = $tasks[$currentTaskIndex];
+
+                        # Execute the task
                         $result = $task();
 
                         $resultTable->set((string)$currentTaskIndex, [
