@@ -39,7 +39,15 @@ class Parallel {
             $runtime->run(function (Channel $channel, int $workerId) {
                 echo "[Batch] Worker-{$workerId} started\n";
 
-                while (($task = $channel->recv()) !== null) {
+                while (true) {
+                    $task = $channel->recv();
+
+                    // Check if the task is null (stop signal)
+                    if ($task === null) {
+                        break;
+                    }
+
+                    // Process the task
                     $taskIndex = $task['index'];
                     $taskFunction = $task['function'];
                     try {
