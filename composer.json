@@ -8,16 +8,14 @@
     "ext-json": "*",
     "ext-ctype": "*",
     "ext-openssl": "*",
+    "ext-pcntl": "*",
     "wyndow/fuzzywuzzy": "^0.6.0",
     "erdalceylan/array-join": "^2.1",
-    "openswoole/core": "22.1.5",
-    "jumaphelix/php-dag": "^2.0",
+    "jumaphelix/php-dag": "^3.0",
     "opis/json-schema": "^2.3",
     "graphp/graph": "^0.9.3",
     "graphp/algorithms": "^0.8.2",
-    "graphp/graphviz": "^0.2.2",
-    "ext-pcntl": "*",
-    "spatie/async": "^1.6"
+    "graphp/graphviz": "^0.2.2"
   },
   "scripts": {
     "test": "vendor/bin/phpunit",
