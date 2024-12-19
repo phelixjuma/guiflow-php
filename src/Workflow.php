@@ -104,7 +104,7 @@ class Workflow
                         // We fetch the results from all the tasks
                         //$results = batch($tasks);
 
-                        $results = Parallel::parallelBatch($tasks, null, "Rule_".$rule['stage']);
+                        $results = Parallel::parallelBatch($tasks, "Rule_".$rule['stage']);
                         //print_r($results);
 
                         // Flatten the results and merge them into $tempData
@@ -239,7 +239,7 @@ class Workflow
                             }
 
                             // We fetch the results from all the tasks
-                            $results = Parallel::parallelBatch($tasks, null, "Action_".$action['stage']);
+                            $results = Parallel::parallelBatch($tasks, "Action_".$action['stage']);
 
                             // Flatten the results and merge them into $tempData
                             foreach ($results as $result) {
