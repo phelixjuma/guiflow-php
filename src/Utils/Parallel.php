@@ -8,7 +8,7 @@ use parallel\Channel;
 class Parallel {
 
     /**
-     * Parallel batch processing using OpenSwoole's Process
+     * Parallel batch processing
      *
      * @param array $tasks
      * @param int|null $workerNum

@@ -19,10 +19,6 @@ use PhelixJuma\GUIFlow\Utils\PathResolver;
 
 use PhelixJuma\GUIFlow\Workflow;
 
-use OpenSwoole\Coroutine as Co;
-use function OpenSwoole\Core\Coroutine\batch;
-use OpenSwoole\Core\Coroutine\WaitGroup;
-
 
 class FunctionAction implements ActionInterface
 {
