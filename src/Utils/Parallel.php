@@ -43,18 +43,23 @@ class Parallel {
                     $task = $channel->recv();
 
                     // Check if the task is null (stop signal)
-                    if ($task === null || empty($task['index'] || empty($task['function']))) {
+                    if ($task === null || !isset($task['index']) || !isset($task['function'])) {
                         break;
                     }
 
                     // Process the task
-                    $taskIndex = $task['index'];
-                    $taskFunction = $task['function'];
-                    try {
-                        $result = $taskFunction();
-                        $channel->send(['index' => $taskIndex, 'result' => $result, 'error' => null]);
-                    } catch (\Throwable $e) {
-                        $channel->send(['index' => $taskIndex, 'result' => null, 'error' => $e->getMessage()]);
+                    if (!empty($task['index']) && !empty($task['function'])) {
+                        $taskIndex = $task['index'];
+                        $taskFunction = $task['function'];
+
+                        try {
+                            $result = $taskFunction();
+                            $channel->send(['index' => $taskIndex, 'result' => $result, 'error' => null]);
+                        } catch (\Throwable $e) {
+                            $channel->send(['index' => $taskIndex, 'result' => null, 'error' => $e->getMessage()]);
+                        }
+                    } else {
+                        break;
                     }
                 }
 
