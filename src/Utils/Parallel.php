@@ -3,9 +3,70 @@
 namespace PhelixJuma\GUIFlow\Utils;
 
 use parallel\Runtime;
-use parallel\Channel;
+use RuntimeException;
 
 class Parallel {
+
+    public static function parallelBatch(array $tasks, $batchId = null): array {
+
+        if (!extension_loaded('parallel')) {
+            throw new RuntimeException('The parallel extension is not available.');
+        }
+
+        $batchId = $batchId ?: Randomiser::getRandomString(5);
+
+        // Get the number of CPU cores
+        $numCores = shell_exec('nproc'); // or use PHP's `sys_getloadavg()` for a more portable solution
+        $numCores = (int)$numCores;
+
+        $totalTasks = count($tasks);
+        $results = [];
+        $futures = [];
+        $runtime = new Runtime();
+        $taskIndex = 0; // Track the next task to submit
+
+        echo "\n[Batch-{$batchId}] Starting batch processing with {$totalTasks} tasks using {$numCores} workers\n";
+
+        // Submit initial tasks up to the number of cores
+        for ($i = 0; $i < min($numCores, $totalTasks); $i++) {
+            echo "[Batch-{$batchId}] Worker-{$taskIndex} submitted\n";
+            $futures[$taskIndex] = $runtime->run($tasks[$taskIndex++]); // Submit the task and increment the index
+        }
+
+        // Process tasks as they complete
+        while ($taskIndex < $totalTasks || !empty($futures)) {
+            // Check for completed futures
+            foreach ($futures as $key => $future) {
+
+                if ($future->done()) { // Check if the future is done
+                    echo "[Batch-{$batchId}] Worker-{$key} completed\n";
+                    // Collect the result of the completed future
+                    try {
+                        $results[] = $future->value();
+                        echo "[Batch-{$batchId}] Worker-{$key} completed with response as ".json_encode($future->value())." \n";
+                    } catch (\Throwable $e) {
+                        // Handle exceptions from the task
+                        $results[] = 'Error: ' . $e->getMessage();
+                        echo "[Batch-{$batchId}] Worker-{$key} completed with error as {$e->getMessage()} \n";
+                    }
+
+                    // Submit the next task if available
+                    if ($taskIndex < $totalTasks) {
+                        echo "[Batch-{$batchId}] Worker-{$taskIndex} submitted\n";
+                        $futures[$key] = $runtime->run($tasks[$taskIndex++]); // Submit the next task
+                    } else {
+                        unset($futures[$key]); // Remove the future if no more tasks are available
+                    }
+                    break; // Exit the loop to avoid modifying the array while iterating
+                }
+            }
+        }
+
+        // clean
+        unset($runtime);
+
+        return $results;
+    }
 
     /**
      * Parallel batch processing
@@ -15,7 +76,7 @@ class Parallel {
      * @param string|null $batchId
      * @return array
      */
-    public static function parallelBatch(array $tasks, int $workerNum = null, $batchId = null): array
+    public static function parallelBatch_(array $tasks, int $workerNum = null, $batchId = null): array
     {
         if (empty($tasks)) {
             return [];
