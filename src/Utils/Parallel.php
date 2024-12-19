@@ -43,7 +43,7 @@ class Parallel {
                     $task = $channel->recv();
 
                     // Check if the task is null (stop signal)
-                    if ($task === null) {
+                    if ($task === null || empty($task['index'] || empty($task['function']))) {
                         break;
                     }
 
