@@ -215,6 +215,10 @@ class FunctionAction implements ActionInterface
                                     $currentValues[$index] = $dataCopy;
                                 } catch (\Exception|\Throwable $e) {
                                 }
+
+                                // small delay to yield to the event loop
+                                co::sleep(0.001);
+
                                 // Signal completion
                                 $wg->done();
 

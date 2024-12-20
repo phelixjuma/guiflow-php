@@ -96,6 +96,9 @@ class Workflow
 
                                     $this->executeRuleSerial($rule, $data);
 
+                                    // small delay to yield to the event loop
+                                    co::sleep(0.001);
+
                                     if (Utils::isObject($data)) {
                                         // An object. Set to temp data
                                         return [$data];
@@ -226,6 +229,9 @@ class Workflow
                                 $tasks[] = function () use ($datum, $action) {
 
                                     $this->executeAction($datum, $action);
+
+                                    // small delay to yield to the event loop
+                                    co::sleep(0.001);
 
                                     if (Utils::isObject($datum)) {
                                         return [$datum];
