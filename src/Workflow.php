@@ -74,7 +74,7 @@ class Workflow
     {
 
         // We execute within a coroutine environment to support parallelization
-        co::run(function() use(&$inputData) {
+        //co::run(function() use(&$inputData) {
             try {
 
                 $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
@@ -89,26 +89,27 @@ class Workflow
 
                             $tempData = [];
 
-                            $tasks = [];
+                            $results = [];
+                            //$tasks = [];
                             foreach ($inputData as $data) {
 
-                                $tasks[] = function () use($data, $rule) {
+                                //$tasks[] = function () use($data, $rule) {
 
                                     $this->executeRuleSerial($rule, $data);
 
                                     // small delay to yield to the event loop
-                                    co::sleep(0.001);
+                                    //co::sleep(0.001);
 
                                     if (Utils::isObject($data)) {
                                         // An object. Set to temp data
-                                        return [$data];
+                                        $results[] = [$data];
                                     } else {
-                                        return $data;
+                                        $results[] = $data;
                                     }
-                                };
+                                //};
                             }
                             // We fetch the results from all the tasks
-                            $results = batch($tasks);
+                            //$results = batch($tasks);
 
                             // Flatten the results and merge them into $tempData
                             foreach ($results as $result) {
@@ -140,7 +141,7 @@ class Workflow
                 $this->errors[] = $error;
             }
 
-        });
+        //});
     }
 
     /**
@@ -223,26 +224,27 @@ class Workflow
 
                             // we parallelize the execution of each action for the dataset
                             $temp = [];
-                            $tasks = [];
+                            $results = [];
+                            //$tasks = [];
                             foreach ($data as $datum) {
 
-                                $tasks[] = function () use ($datum, $action) {
+                                //$tasks[] = function () use ($datum, $action) {
 
                                     $this->executeAction($datum, $action);
 
                                     // small delay to yield to the event loop
-                                    co::sleep(0.001);
+                                    //co::sleep(0.001);
 
                                     if (Utils::isObject($datum)) {
-                                        return [$datum];
+                                        $results[] = [$datum];
                                     } else {
-                                        return $datum;
+                                        $results[] = $datum;
                                     }
-                                };
+                                //};
                             }
 
                             // We fetch the results from all the tasks
-                            $results = batch($tasks);
+                            //$results = batch($tasks);
 
                             // Flatten the results and merge them into $tempData
                             foreach ($results as $result) {
