@@ -20,15 +20,8 @@ class ConfigurationValidatorTest extends TestCase
         $this->assertNotEmpty($resolvedSchema, "There should be \$ref occurrences in the schema");
     }
 
-    public function _testSchemaComponents()
+    public function testGenerateSchemaComponents($version = 'v3')
     {
-
-        $components = ConfigurationValidator::getSchemaComponents('v3');
-
-        // Save all refs to a JSON file
-        //$jsonString = file_put_contents("schema-components.json", json_encode($components));
-        //echo "\n$jsonString\n";
-
-        //$this->assertNotEmpty($components, "There should be \$ref occurrences in the schema");
+        ConfigurationValidator::generateSchemaComponents($version);
     }
 }

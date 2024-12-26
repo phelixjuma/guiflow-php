@@ -3770,6 +3770,7 @@
 
     "Condition": {
       "title": "Condition",
+      "description": "Control when to execute a single or a set of actions",
       "oneOf": [
         {
           "title": "Always True Condition",
@@ -4046,6 +4047,7 @@
 
     "Action_Arithmetic": {
       "title": "Arithmetic Action",
+      "description": "Basic arithmetic operations: add, subtract, multiply and divide",
       "type": "object",
       "allOf": [
         {
@@ -4096,6 +4098,7 @@
     },
     "Action_Deletion_DeletePathValue": {
       "title": "Delete Path Value Action",
+      "description": "Set the data at a given path to empty while retaining the path",
       "type": "object",
       "allOf": [
         {
@@ -4126,6 +4129,7 @@
     },
     "Action_Deletion_RemovePath": {
       "title": "Remove Path Action",
+      "description": "Remove an entire path including its data",
       "type": "object",
       "allOf": [
         {
@@ -4156,6 +4160,7 @@
     },
     "Action_Set": {
       "title": "Set Action",
+      "description": "Set data into a given path",
       "type": "object",
       "allOf": [
         {
@@ -4259,6 +4264,7 @@
 
     "Action_Function_UserDefinedFunction": {
       "title": "User Defined Function",
+      "description": "Execute custom defined and implemented functions",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4281,6 +4287,7 @@
     },
     "Action_Function_SystemDefinedFunction": {
       "title": "System Defined Function",
+      "description": "Execute pre-defined functions with custom implementation",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4303,6 +4310,7 @@
     },
     "Action_Function_Transform": {
       "title": "Transform",
+      "description": "Provides a set of data transformation functions such as string replace, regex replace, string to list conversion, string to datetime, regex mapper, dictionary mapper",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4324,6 +4332,7 @@
       "unevaluatedProperties": false
     },
     "Action_Function_Filter": {
+      "description": "Filter a list of data based on a set of conditions",
       "title": "Filter",
       "allOf": [
         {
@@ -4347,6 +4356,7 @@
     },
     "Action_Function_Split": {
       "title": "Split",
+      "description": "Split a list of data into separate and distinct lists. Supports horizontal, vertical and conditional split",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4369,6 +4379,7 @@
     },
     "Action_Function_Merge": {
       "title": "Merge",
+      "description": "Merges two different lists of dictionaries into a single list based on common fields. Similar to SQL's JOIN oeprator",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4391,6 +4402,7 @@
     },
     "Action_Function_CombineLists": {
       "title": "Combine Lists",
+      "description": "Combines multiple lists into a single list",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4413,6 +4425,7 @@
     },
     "Action_Function_Set": {
       "title": "Set",
+      "description": "Set data into a specified path",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4435,6 +4448,7 @@
     },
     "Action_Function_Join": {
       "title": "Join",
+      "description": "Concatenates lists within two dictionary datasets based on a condition. Outputs the first dictionary with the specified target list concatenated with the list from the second dictionary",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4457,6 +4471,7 @@
     },
     "Action_Function_Reducer": {
       "title": "Reducer",
+      "description": "Produces a single result from a given list of data. Supported actions are: min, max, modal, priority, get item at index",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4478,7 +4493,8 @@
       "unevaluatedProperties": false
     },
     "Action_Function_SortMultiByKey": {
-      "title": "Sort List of Objects",
+      "title": "Sort List of Dictionaries",
+      "description": "Sort list based on dictionary keys in asc or desc order",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4498,6 +4514,7 @@
     },
     "Action_Function_FormatDate": {
       "title": "Format Date",
+      "description": "Format date. Allows you to specify the specific format you need",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4517,6 +4534,7 @@
     },
     "Action_Function_AbsoluteValue": {
       "title": "Absolute Value",
+      "description": "Get the absolute value of a number",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4536,6 +4554,7 @@
     },
     "Action_Function_FuzzyExtractOne": {
       "title": "Fuzzy Extract One",
+      "description": "Extract the top matching item from a list based on fuzzy search",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4555,6 +4574,7 @@
     },
     "Action_Function_FuzzyExtractN": {
       "title": "Fuzzy Extract Top N",
+      "description": "Extract the top N matching items from a list based on fuzzy search",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4574,6 +4594,7 @@
     },
     "Action_Function_FuzzySearch": {
       "title": "Fuzzy Search",
+      "description": "Standard search function using fuzzy string matching. Takes in a string and returns the correct match with scores from the given master data",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4593,6 +4614,7 @@
     },
     "Action_Function_FuzzyMatch": {
       "title": "Fuzzy Search",
+      "description": "Standard matching function using fuzzy string matching. Takes a list of strings and returns the correct match for each of them with scores from the given master data",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4612,6 +4634,7 @@
     },
     "Action_Function_RegexExtract": {
       "title": "Regex Extract",
+      "description": "Extract data from a text based on regular expression pattern matching",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4630,7 +4653,8 @@
       "unevaluatedProperties": false
     },
     "Action_Function_ExtractUnit": {
-      "title": "Regex Extract",
+      "title": "Regex Extract Product Unit",
+      "description": "Extract quantity and unit of measure from a given product description eg 'bread 500g white' outputs '500g'. Uses regex",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4649,7 +4673,8 @@
       "unevaluatedProperties": false
     },
     "Action_Function_ExtractPackagingDetails": {
-      "title": "Regex Extract",
+      "title": "Regex Extract Product Packaging Details",
+      "description": "Extract pack configuration from product description eg 'bread 24 x 500g white' outputs '24 x 500g'. Uses regex",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4668,7 +4693,8 @@
       "unevaluatedProperties": false
     },
     "Action_Function_GetTopNRankedItemsByKey": {
-      "title": "Regex Extract",
+      "title": "Get Top N Ranked Items by Key",
+      "description": "Ranks items by a numeric value and returns the top n in descending order. Items with same rank are treated equally",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4688,6 +4714,7 @@
     },
     "Action_Function_Append": {
       "title": "Append",
+      "description": "Add one string at the end of another string",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4707,6 +4734,7 @@
     },
     "Action_Function_Prepend": {
       "title": "Prepend",
+      "description": "Add one string at the beginning of another string",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4726,6 +4754,7 @@
     },
     "Action_Function_Concat": {
       "title": "Concat",
+      "description": "Concatenate a list of given strings",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4744,7 +4773,8 @@
       "unevaluatedProperties": false
     },
     "Action_Function_ConcatMultiArrayAssoc": {
-      "title": "Concat Multi Array Assoc",
+      "title": "Concat Dictionary Values",
+      "description": "For a list of dictionaries, concatenate different dictionary values into a single new dictionary value",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4764,6 +4794,7 @@
     },
     "Action_Function_CustomPregReplace": {
       "title": "Custom Preg Replace",
+      "description": "Replace substring from a given text using regex",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4783,6 +4814,7 @@
     },
     "Action_Function_StringDiff": {
       "title": "String Diff",
+      "description": "Compare two strings and if one is a sub string of the other, we remove the sub string",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4802,6 +4834,7 @@
     },
     "Action_Function_RegexMapperMultiple": {
       "title": "Regex Mapper Multiple",
+      "description": "Uses patterns to find and replace text in data based on a set of rules",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4821,6 +4854,7 @@
     },
     "Action_Function_RemoveRepeatedWords": {
       "title": "Remove Repeated Words",
+      "description": "Removes repeated words from a string",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4839,7 +4873,8 @@
       "unevaluatedProperties": false
     },
     "Action_Function_AssocArraySumIf": {
-      "title": "Assoc Array Sum If",
+      "title": "Conditional Sum",
+      "description": "Find the sum of values from a list of dictionaries, if they meat a specified condition",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4859,6 +4894,7 @@
     },
     "Action_Function_GetFromObject": {
       "title": "Get From Object",
+      "description": "Get a specific value from a key-value store",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4877,7 +4913,8 @@
       "unevaluatedProperties": false
     },
     "Action_Function_ExtractAttributesFromCorpusFields": {
-      "title": "Get From Object",
+      "title": "Extract Attributes from Corpus Fields",
+      "description": "Extracts attributes for every item in a given corpus",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4897,6 +4934,7 @@
     },
     "Action_Function_SetAttributeFilters": {
       "title": "Set Attribute Filters",
+      "description": "Set Attribute Filters",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4915,7 +4953,8 @@
       "unevaluatedProperties": false
     },
     "Action_Function_GetObjectFromList": {
-      "title": "Get From Object",
+      "title": "Get Object from List",
+      "description": "Get Object from List based on a condition",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4935,6 +4974,7 @@
     },
     "Action_Function_FlattenObjects": {
       "title": "Flatten Objects",
+      "description": "Flatten Objects. Eliminates nested objects by moving them to the root level",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4954,6 +4994,7 @@
     },
     "Action_Function_ExpandLists": {
       "title": "Expand Lists",
+      "description": "Flattens lists so all nested arrays are moved to the root level",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4973,6 +5014,7 @@
     },
     "Action_Function_FlattenAndExpand": {
       "title": "Flatten and Expand",
+      "description": "Flattens all objects then expands all lists",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -4992,6 +5034,7 @@
     },
     "Action_Function_RenameObjectKeys": {
       "title": "Rename Object Keys",
+      "description": "Rename keys in a key-value data",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5011,6 +5054,7 @@
     },
     "Action_Function_DateAddSubtractDays": {
       "title": "Date Add Or Subtract Days",
+      "description": "Add or subtract days from a date",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5030,6 +5074,7 @@
     },
     "Action_Function_DateDiff": {
       "title": "Date Diff",
+      "description": "Find the difference between a start and end date",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5049,6 +5094,7 @@
     },
     "Action_Function_DateFormat": {
       "title": "Date Format",
+      "description": "Format Date",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5068,6 +5114,7 @@
     },
     "Action_Function_ConvertUnit": {
       "title": "Convert Unit",
+      "description": "Convert quantity from one unit to the other eg 24 PCS to 2 CTNs",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5087,6 +5134,7 @@
     },
     "Action_Function_ConvertUnitMulti": {
       "title": "Convert Unit Multi",
+      "description": "Convert quantity from one unit to another in a list of dictionaries. See 'Convert Unit Multi v2' function",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5105,7 +5153,8 @@
       "unevaluatedProperties": false
     },
     "Action_Function_ConvertUnitsV2": {
-      "title": "Convert Unit Multi",
+      "title": "Convert Unit Multi v2",
+      "description": "Convert quantity from one unit to another in a list of dictionaries. Better implementation of Convert Unit Multi",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5125,6 +5174,7 @@
     },
     "Action_Function_GetMetricConversionTable": {
       "title": "Get Metric Conversion Table",
+      "description": "Get data with metric conversion table",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5144,6 +5194,7 @@
     },
     "Action_Function_ModelMapping": {
       "title": "Model Mapping",
+      "description": "Convert data from one schema to another schema",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5163,6 +5214,7 @@
     },
     "Action_Function_MakeObjectListUnique": {
       "title": "Make Object List Unique",
+      "description": "Remove repeated key-value data from an array based on a unique key requirement",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5182,6 +5234,7 @@
     },
     "Action_Function_DuplicateListItem": {
       "title": "Duplicate List Item",
+      "description": "Duplicate items in an array",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5201,6 +5254,7 @@
     },
     "Action_Function_GetRandomString": {
       "title": "Get Random String",
+      "description": "Generate a random string",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5220,6 +5274,7 @@
     },
     "Action_Function_BasicArithmetic": {
       "title": "Basic Arithmetic",
+      "description": "Basic Arithmetic: add, subtract, multiply, divide",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5239,6 +5294,7 @@
     },
     "Action_Function_Length": {
       "title": "Length",
+      "description": "Get the length or size of data",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5258,6 +5314,7 @@
     },
     "Action_Function_CorrectDate": {
       "title": "Correct Date",
+      "description": "Correct malformed date",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5276,7 +5333,8 @@
       "unevaluatedProperties": false
     },
     "Action_Function_ParseTemplate": {
-      "title": "ParseTemplate",
+      "title": "Parse Template",
+      "description": "Extract data from a string based on a defined template",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5296,6 +5354,7 @@
     },
     "Action_Function_PlatformFunctions": {
       "title": "Platform Functions",
+      "description": "A set of supported platform functions. In this case, PHP functions",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5315,6 +5374,7 @@
     },
     "Action_Function_PatternBasedStemSpellCorrections": {
       "title": "Pattern Based Stem Spell Corrections",
+      "description": "Correct spelling mistakes based on a predefined pattern",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5333,7 +5393,8 @@
       "unevaluatedProperties": false
     },
     "Action_Function_ValidateAndCorrectQuantityAndPrices": {
-      "title": "Pattern Based Stem Spell Corrections",
+      "title": "Validate and Correct Quantity and Prices",
+      "description": "Given a list of items with their quantities, prices and the total amounts, it validates to see a match and does corrections of mistakes to ensure a match",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5353,6 +5414,7 @@
     },
     "Action_Function_ValidateDataStructure": {
       "title": "Validate data structure",
+      "description": "Validates that a given data validates against a set of rules",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"
@@ -5372,6 +5434,7 @@
     },
     "Action_Function_Map": {
       "title": "Map",
+      "description": "Loop through an array and for each item, apply a function",
       "allOf": [
         {
           "$ref": "#/definitions/actionBase"

@@ -87,14 +87,16 @@ class ConfigurationValidator
      * @return array
      * @throws Exception
      */
-    public static function getSchemaComponents($v = 'v3') {
+    public static function getSchemaComponents($v = 'v3', $resolve = false) {
 
         // We get the schema
         $schemaPath = self::getSchemaPath($v);
         $schema = json_decode(file_get_contents($schemaPath), JSON_FORCE_OBJECT);
 
         // We resolve the schema
-        $schema = JsonSchemaResolver::resolveSchema($schema);
+        if ($resolve) {
+            $schema = JsonSchemaResolver::resolveSchema($schema);
+        }
 
         // We get all definitions
         $definitions = $schema['definitions'] ?? [];
@@ -109,36 +111,65 @@ class ConfigurationValidator
                     $parts = explode("_", $definitionName);
                     $type = $parts[0];
                     $subType = $parts[1] ?? $type;
-                    $name = $parts[2] ?? $subType;
 
                     // If the definition is not fully resolved, as is the case with cyclic definitions, we add the definition
                     $unresolvedDefinitions = [];
                     $refs = [];
                     JsonSchemaResolver::traverseSchema($definition, '', $refs);
 
-                    if (!empty($refs)) {
-                        foreach ($refs as $ref) {
-                            if (!in_array($ref['value'], $unresolvedDefinitions)) {
-                                $unresolvedDefinitions[] = $ref['value'];
-                                // We add the definition
-                                $keyParts = explode("/", $ref['value']);
-                                $key = $keyParts[sizeof($keyParts) - 1];
-                                $definition['definitions'][$key] = $schema['definitions'][$key];
+                    // Keep processing until no more refs remain
+                    while (!empty($refs)) {
+                        // Take one reference off the list
+                        $ref = array_pop($refs);
+
+                        // Make sure we haven't already handled this reference
+                        if (!in_array($ref['value'], $unresolvedDefinitions, true)) {
+                            $unresolvedDefinitions[] = $ref['value'];
+
+                            // Derive the local definition key from $ref['value'], e.g. #/definitions/SomeType
+                            $keyParts = explode('/', $ref['value']);
+                            $key      = end($keyParts);
+
+                            // Add the referenced definition into $definition
+                            // (assuming $schema['definitions'][$key] exists)
+                            $definition['definitions'][$key] = $schema['definitions'][$key];
+
+                            // Now, the newly added definition might have more references of its own
+                            // so let's traverse it and add them into the queue
+                            $newRefs = [];
+                            JsonSchemaResolver::traverseSchema($definition['definitions'][$key], '', $newRefs);
+
+                            // Add any newly found references onto the stack so they get processed too
+                            foreach ($newRefs as $newRef) {
+                                // Only push them if they're not already known
+                                if (!in_array($newRef['value'], $unresolvedDefinitions, true)) {
+                                    $refs[] = $newRef;
+                                }
                             }
                         }
                     }
 
-                    $components[$definitionName] = [
-                        'type'      => $type,
-                        'sub_type'  => $subType,
-                        'name'      => $name,
-                        'title'     => $definition['title'] ?? $name,
-                        'schema'    => $definition
+                    $components[] = [
+                        'name'          => $definitionName,
+                        'type'          => $type,
+                        'group'         => $subType,
+                        'title'         => $definition['title'] ?? ($parts[2] ?? $subType),
+                        'description'   => $definition['description'] ?? '',
+                        'schema'        => $definition
                     ];
                 }
             }
         }
 
         return $components;
+    }
+
+    public static function generateSchemaComponents($version = 'v3')
+    {
+
+        $components = ConfigurationValidator::getSchemaComponents($version);
+
+        // Save all refs to a JSON file
+        file_put_contents(dirname(__DIR__,2).DIRECTORY_SEPARATOR."src/SchemaDefinitions/schema-components.$version.json", json_encode($components));
     }
 }
