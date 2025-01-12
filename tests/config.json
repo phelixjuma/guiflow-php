@@ -1,32 +1,23 @@
 [
   {
-    "rule": "Set order date, if empty",
-    "description": "",
-    "stage": "set_current_date_as_order_date",
+    "rule": "Rule-1003dc4a-9b28-4bd9-b090-bfe6d79e99fa",
+    "stage": "1003dc4a-9b28-4bd9-b090-bfe6d79e99fa",
+    "description": "Format dates",
     "dependencies": [],
     "skip": "0",
-    "condition": {
-      "path": "order_date",
-      "operator": "not exists"
-    },
+    "condition": "always",
     "actions": [
       {
-        "description": "",
-        "stage": "set_current_date_as_order_date",
-        "dependencies": [],
         "action": "function",
+        "description": "Action node",
+        "stage": "format_payment_date",
+        "dependencies": [],
         "skip": "0",
         "params": {
-          "path": "order_date",
-          "function": "transform",
+          "path": "payment_date",
+          "function": "date_format",
           "args": {
-            "transformer": "string_to_date_time",
-            "transformer_args": {
-              "format": "Y-m-d H:i:s",
-              "pre_modifier": "Today",
-              "post_modifier": ""
-            },
-            "transformer_target_keys": []
+            "format": "Y-m-d"
           },
           "newField": "",
           "strict": "",
@@ -36,27 +27,29 @@
     ]
   },
   {
-    "rule": "For Mega Wholesalers, we get the warehouse region for customer matching",
-    "description": "",
-    "stage": "mega_wholesalers_prepare_customer_name",
+    "rule": "Rule-71524942-8b9f-43b9-8bbc-62cec35c5bb8",
+    "stage": "71524942-8b9f-43b9-8bbc-62cec35c5bb8",
+    "description": "Format payment allocations",
     "dependencies": [],
     "skip": "0",
     "condition": "always",
     "actions": [
       {
-        "description": "",
-        "stage": "jumra_split_order_by_item_classification",
-        "dependencies": [
-          "jumra_get_item_classification"
-        ],
-        "skip": "0",
         "action": "function",
+        "description": "Action node",
+        "stage": "remove_duplicate_payment_advices",
+        "dependencies": [],
+        "skip": "0",
         "params": {
-          "path": "",
-          "function": "split",
+          "path": "payment_allocations",
+          "function": "make_object_list_unique",
           "args": {
-            "split_path": "items",
-            "criteria_path": "items.*.original_value.name"
+            "unique_key_paths": [
+              "document_number",
+              "document_type"
+            ],
+            "rank_key_path": "payment_allocation_sn_no",
+            "rank_order": "asc"
           },
           "newField": "",
           "strict": "",
@@ -64,69 +57,90 @@
         }
       },
       {
-        "description": "Add customer section to name",
-        "stage": "eastmatt_add_customer_section_to_name",
-        "dependencies": [
-          "eastmatt_get_customer_section"
-        ],
-        "skip": "0",
         "action": "function",
+        "description": "We format document type",
+        "stage": "format_document_type",
+        "dependencies": [],
+        "skip": "0",
         "params": {
-          "path": "",
-          "function": "concat",
+          "path": "payment_allocations",
+          "function": "map_parallel",
           "args": {
-            "data_to_concat": [
-              {
-                "path": "customer_name"
-              },
-              {
-                "path": "items.0.original_value.name"
-              }
-            ],
-            "separator": "",
-            "enclosure": "brackets"
+            "path": "",
+            "function": "set",
+            "args": {
+              "path": "",
+              "value": "",
+              "valueFromField": "",
+              "valueMapping": "",
+              "conditionalValue": [
+                {
+                  "condition": {
+                    "path": "document_type",
+                    "operator": "==",
+                    "value": "Invoice"
+                  },
+                  "value": "I",
+                  "valueFromField": "",
+                  "use_data_as_path_value": "0"
+                },
+                {
+                  "condition": {
+                    "path": "document_type",
+                    "operator": "==",
+                    "value": "Credit Note"
+                  },
+                  "value": "C",
+                  "valueFromField": "",
+                  "use_data_as_path_value": "0"
+                }
+              ],
+              "newField": "document_type_short_form"
+            },
+            "newField": "",
+            "strict": "1",
+            "condition": ""
           },
-          "newField": "customer_name",
-          "strict": "",
+          "newField": "",
+          "strict": "1",
           "condition": ""
         }
       }
     ]
   },
   {
-    "rule": "Remove discontinued items",
-    "stage": "remove_discontinued_items",
-    "description": "",
-    "dependencies": [],
+    "rule": "Rule-45309814-beda-4a29-83cc-541d0fe9641d",
+    "stage": "45309814-beda-4a29-83cc-541d0fe9641d",
+    "description": "Map data to ERP schema",
+    "dependencies": [
+      "remove_duplicate_payment_advices"
+    ],
     "skip": "0",
     "condition": "always",
     "actions": [
       {
         "action": "function",
-        "stage": "remove_discontinued_items",
-        "description": "Filter out discontinued items",
+        "description": "Action node",
+        "stage": "schema_conversion",
         "dependencies": [],
         "skip": "0",
         "params": {
-          "path": "items",
-          "function": "filter",
+          "path": "",
+          "function": "model_mapping",
           "args": {
-            "filter_criteria": {
-              "operator": "AND",
-              "conditions": [
-                {
-                  "term": "rice",
-                  "mode": "not matches",
-                  "key": "original_value.name",
-                  "similarity_threshold": "",
-                  "term_exclusion_pattern": "",
-                  "value_exclusion_pattern": ""
-                }
-              ]
-            }
+            "model_mapping": {
+              "cardCode": "customer_name.meta_data.id",
+              "cardName": "customer_name.meta_data.other_details.cardName",
+              "docDate": "payment_date",
+              "postingDate": "payment_date",
+              "invoiceLines.*.type": "payment_allocations.*.document_type_short_form",
+              "invoiceLines.*.documentNumber": "payment_allocations.*.document_number",
+              "invoiceLines.*.amount": "payment_allocations.*.allocated_amount"
+            },
+            "inverted": "0"
           },
           "newField": "",
-          "strict": "0",
+          "strict": "",
           "condition": ""
         }
       }

@@ -2,10 +2,7 @@
 
 namespace PhelixJuma\GUIFlow;
 
-use JumaPhelix\DAG\DAG;
-use JumaPhelix\DAG\SharedDataManager;
-use JumaPhelix\DAG\Task;
-use JumaPhelix\DAG\TaskExecutor;
+use Exception;
 use PhelixJuma\GUIFlow\Actions\AddAction;
 use PhelixJuma\GUIFlow\Actions\DeleteValueAction;
 use PhelixJuma\GUIFlow\Actions\DivideAction;
@@ -16,15 +13,27 @@ use PhelixJuma\GUIFlow\Actions\SetValueAction;
 use PhelixJuma\GUIFlow\Actions\SubtractAction;
 use PhelixJuma\GUIFlow\Conditions\CompositeCondition;
 use PhelixJuma\GUIFlow\Conditions\SimpleCondition;
+use PhelixJuma\GUIFlow\Executor\DAG;
+use PhelixJuma\GUIFlow\Executor\SharedDataManager;
+use PhelixJuma\GUIFlow\Executor\Task;
+use PhelixJuma\GUIFlow\Executor\TaskStatus;
+use PhelixJuma\GUIFlow\Executor\WorkflowExecutor;
+use PhelixJuma\GUIFlow\Observability\ObservabilityService;
 use PhelixJuma\GUIFlow\Utils\ConfigurationValidator;
 use PhelixJuma\GUIFlow\Utils\PathResolver;
 use PhelixJuma\GUIFlow\Utils\Utils;
 
 use OpenSwoole\Coroutine as Co;
+use Ramsey\Uuid\Uuid;
+use ReflectionException;
 use function OpenSwoole\Core\Coroutine\batch;
 
 class Workflow
 {
+
+    private $id;
+    private $parent_id;
+
     private array $config;
     private object $functionsClass;
 
@@ -36,26 +45,60 @@ class Workflow
     public DAG $workflowDAG;
 
     /**
-     * @var TaskExecutor
+     * @var WorkflowExecutor
      */
-    public TaskExecutor $workflowExecutor;
+    public WorkflowExecutor $workflowExecutor;
 
+    protected ObservabilityService $observabilityService;
 
-    public function __construct(array $config, object $functionsClass)
+    /**
+     * @param $id
+     * @param array $config
+     * @param object $functionsClass
+     * @param $observabilityBackend
+     * @param $observabilityConfigs
+     * @throws ReflectionException|Exception
+     */
+    public function __construct($id, array $config, object $functionsClass, $observabilityBackend = '', $observabilityConfigs = [])
     {
+        $this->id = $id;
         $this->config = $config;
         $this->functionsClass = $functionsClass;
 
         // Validate the configuration against the schema
         ConfigurationValidator::validate($this->config, 'v3');
+
+        $this->observabilityService = new ObservabilityService($observabilityConfigs, $observabilityBackend);
+    }
+
+    public function getId() {
+        return $this->id;
+    }
+
+    public function setParentId($parentId) {
+        return $this->parent_id = $parentId;
+    }
+
+    public function getParentId() {
+        return $this->parent_id;
+    }
+
+    /**
+     * @param $executionId
+     * @return mixed
+     * @throws Exception
+     */
+    public function getExecutionById($executionId): mixed
+    {
+        return $this->observabilityService->getExecutionById($executionId);
     }
 
     /**
      * @param $data
      * @param bool $parallelize
-     * @return void
+     * @return string
      */
-    public function run(&$data, bool $parallelize = false): void
+    public function run(&$data, bool $parallelize = false): string
     {
         if (Utils::isList($data)) {
             foreach ($data as $index => &$d) {
@@ -64,17 +107,23 @@ class Workflow
         }
 
         if ($parallelize) {
-            $this->runWorkFlowParallel($data);
+            return $this->runWorkFlowParallel($data);
         } else {
-            $this->runWorkFlowSerial($data);
+            return $this->runWorkFlowSerial($data);
         }
     }
 
-    private function runWorkFlowSerial(&$inputData): void
+    /**
+     * @param $inputData
+     * @return string
+     */
+    private function runWorkFlowSerial(&$inputData): string
     {
 
+        $workflowExecutionId = Uuid::uuid4()->toString();
+
         // We execute within a coroutine environment to support parallelization
-        //co::run(function() use(&$inputData) {
+        co::run(function() use(&$inputData) {
             try {
 
                 $config = json_decode(json_encode($this->config), JSON_FORCE_OBJECT);
@@ -89,16 +138,15 @@ class Workflow
 
                             $tempData = [];
 
-                            $results = [];
-                            //$tasks = [];
+                            $tasks = [];
                             foreach ($inputData as $data) {
 
-                                //$tasks[] = function () use($data, $rule) {
+                                $tasks[] = function () use($data, $rule) {
 
                                     $this->executeRuleSerial($rule, $data);
 
                                     // small delay to yield to the event loop
-                                    //co::sleep(0.001);
+                                    co::sleep(1);
 
                                     if (Utils::isObject($data)) {
                                         // An object. Set to temp data
@@ -106,10 +154,11 @@ class Workflow
                                     } else {
                                         $results[] = $data;
                                     }
-                                //};
+                                    return $results;
+                                };
                             }
                             // We fetch the results from all the tasks
-                            //$results = batch($tasks);
+                            $results = batch($tasks);
 
                             // Flatten the results and merge them into $tempData
                             foreach ($results as $result) {
@@ -123,7 +172,7 @@ class Workflow
                             // Set the temp data to input data
                             $inputData = $tempData;
                         }
-                    } catch (\Exception|\Throwable $e ) {
+                    } catch (Exception|\Throwable $e ) {
                         $error = [
                             'rule'  => $rule['stage'],
                             'message' => $e->getMessage(),
@@ -133,23 +182,35 @@ class Workflow
                     }
                 }
 
-            } catch (\Exception|\Throwable $e ) {
+            } catch (Exception|\Throwable $e ) {
                 $error = [
                     'message' => $e->getMessage(),
                     'trace' => $e->getTrace()
                 ];
                 $this->errors[] = $error;
             }
+        });
 
-        //});
+        return $workflowExecutionId;
     }
 
     /**
      * @param $inputData
-     * @return void
+     * @return string
      */
-    private function runWorkFlowParallel(&$inputData): void
+    private function runWorkFlowParallel(&$inputData): string
     {
+
+        $workflowExecutionId = Uuid::uuid4()->toString();
+
+        $this->observabilityService->logWorkflowExecution([
+            'id'            => $this->id,
+            'parent_id'     => $this->parent_id,
+            'execution_id'  => $workflowExecutionId,
+            'status'        => TaskStatus::PENDING,
+            'input_state'   => $inputData,
+            'start_time'    => microtime(true)
+        ]);
 
         try {
 
@@ -162,7 +223,7 @@ class Workflow
                 if (Utils::isObject($inputData)) {
 
                     $dataManager = new SharedDataManager($inputData);
-                    $this->executeRuleParallel($rule, $ruleIndex, $dataManager);
+                    $this->addRulesToDAG($rule, $ruleIndex, $dataManager);
 
                 } else {
                     $tempData = [];
@@ -171,7 +232,7 @@ class Workflow
                         $data['workflow_list_position'] = $dataIndex;
 
                         $dataManager = new SharedDataManager($data);
-                        $this->executeRuleParallel($rule, $ruleIndex, $dataManager);
+                        $this->addRulesToDAG($rule, $ruleIndex, $dataManager);
 
                         if (Utils::isObject($data)) {
                             $tempData[] = $data;
@@ -187,12 +248,23 @@ class Workflow
             }
 
             // Initialize the task executor
-            $this->workflowExecutor = new TaskExecutor($this->workflowDAG);
-            $this->workflowExecutor->execute();
+            $this->workflowExecutor = new WorkflowExecutor($this->workflowDAG);
+            $this->workflowExecutor->execute($this->observabilityService, $workflowExecutionId);
 
-        } catch (\Exception|\Throwable $e ) {
+        } catch (Exception|\Throwable $e ) {
+
             $this->errors[] = $e->getMessage();
+
+            $this->observabilityService->updateWorkflowExecution($workflowExecutionId, [
+                'status'        => TaskStatus::FAILED,
+                'end_time'      => microtime(true),
+                'error_message' => $e->getMessage(),
+                'error_trace'   => $e->getTraceAsString()
+            ]);
+
         }
+
+        return $workflowExecutionId;
     }
 
     /**
@@ -200,7 +272,8 @@ class Workflow
      * @param $data
      * @return void
      */
-    private function executeRuleSerial($rule, &$data) {
+    private function executeRuleSerial($rule, &$data): void
+    {
 
         $skip = $rule['skip'] ?? 0;
         $condition = $rule['condition'];
@@ -224,27 +297,27 @@ class Workflow
 
                             // we parallelize the execution of each action for the dataset
                             $temp = [];
-                            $results = [];
-                            //$tasks = [];
+                            $tasks = [];
                             foreach ($data as $datum) {
 
-                                //$tasks[] = function () use ($datum, $action) {
+                                $tasks[] = function () use ($datum, $action) {
 
                                     $this->executeAction($datum, $action);
 
                                     // small delay to yield to the event loop
-                                    //co::sleep(0.001);
+                                    co::sleep(1);
 
                                     if (Utils::isObject($datum)) {
                                         $results[] = [$datum];
                                     } else {
                                         $results[] = $datum;
                                     }
-                                //};
+                                    return $results;
+                                };
                             }
 
                             // We fetch the results from all the tasks
-                            //$results = batch($tasks);
+                            $results = batch($tasks);
 
                             // Flatten the results and merge them into $tempData
                             foreach ($results as $result) {
@@ -260,7 +333,7 @@ class Workflow
                         }
                     }
 
-                } catch (\Exception|\Throwable $e ) {
+                } catch (Exception|\Throwable $e ) {
                     $error = [
                         'action'    => $action['stage'],
                         'message' => "{$e->getMessage()} on line {$e->getLine()} of file {$e->getFile()}. Error code is {$e->getCode()}",
@@ -278,7 +351,8 @@ class Workflow
      * @param $dataManager
      * @return void
      */
-    private function executeRuleParallel($rule, $ruleIndex, &$dataManager) {
+    private function addRulesToDAG($rule, $ruleIndex, &$dataManager): void
+    {
 
         $skip = $rule['skip'] ?? 0;
         $ruleStage = "rule_" . (!empty($rule['stage']) ? $rule['stage'] : $ruleIndex);
@@ -287,12 +361,12 @@ class Workflow
         $actions = $rule['actions'];
 
         // Define the rule task, which is to evaluate its condition.
-        $ruleTask = new Task($ruleStage, function() use ($ruleStage, $dataManager, $skip, $condition) {
+        $ruleTask = new Task($ruleStage, $dataManager->getData(), function() use ($ruleStage, $dataManager, $skip, $condition) {
 
             // Evaluate the rule's condition to determine if actions should be skipped
             $isSkipped = $skip == 1 || !self::evaluateCondition($dataManager->getData(), $condition);
 
-            return ['isSkipped' => $isSkipped];
+            return ['isSkipped' => $isSkipped, 'data' => $dataManager->getData()];
         });
 
         // Add the rule task to the workflow.
@@ -305,7 +379,7 @@ class Workflow
             $actionDependencies = $action['dependencies'] ?? [];
             $skipAction = $action['skip'] ?? 0;
 
-            $actionTask = new Task($actionStage, function($parentResults) use ($dataManager,$actionStage, $action, $skipAction) {
+            $actionTask = new Task($actionStage, $dataManager->getData(), function($parentResults) use (&$dataManager,$actionStage, $action, $skipAction) {
 
                 $shouldSkipRule = array_reduce($parentResults, function($carry, $result) {
                     return $carry || (isset($result['isSkipped']) && $result['isSkipped']);
@@ -372,7 +446,8 @@ class Workflow
      * @param $pathValue
      * @return void
      */
-    private static function addPathValueToCondition(&$condition, $pathValue) {
+    private static function addPathValueToCondition(&$condition, $pathValue): void
+    {
 
         if (!is_array($condition)) {
             return;
@@ -396,7 +471,7 @@ class Workflow
      * @param $useDataAsPathValue
      * @return mixed
      */
-    public static function evaluateCondition($data, $condition, $useDataAsPathValue = false)
+    public static function evaluateCondition($data, $condition, $useDataAsPathValue = false): mixed
     {
         // We add path value, if set
         if ($useDataAsPathValue) {
@@ -414,7 +489,7 @@ class Workflow
      * @param $action
      * @return void
      */
-    private function executeAction(&$data, $action)
+    private function executeAction(&$data, $action): void
     {
 
         // get the action class
@@ -457,25 +532,16 @@ class Workflow
 
     private static function getActionClass($action): string
     {
-        switch ($action['action']) {
-            case 'add':
-                return AddAction::class;
-            case 'subtract':
-                return SubtractAction::class;
-            case 'multiply':
-                return MultiplyAction::class;
-            case 'divide':
-                return DivideAction::class;
-            case 'set':
-                return SetValueAction::class;
-            case 'delete':
-                return DeleteValueAction::class;
-            case 'remove_path':
-                return RemovePathAction::class;
-            case 'function':
-                return FunctionAction::class;
-            default:
-                throw new \InvalidArgumentException('Unknown action type: ' . $action['action']);
-        }
+        return match ($action['action']) {
+            'add' => AddAction::class,
+            'subtract' => SubtractAction::class,
+            'multiply' => MultiplyAction::class,
+            'divide' => DivideAction::class,
+            'set' => SetValueAction::class,
+            'delete' => DeleteValueAction::class,
+            'remove_path' => RemovePathAction::class,
+            'function' => FunctionAction::class,
+            default => throw new \InvalidArgumentException('Unknown action type: ' . $action['action']),
+        };
     }
 }

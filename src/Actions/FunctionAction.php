@@ -145,9 +145,9 @@ class FunctionAction implements ActionInterface
                 $newValue = Utils::join(...$paramValues);
             } elseif (isset($this->function[1]) && ($this->function['1'] == 'map' || $this->function['1'] == 'map_parallel')) {
 
-                $count = sizeof($currentValues);
-
-                if ($count == 0) {
+                if (empty($currentValues)) {
+                    $newValue = $currentValues;
+                } elseif (sizeof($currentValues) == 0) {
                     $newValue = $currentValues;
                 } else {
 

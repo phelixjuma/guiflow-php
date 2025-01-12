@@ -4,11 +4,15 @@ namespace PhelixJuma\GUIFlow\Tests;
 
 use PHPUnit\Framework\TestCase;
 use PhelixJuma\GUIFlow\Workflow;
+use Ramsey\Uuid\Uuid;
 
 class GUIFlowTest extends TestCase
 {
 
-    public function _testFullRulesSet()
+    /**
+     * @throws \ReflectionException
+     */
+    public function testFullRulesSet()
     {
         $config_json = file_get_contents(__DIR__ ."/config.json");
         $config = json_decode($config_json);
@@ -19,18 +23,50 @@ class GUIFlowTest extends TestCase
         //print "\nBefore\n";
         //print(json_encode($data));
 
-        $workflow = new Workflow($config, $this);
-        $workflow->run($data, false);
+        $observability = [
+            'backend'   => 'redis',
+            'config'    => [
+                'relational'    => [
+                    'dbname' => 'observability',
+                    'user' => 'root',
+                    'password' => 'password',
+                    'host' => '127.0.0.1',
+                    'driver' => 'pdo_mysql',
+                ],
+                'redis' => [
+                    'scheme' => 'tcp',
+                    'host' => '127.0.0.1',
+                    'port' => 6379,
+                ],
+                'dynamodb' => [
+                    'region' => 'your-region',
+                    'version' => 'latest',
+                    'credentials' => [
+                        'key' => 'your-access-key',
+                        'secret' => 'your-secret-key',
+                    ],
+                ]
+            ]
+        ];
 
-        //print "\nExecution Time:\n";
+        $workflowId = Uuid::uuid4()->toString();
+
+        $workflow = new Workflow($workflowId, $config, $this, $observability['backend'], $observability['config']);
+
+        $workflowExecutionId = $workflow->run($data, true);
+
+        print "\nWorkflow Execution Id {$workflowExecutionId}:\n";
         //print_r($workflow->workflowExecutor->getResults()[0]->getExecutionTime());
+
+        print "\nWorkflow Executions:\n";
+        print_r($workflow->getExecutionById($workflowExecutionId));
 
         if (!empty($workflow->errors)) {
             print "\nFound errors:\n";
-            print_r($workflow->errors);
+            //print_r($workflow->errors);
         } else {
-            print "\nAfter\n";
-            print_r($data);
+            //print "\nAfter\n";
+            //print_r($data);
         }
 
         //print_r($data);
