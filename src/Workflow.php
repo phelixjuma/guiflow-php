@@ -150,11 +150,10 @@ class Workflow
 
                                     if (Utils::isObject($data)) {
                                         // An object. Set to temp data
-                                        $results[] = [$data];
+                                        return [$data];
                                     } else {
-                                        $results[] = $data;
+                                        return $data;
                                     }
-                                    return $results;
                                 };
                             }
                             // We fetch the results from all the tasks
@@ -308,11 +307,10 @@ class Workflow
                                     co::sleep(1);
 
                                     if (Utils::isObject($datum)) {
-                                        $results[] = [$datum];
+                                        return [$datum];
                                     } else {
-                                        $results[] = $datum;
+                                        return $datum;
                                     }
-                                    return $results;
                                 };
                             }
 
