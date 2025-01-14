@@ -16,7 +16,7 @@
     "graphp/algorithms": "^0.8.2",
     "graphp/graphviz": "^0.2.2",
     "aws/aws-sdk-php": "^3.336",
-    "predis/predis": "^2.3",
+    "predis/predis": "^1.1",
     "doctrine/orm": "^3.3",
     "spatie/async": "^1.6",
     "ramsey/uuid": "^4.7",
