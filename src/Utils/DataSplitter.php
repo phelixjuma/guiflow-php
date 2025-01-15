@@ -97,11 +97,13 @@ class DataSplitter
         }
 
         // Step 1: Replicate items that exceed the limit
+        $wasSplit = false;
         $newItems = [];
         foreach ($items as $item) {
             $quantity = PathResolver::getValueByPath($item, $criteriaPath);
 
             if ($quantity > $limit) {
+                $wasSplit = true;
                 while ($quantity > $limit) {
                     $splitItem = $item;
                     PathResolver::setValueByPath($splitItem, $criteriaPath, $limit);
@@ -175,8 +177,11 @@ class DataSplitter
                 PathResolver::setValueByPath($dataCopy, $splitPath, $currentGroup);
 
                 // Mark as split data
-                $dataCopy['has_been_split'] = 1;
-                $dataCopy['workflow_list_position'] = $index;
+                if ($wasSplit) {
+                    $dataCopy['has_been_split'] = 1;
+                    $dataCopy['workflow_list_position'] = $index;
+                }
+
 
                 $results[] = $dataCopy;
 
