@@ -1214,13 +1214,23 @@ class Utils
      * @return array|string|string[]|null
      */
     public static function removeExtraSpaces($text) {
-        if (!is_null($text) && is_string($text)) {
-            // remove extra spaces
-            $text = preg_replace('/\s+/', ' ', trim($text));
-            // remove spaces around words inside enclosers
-            return preg_replace('/([\(\[\{])\s*(.*?)\s*([\)\]\}])/i', '$1$2$3', $text);
+
+        if (!is_string($text)) {
+            return $text;
         }
-        return $text;
+
+        // remove extra spaces
+        $text = preg_replace('/\s+/', ' ', trim($text));
+
+        // remove spaces around words inside enclosures
+        $cleaned = preg_replace('/([\(\[\{])\s*(.*?)\s*([\)\]\}])/i', '$1$2$3', $text);
+
+        if (preg_last_error() !== PREG_NO_ERROR) {
+            //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
+            print "\Regex error removing extra spaces on $text ".self::getPregError(preg_last_error())."\n";
+            return $text;
+        }
+        return $cleaned;
     }
 
     public static function remove_repeated_words($data) {
@@ -1381,9 +1391,9 @@ class Utils
                     }
                 }
 
-                $value =  self::removeExtraSpaces($value);
-
                 print "\nCompleted mappings. New value is $value\n";
+
+                $value =  self::removeExtraSpaces($value);
 
                 return $value;
             }
