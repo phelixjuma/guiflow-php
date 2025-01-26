@@ -1392,7 +1392,6 @@ class Utils
                             $value = $newValue; // Only update $value if preg_replace() succeeds
                         } catch (\Throwable $e) {
                             print "\nRegex failed for pattern $pattern with replacement $replace on value $value with error: " . $e->getMessage() . "\n";
-                            continue;
                         }
                     }
 
