@@ -1366,7 +1366,6 @@ class Utils
 
                 $modifier = !$is_case_sensitive ? 'i' : '';
 
-                print "\nStarting mappings on $value: ".json_encode($mappings)." \n";
 
                 foreach ($mappings as $key => $mapping) {
 
@@ -1378,6 +1377,8 @@ class Utils
                         $replace = $mapping;
                     }
 
+                    print "\nStarting mappings mapping with $key : $mapping. Value is $value \n";
+
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
                     $replace = str_ireplace("[space]", " ", $replace);
 
@@ -1385,13 +1386,13 @@ class Utils
                         $value = preg_replace($pattern, $replace, $value);
                     }
 
+                    print "\nCompleted mapping with $key : $mapping. New value is $value\n";
+
                     if (preg_last_error() !== PREG_NO_ERROR) {
                         //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
                         print "\nRegex error on pattern $pattern, replacement $replace and value $value. Error says ".self::getPregError(preg_last_error())."\n";
                     }
                 }
-
-                print "\nCompleted mappings. New value is $value\n";
 
                 $value =  self::removeExtraSpaces($value);
 
