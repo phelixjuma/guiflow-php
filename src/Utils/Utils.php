@@ -1384,7 +1384,8 @@ class Utils
                         $replace = $mapping;
                     }
 
-                    $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
+                    //$pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
+                    $pattern = '/' . $search . '/'.$modifier;
                     $replace = str_ireplace("[space]", " ", $replace);
 
                     print "\nStarting mappings mapping with $key : $mapping. Pattern is $pattern. Value is $value \n";
