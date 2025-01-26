@@ -502,6 +502,7 @@ class Utils
             }
 
         } catch (\Exception $e) {
+            print "date_add_subtract_days error: {$e->getMessage()}";
         }
         return $response;
     }
@@ -545,6 +546,7 @@ class Utils
             }
 
         } catch (\Exception $e) {
+            print $e->getMessage();
         }
         return $response;
     }
@@ -567,7 +569,7 @@ class Utils
                 $response = !empty($data) ? (new \DateTime($data))->format($format) : "";
             }
         } catch (\Exception $e) {
-
+            print $e->getMessage();
         }
         return $response;
     }
