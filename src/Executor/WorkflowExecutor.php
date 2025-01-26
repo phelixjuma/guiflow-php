@@ -60,8 +60,6 @@ class WorkflowExecutor {
             // Get the sorted tasks
             $sortedTasks = $this->dag->topologicalSort();
 
-            print_r($sortedTasks);
-
             foreach ($sortedTasks as $taskId) {
 
                 // define workflow task execution id
