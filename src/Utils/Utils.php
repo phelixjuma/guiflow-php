@@ -1387,7 +1387,7 @@ class Utils
                         try {
                             $newValue = preg_replace($pattern, $replace, $value);
                             if ($newValue === null) {
-                                throw new \Exception("\nRegex error on pattern $pattern, replacement $replace and value $value. Error says ".self::getPregError(preg_last_error())."\n";);
+                                throw new \Exception("\nRegex error on pattern $pattern, replacement $replace and value $value. Error says ".self::getPregError(preg_last_error())."\n");
                             }
                             $value = $newValue; // Only update $value if preg_replace() succeeds
                         } catch (\Throwable $e) {
