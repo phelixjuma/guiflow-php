@@ -1214,7 +1214,7 @@ class Utils
      * @return array|string|string[]|null
      */
     public static function removeExtraSpaces($text) {
-        if (!is_null($text)) {
+        if (!is_null($text) && is_string($text)) {
             // remove extra spaces
             $text = preg_replace('/\s+/', ' ', trim($text));
             // remove spaces around words inside enclosers
