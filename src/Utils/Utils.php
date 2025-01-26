@@ -1367,6 +1367,9 @@ class Utils
                 $modifier = !$is_case_sensitive ? 'i' : '';
 
 
+                error_reporting(E_ALL);
+                ini_set('display_errors', 1);
+
                 foreach ($mappings as $key => $mapping) {
 
                     if (is_array($mapping) && isset($mapping['pattern']) && $mapping['replacement']) {
@@ -1385,7 +1388,7 @@ class Utils
                     if (!empty($value) && is_string($value)) {
 
                         $newValue = preg_replace($pattern, $replace, $value);
-                        if ($newValue === null) {
+                        if (preg_last_error() !== PREG_NO_ERROR) {
                             print "\nRegex failed for pattern $pattern with replacement $replace on value $value\n";
                         }
                         $value = $newValue; // Only update $value if preg_replace() succeeds
