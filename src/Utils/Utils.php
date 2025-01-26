@@ -1383,15 +1383,21 @@ class Utils
                     $replace = str_ireplace("[space]", " ", $replace);
 
                     if (!empty($value) && is_string($value)) {
-                        $value = preg_replace($pattern, $replace, $value);
+
+                        try {
+                            $newValue = preg_replace($pattern, $replace, $value);
+                            if ($newValue === null) {
+                                throw new \Exception("\nRegex error on pattern $pattern, replacement $replace and value $value. Error says ".self::getPregError(preg_last_error())."\n";);
+                            }
+                            $value = $newValue; // Only update $value if preg_replace() succeeds
+                        } catch (\Throwable $e) {
+                            print "\nRegex failed for pattern $pattern with replacement $replace on value $value with error: " . $e->getMessage() . "\n";
+                            continue;
+                        }
                     }
 
                     print "\nCompleted mapping with $key : $mapping. New value is $value\n";
 
-                    if (preg_last_error() !== PREG_NO_ERROR) {
-                        //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
-                        print "\nRegex error on pattern $pattern, replacement $replace and value $value. Error says ".self::getPregError(preg_last_error())."\n";
-                    }
                 }
 
                 $value =  self::removeExtraSpaces($value);
