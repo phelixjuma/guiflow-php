@@ -1364,6 +1364,10 @@ class Utils
             },
             'regex_mapper' => function($value, $mappings, $is_case_sensitive = false) {
 
+                if (!is_string($value)) {
+                    return $value;
+                }
+
                 $modifier = !$is_case_sensitive ? 'i' : '';
 
 
@@ -1385,16 +1389,15 @@ class Utils
 
                     print "\nStarting mappings mapping with $key : $mapping. Pattern is $pattern. Value is $value \n";
 
-                    if (!empty($value) && is_string($value)) {
+                    $newValue = preg_replace($pattern, $replace, $value);
 
-                        $newValue = preg_replace($pattern, $replace, $value);
-                        if (preg_last_error() !== PREG_NO_ERROR) {
-                            print "\nRegex failed for pattern $pattern with replacement $replace on value $value\n";
-                        }
-                        $value = $newValue; // Only update $value if preg_replace() succeeds
+                    print "\nCompleted mapping with $key : $mapping. New value is $newValue\n";
+
+                    if (preg_last_error() !== PREG_NO_ERROR) {
+                        print "\nRegex failed for pattern $pattern with replacement $replace on value $value\n";
                     }
+                    $value = $newValue; // Only update $value if preg_replace() succeeds
 
-                    print "\nCompleted mapping with $key : $mapping. New value is $value\n";
 
                 }
 
