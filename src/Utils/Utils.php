@@ -1377,7 +1377,7 @@ class Utils
 
                     if (preg_last_error() !== PREG_NO_ERROR) {
                         //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
-                        print "\nRegex error on pattern $pattern, replacement $replace and value $value\n";
+                        print "\nRegex error on pattern $pattern, replacement $replace and value $value. Error says ".self::getPregError(preg_last_error())."\n";
                     }
                 }
 
