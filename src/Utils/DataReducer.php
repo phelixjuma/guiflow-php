@@ -2,6 +2,8 @@
 
 namespace PhelixJuma\GUIFlow\Utils;
 
+use InvalidArgumentException;
+
 class DataReducer
 {
     private $data;
@@ -113,4 +115,55 @@ class DataReducer
         }
         return $default;  // or some default value, if necessary
     }
+
+    /**
+     * @param string $key
+     * @param array $groupingPhrases
+     * @param array $excludePhrases
+     * @return array
+     */
+    private function match_and_exclude_reducer(string $key, array $groupingPhrases, array $excludePhrases): array {
+
+        $groupedItems = [];
+        $reducedList = [];
+
+        // Step 1: Group items by their base text (excluding grouping phrases)
+        foreach ($this->data as $item) {
+            if (!isset($item[$key])) {
+                throw new InvalidArgumentException("Key '{$key}' not found in one of the items.");
+            }
+
+            $baseText = $item[$key];
+            foreach ($groupingPhrases as $phrase) {
+                $baseText = preg_replace("/\b$phrase\b/i", '', $baseText);
+            }
+            $baseText = trim(preg_replace('/\s+/', ' ', $baseText)); // Normalize spaces
+            $groupedItems[$baseText][] = $item;
+        }
+
+        // Step 2: Reduce the groups
+        foreach ($groupedItems as $baseText => $items) {
+            if (count($items) > 1) {
+                // Check if there's a match to exclude based on multiple exclusion phrases
+                $keepItems = array_filter($items, function ($item) use ($excludePhrases, $key) {
+                    foreach ($excludePhrases as $excludePhrase) {
+                        if (preg_match("/\b$excludePhrase\b/i", $item[$key])) {
+                            return false; // Exclude this item
+                        }
+                    }
+                    return true; // Keep this item
+                });
+
+                // If keepItems exist, include only them; otherwise include all
+                $reducedList = array_merge($reducedList, $keepItems ?: $items);
+            } else {
+                // If there's only one item, keep it
+                $reducedList[] = $items[0];
+            }
+        }
+
+        return $reducedList;
+    }
+
+
 }
