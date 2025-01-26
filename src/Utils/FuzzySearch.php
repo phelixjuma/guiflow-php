@@ -56,6 +56,11 @@ class FuzzySearch
     public static function cleanText($text, $stopWords=[]): string
     {
 
+        if (!is_string($text)) {
+            print "arg passed to clean text is not a string: ".json_encode($text);
+            return $text;
+        }
+
         // Remove special characters except spaces
         $text = Utils::removeExtraSpaces(preg_replace('/[^a-zA-Z0-9 ]/i', '', $text));
 
@@ -83,6 +88,8 @@ class FuzzySearch
         }
 
         // Remove extra spaces
+
+
         return Utils::removeExtraSpaces($text);
     }
 
