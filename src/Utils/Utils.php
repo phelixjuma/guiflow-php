@@ -1386,7 +1386,7 @@ class Utils
 
                         $newValue = preg_replace($pattern, $replace, $value);
                         if ($newValue === null) {
-                            print "\nRegex failed for pattern $pattern with replacement $replace on value $value with error: " . $e->getMessage() . "\n";
+                            print "\nRegex failed for pattern $pattern with replacement $replace on value $value\n";
                         }
                         $value = $newValue; // Only update $value if preg_replace() succeeds
                     }
