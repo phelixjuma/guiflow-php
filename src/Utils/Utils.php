@@ -1377,22 +1377,18 @@ class Utils
                         $replace = $mapping;
                     }
 
-                    print "\nStarting mappings mapping with $key : $mapping. Value is $value \n";
-
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
                     $replace = str_ireplace("[space]", " ", $replace);
 
+                    print "\nStarting mappings mapping with $key : $mapping. Pattern is $pattern. Value is $value \n";
+
                     if (!empty($value) && is_string($value)) {
 
-                        try {
-                            $newValue = preg_replace($pattern, $replace, $value);
-                            if ($newValue === null) {
-                                throw new \Exception("\nRegex error on pattern $pattern, replacement $replace and value $value. Error says ".self::getPregError(preg_last_error())."\n");
-                            }
-                            $value = $newValue; // Only update $value if preg_replace() succeeds
-                        } catch (\Throwable $e) {
+                        $newValue = preg_replace($pattern, $replace, $value);
+                        if ($newValue === null) {
                             print "\nRegex failed for pattern $pattern with replacement $replace on value $value with error: " . $e->getMessage() . "\n";
                         }
+                        $value = $newValue; // Only update $value if preg_replace() succeeds
                     }
 
                     print "\nCompleted mapping with $key : $mapping. New value is $value\n";
