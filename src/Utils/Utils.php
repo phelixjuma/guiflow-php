@@ -1385,18 +1385,17 @@ class Utils
                     }
 
                     $pattern = '/' . self::custom_preg_escape(self::full_unescape($search)) . '/'.$modifier;
-                    //$pattern = '/' . $search . '/'.$modifier;
                     $replace = str_ireplace("[space]", " ", $replace);
 
-                    print "\nStarting mappings mapping with $key : $mapping. Pattern is $pattern. Value is $value \n";
+                    //print "\nStarting mappings mapping with $key : $mapping. Pattern is $pattern. Value is $value \n";
 
-                    preg_match_all($pattern, $value, $matches);
+                    //preg_match_all($pattern, $value, $matches);
 
-                    print "\nFound matches in $key : $mapping. Pattern is $pattern: ".json_encode($matches)." \n";
+                    //print "\nFound matches in $key : $mapping. Pattern is $pattern: ".json_encode($matches)." \n";
 
                     $newValue = preg_replace($pattern, $replace, $value);
 
-                    print "\nCompleted mapping with $key : $mapping. New value is $newValue\n";
+                    //print "\nCompleted mapping with $key : $mapping. New value is $newValue\n";
 
                     if (preg_last_error() !== PREG_NO_ERROR) {
                         print "\nRegex failed for pattern $pattern with replacement $replace on value $value\n";
