@@ -51,10 +51,14 @@ class FuzzySearch
     /**
      * @param $text
      * @param $stopWords
-     * @return string
+     * @return array|mixed|string|string[]|null
      */
-    public static function cleanText($text, $stopWords=[]): string
+    public static function cleanText($text, $stopWords=[])
     {
+
+        if (empty($text)) {
+            return $text;
+        }
 
         if (!is_string($text)) {
             print "arg passed to clean text is not a string: ".json_encode($text);

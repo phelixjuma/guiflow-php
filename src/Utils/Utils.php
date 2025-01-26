@@ -1356,6 +1356,8 @@ class Utils
 
                 $modifier = !$is_case_sensitive ? 'i' : '';
 
+                print "\nStarting mappings on $value: ".json_encode($mappings)." \n";
+
                 foreach ($mappings as $key => $mapping) {
 
                     if (is_array($mapping) && isset($mapping['pattern']) && $mapping['replacement']) {
@@ -1377,7 +1379,12 @@ class Utils
                         //throw new \Exception("Preg Error: ".self::getPregError(preg_last_error()));
                     }
                 }
-                return self::removeExtraSpaces($value);
+
+                $value =  self::removeExtraSpaces($value);
+
+                print "\nCompleted mappings. New value is $value\n";
+
+                return $value;
             }
         ];
 
