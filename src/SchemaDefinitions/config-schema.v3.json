@@ -1364,6 +1364,40 @@
                     "index"
                   ],
                   "additionalProperties": false
+                },
+                {
+                  "title": "Match and Exclude Reducer",
+                  "description": "Groups data based on a grouping criteria and then removes some of the items based on the exclusion criteria",
+                  "properties": {
+                    "reducer": {
+                      "type": "string",
+                      "enum": [
+                        "match_and_exclude_reducer"
+                      ]
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "grouping_phrases": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "exclusion_phrases": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "reducer",
+                    "key",
+                    "grouping_phrases",
+                    "exclusion_phrases"
+                  ],
+                  "additionalProperties": false
                 }
               ]
             }
