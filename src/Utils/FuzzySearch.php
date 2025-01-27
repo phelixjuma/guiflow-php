@@ -131,12 +131,21 @@ class FuzzySearch
     private function search($query, $similarityThreshold, int $topN = 1, $scoringMethod="tokenSetRatio"): array
     {
 
-        // We get cosine similarity of embeddings for every item
-        $tempCorpus = $this->corpus;
+        // Filter corpus for those with search key
+        $tempCorpus = array_filter($this->corpus, fn($item) => !empty($item[$this->corpusSearchKey]));
 
+        // Make the corpus unique
+        $tempCorpus = Utils::make_object_list_unique($tempCorpus, $this->corpusSearchKey, $this->corpusSearchKey);
+
+        // We assign similarity
         array_walk($tempCorpus, function (&$value, $key) use($query, $scoringMethod) {
-            $value['similarity'] = $this->getSimilarity($value[$this->corpusSearchKey], $query, $scoringMethod);
+            $value['similarity'] = 0;
+            if (!empty($value[$this->corpusSearchKey])) {
+                $value['similarity'] = $this->getSimilarity($value[$this->corpusSearchKey], $query, $scoringMethod);
+            }
         });
+
+        print "\n query: $query; corpus with similarity is: ".json_encode($tempCorpus)."\n";
 
         // We sort the data by similarity
         usort($tempCorpus, function($a, $b) {
