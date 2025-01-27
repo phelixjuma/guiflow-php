@@ -1110,7 +1110,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testExtractOne()
+    public function testExtractOne()
     {
 
         $data = [
@@ -1121,13 +1121,16 @@ class FunctionActionTest extends TestCase
                 [
                     'description' => "VELVEX ADULT BODY WIPES 72S"
                 ],
+                [
+                    'description'   => "VELVEX MAKE-UP REMOVAL WIPES 25S"
+                ]
             ],
             "classes"   => ["VELVEX", "VELVEX ANTIBACTERIAL"]
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("items.*.description", [$this, "fuzzy_extract_one"], ["choices" => ["VELVEX", "VELVEX ANTIBACTERIAL"], 'min_score' => 0, 'default_choice' => "", 'fuzzy_method' => 'tokenSetRatio'], "items.*.brand");
+        $action = new FunctionAction("items.*.description", [$this, "fuzzy_extract_one"], ["choices" => ["VELVEX", "VELVEX ANTIBACTERIAL", "VELVEX MAKE-UP"], 'min_score' => 0, 'default_choice' => "", 'fuzzy_method' => 'tokenSetRatio'], "items.*.brand");
 
         $action->execute($data);
 

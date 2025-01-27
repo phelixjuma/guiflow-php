@@ -849,7 +849,6 @@ class Utils
     public static function fuzzy_extract_one($query, $choices, $minScore=50, $defaultChoice="", $fuzzyMethod = 'tokenSetRatio') {
 
         $fuzz = new Fuzz();
-        $fuzzProcess = new Process();
 
         $isList = is_array($query);
 
@@ -883,9 +882,10 @@ class Utils
 
                     // We remove stop words from choice
                     $choiceSearch = FuzzySearch::cleanText($choice);
+                    $cleanedQuery = FuzzySearch::cleanText($search);
 
                     if (!empty($search) && !empty($choiceSearch)) {
-                        $results[$index]['similarity'] = $fuzz->$fuzzyMethod($search, $choiceSearch);
+                        $results[$index]['similarity'] = $fuzz->$fuzzyMethod($cleanedQuery, $choiceSearch);
                     }
                 }
 
@@ -906,8 +906,8 @@ class Utils
                     return 0;
                 });
 
+                //print_r($results);
 
-                //$result = $fuzzProcess->extractOne($search, $choices, null, [$fuzz, $fuzzyMethod]);
                 $result = $results[0];
 
                 if (!empty($result)) {
