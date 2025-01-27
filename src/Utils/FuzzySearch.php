@@ -132,17 +132,14 @@ class FuzzySearch
     {
 
         // Filter corpus for those with search key
-        $tempCorpus = array_filter($this->corpus, fn($item) => !empty($item[$this->corpusSearchKey]));
+        $tempCorpus = array_values(array_filter($this->corpus, fn($item) => !empty($item[$this->corpusSearchKey])));
 
         // Make the corpus unique
-        $tempCorpus = Utils::make_object_list_unique($tempCorpus, $this->corpusSearchKey, $this->corpusSearchKey);
+        $tempCorpus = Utils::make_object_list_unique($tempCorpus, $this->corpusIdKey, $this->corpusIdKey);
 
         // We assign similarity
         array_walk($tempCorpus, function (&$value, $key) use($query, $scoringMethod) {
-            $value['similarity'] = 0;
-            if (!empty($value[$this->corpusSearchKey])) {
-                $value['similarity'] = $this->getSimilarity($value[$this->corpusSearchKey], $query, $scoringMethod);
-            }
+            $value['similarity'] = $this->getSimilarity($value[$this->corpusSearchKey], $query, $scoringMethod);
         });
 
         print "\n query: $query; corpus with similarity is: ".json_encode($tempCorpus)."\n";
@@ -156,7 +153,7 @@ class FuzzySearch
         $topNItems = array_slice($tempCorpus, 0, $topN);
 
         // We filter out those whose similarities are above the threshold.
-        return  array_filter($topNItems, fn($item) => $item['similarity'] >= $similarityThreshold);
+        return  array_values(array_filter($topNItems, fn($item) => $item['similarity'] >= $similarityThreshold));
     }
 
     /**
