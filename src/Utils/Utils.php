@@ -872,11 +872,47 @@ class Utils
                     return trim(preg_replace("/[^A-Za-z0-9 ]/i", "", $item));
                 }, $choices));
 
-                $result = $fuzzProcess->extractOne($search, $choices, null, [$fuzz, $fuzzyMethod]);
+                $results = [];
+
+                // We add similarity score
+                foreach ($choices as $index => $choice) {
+
+                    $results[$index]['choice'] = $choice;
+                    $results[$index]['similarity'] = 0;
+                    $results[$index]['weight'] = strlen($choice);
+
+                    // We remove stop words from choice
+                    $choiceSearch = FuzzySearch::cleanText($choice);
+
+                    if (!empty($search) && !empty($choiceSearch)) {
+                        $results[$index]['similarity'] = $fuzz->$fuzzyMethod($search, $choiceSearch);
+                    }
+                }
+
+                // We sort the results
+                usort($results, function ($a, $b) {
+
+                    // First sort by similarity descending
+                    if ($a['similarity'] !== $b['similarity']) {
+                        return $b['similarity'] <=> $a['similarity'];
+                    }
+
+                    // If similarity is the same, sort by weight descending
+                    if ($a['weight'] !== $b['weight']) {
+                        return $b['weight'] <=> $a['weight'];
+                    }
+
+                    // Preserve original order for ties
+                    return 0;
+                });
+
+
+                //$result = $fuzzProcess->extractOne($search, $choices, null, [$fuzz, $fuzzyMethod]);
+                $result = $results[0];
 
                 if (!empty($result)) {
-                    $choice = $result[0];
-                    $score = $result[1];
+                    $choice = $result['choice'];
+                    $score = $result['similarity'];
 
                     if ($score >= $minScore) {
                         $extracted["$key-$search"] = $choice;

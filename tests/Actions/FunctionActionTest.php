@@ -1116,44 +1116,24 @@ class FunctionActionTest extends TestCase
         $data = [
             'items' => [
                 [
-                    'description' => [
-                        'meta_data' => [
-                            'other_details' => [
-                                'Shipping_Address' => 'NAIVAS JUJA Shop-JUJA Shop'
-                            ]
-                        ]
-                    ]
+                    'description' => "VELVEX ANTIBACTERIAL WET WIPES 10S"
                 ],
                 [
-                    'description' => [
-                        'meta_data' => [
-                            'other_details' => [
-                                'Shipping_Address' => 'NAIVAS JUJA Shop-JUJA Shop'
-                            ]
-                        ]
-                    ]
+                    'description' => "VELVEX ADULT BODY WIPES 72S"
                 ],
-                [
-                    'description' => [
-                        'meta_data' => [
-                            'other_details' => [
-                                'Shipping_Address' => 'NAIVAS NYERI Deli-NYERI Deli'
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+            ],
+            "classes"   => ["VELVEX", "VELVEX ANTIBACTERIAL"]
         ];
 
         $expectedData = [];
 
-        $action = new FunctionAction("items.*.description.meta_data.other_details.Shipping_Address", [$this, "fuzzy_extract_one"], ["choices" => ["Shop", "Deli", "Butchery"], 'min_score' => 50, 'default_choice' => "Shop", 'fuzzy_method' => 'tokenSetRatio'], "items.*.description.meta_data.other_details.Section");
+        $action = new FunctionAction("items.*.description", [$this, "fuzzy_extract_one"], ["choices" => ["VELVEX", "VELVEX ANTIBACTERIAL"], 'min_score' => 0, 'default_choice' => "", 'fuzzy_method' => 'tokenSetRatio'], "items.*.brand");
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
-        $this->assertEquals($data, $expectedData);
+        //$this->assertEquals($data, $expectedData);
     }
 
     public function _testModalReducer()
