@@ -44,9 +44,6 @@ class FuzzySearch
         $this->corpus = $corpus;
         $this->stopWords = $stopWords;
 
-
-        print "\nAll corpus: ".json_encode($this->corpus)."\n";
-
         return $this;
     }
 
@@ -136,15 +133,12 @@ class FuzzySearch
         // Filter corpus for those with search key
         $tempCorpus = array_values(array_filter($this->corpus, fn($item) => !empty($item[$this->corpusSearchKey])));
 
-        // Make the corpus unique
-        //$tempCorpus = Utils::make_object_list_unique($tempCorpus, $this->corpusIdKey, $this->corpusIdKey);
-
         // We assign similarity
         array_walk($tempCorpus, function (&$value, $key) use($query, $scoringMethod) {
             $value['similarity'] = $this->getSimilarity($value[$this->corpusSearchKey], $query, $scoringMethod);
         });
 
-        print "\n query: $query; corpus with similarity is: ".json_encode($tempCorpus)."\n";
+        //print "\n query: $query; corpus with similarity is: ".json_encode($tempCorpus)."\n";
 
         // We sort the data by similarity
         usort($tempCorpus, function($a, $b) {
