@@ -867,9 +867,9 @@ class Utils
                 // make choices unique
                 $choices = array_values(array_unique($choices));
 
-                $choices = array_filter(array_map(function($item) {
-                    return trim(preg_replace("/[^A-Za-z0-9 ]/i", "", $item));
-                }, $choices));
+//                $choices = array_filter(array_map(function($item) {
+//                    return trim(preg_replace("/[^A-Za-z0-9 ]/i", "", $item));
+//                }, $choices));
 
                 $results = [];
 
