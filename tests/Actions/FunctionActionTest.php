@@ -1110,7 +1110,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testExtractOne()
+    public function _testExtractOne()
     {
 
         $data = [

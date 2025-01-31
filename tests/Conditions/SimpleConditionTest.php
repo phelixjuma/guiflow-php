@@ -237,4 +237,39 @@ class SimpleConditionTest extends TestCase
         //$this->assertTrue($response);
     }
 
+    public function _testEvaluateSize()
+    {
+        $data = [
+            "customer_name" => [
+                "meta_data" => [
+                    "id" => "C00048"
+                ]
+            ],
+            "products_list" => [
+                [
+                    "name"  => "product 1"
+                ],
+                [
+                    "name"  => "product 2"
+                ]
+            ]
+        ];
+
+        $condition = [
+            "path" => "products_list",
+            "operator" => "sizeofeq",
+            "value" => "1"
+        ];
+
+        $pathResolver = new PathResolver();
+
+        $simpleCondition = new SimpleCondition($condition, $pathResolver);
+
+        $response = $simpleCondition->evaluate($data);
+
+        print "\nCondition Returns $response\n";
+
+        //$this->assertTrue($response);
+    }
+
 }

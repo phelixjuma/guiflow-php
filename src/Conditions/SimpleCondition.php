@@ -31,6 +31,8 @@ class SimpleCondition implements ConditionInterface
             return true;
         }
 
+        $hasWildcardPaths = !empty($this->condition['path']) && str_contains($this->condition['path'], "*");
+
         $pathValues = $data;
         if (isset($this->condition['path_value'])) {
             $pathValues = $this->condition['path_value'];
@@ -49,7 +51,7 @@ class SimpleCondition implements ConditionInterface
         $similarityThreshold = $this->condition['similarity_threshold'] ?? null;
 
         // Handle wildcard paths
-        if (is_array($pathValues) && !Utils::isObject($pathValues)) {
+        if ($hasWildcardPaths && is_array($pathValues) && !Utils::isObject($pathValues)) {
             foreach ($pathValues as $pathValue) {
                 if (self::compare($pathValue, $operator, $value, $similarityThreshold)) {
                     return true; // Return true as soon as one match is found
@@ -121,7 +123,7 @@ class SimpleCondition implements ConditionInterface
                     return is_string($pathValue) && strlen($pathValue) <= $value;
                 case 'sizeofeq':
                     $size = Utils::length($pathValue);
-                    return $size == $value;
+                    return intval($size) == intval($value);
                 case 'sizeofneq':
                     $size = Utils::length($pathValue);
                     return $size != $value;
