@@ -119,6 +119,24 @@ class SimpleCondition implements ConditionInterface
                     return is_string($pathValue) && strlen($pathValue) < $value;
                 case 'strlenlte':
                     return is_string($pathValue) && strlen($pathValue) <= $value;
+                case 'sizeofeq':
+                    $size = Utils::length($pathValue);
+                    return $size == $value;
+                case 'sizeofneq':
+                    $size = Utils::length($pathValue);
+                    return $size != $value;
+                case 'sizeofgt':
+                    $size = Utils::length($pathValue);
+                    return $size > $value;
+                case 'sizeofgte':
+                    $size = Utils::length($pathValue);
+                    return $size >= $value;
+                case 'sizeoflt':
+                    $size = Utils::length($pathValue);
+                    return $size < $value;
+                case 'sizeoflte':
+                    $size = Utils::length($pathValue);
+                    return $size <= $value;
                 case 'contains':
                     return !empty($pathValue) && !empty($value) && str_contains($pathValue, $value);
                 case 'not contains':
