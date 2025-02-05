@@ -67,7 +67,7 @@ class Utils
     public static function prepend($data, $stringsToAppend, $separator = " ", $useDataAsPathValue = true, $valueKey=null, $condition = null)
     {
 
-        $modifiedSeparator = " $separator ";
+        $modifiedSeparator = $separator == "[space]" ? " " : "$separator";
         $strings = implode($modifiedSeparator, $stringsToAppend);
 
         // If the data is an array, apply prepend recursively to each element
@@ -98,7 +98,7 @@ class Utils
 
         $stringsToAppend = self::getValues($data, $dataToAdd);
 
-        $modifiedSeparator = " $separator ";
+        $modifiedSeparator = $separator == "[space]" ? " " : "$separator";
         $strings = implode($modifiedSeparator, $stringsToAppend);
 
         // If the data is an array, apply append recursively to each element
