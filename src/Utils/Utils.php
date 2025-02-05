@@ -174,7 +174,8 @@ class Utils
     }
 
     /**
-     * @param $strings
+     * @param $data
+     * @param $dataToAdd
      * @param $separator
      * @param $enclosure
      * @return array|string|string[]|null
@@ -184,7 +185,7 @@ class Utils
 
         $stringsToAdd = self::getValues($data, $dataToAdd);
 
-        $separator = " $separator "; // add spaces to the separator
+        $separator = $separator == "[space]" ? " " : "$separator";
         if (empty($enclosure)) {
             return self::removeExtraSpaces(implode($separator, $stringsToAdd));
         } else {
@@ -208,15 +209,17 @@ class Utils
     }
 
     /**
-     * @param array $data
-     * @param array $fields
+     * @param $data
+     * @param $fields
      * @param $newField
-     * @return array
+     * @param $separator
+     * @param $enclosure
+     * @return mixed
      */
     public static function concat_multi_array_assoc($data, $fields, $newField, $separator = " ", $enclosure="")
     {
 
-        $separator = " $separator "; // add spaces to the separator
+        $separator = $separator == "[space]" ? " " : "$separator";
 
         if (is_array($data)) {
             array_walk($data, function (&$value, $key) use($fields, $newField, $separator, $enclosure) {
