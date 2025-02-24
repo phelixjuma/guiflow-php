@@ -54,7 +54,6 @@ class PathResolver
 
     public static function setValueByPath(array &$data, string $path, $value)
     {
-
         $parts = explode('.', $path);
         $current = &$data;
 
@@ -100,7 +99,9 @@ class PathResolver
                 $current[$part] = [];
             }
             // Move the pointer
-            $current = &$current[$part];
+            if (isset($current[$part])) {
+                $current = &$current[$part];
+            }
         }
 
         // At the end of the loop, set the value
@@ -160,7 +161,9 @@ class PathResolver
             }
 
             // Move the pointer
-            $current = &$current[$part];
+            if (is_array($current) && isset($current[$part])) {
+                $current = &$current[$part];
+            }
         }
     }
 
