@@ -54,11 +54,6 @@ class PathResolver
 
     public static function setValueByPath(array &$data, string $path, $value)
     {
-        $exists = self::getValueByPath($data, $path);
-
-        if ($exists == null) {
-            return;
-        }
 
         $parts = explode('.', $path);
         $current = &$data;
