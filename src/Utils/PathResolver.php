@@ -99,7 +99,9 @@ class PathResolver
                 $current[$part] = [];
             }
             // Move the pointer
-            $current = &$current[$part];
+            if (isset($current[$part])) {
+                $current = &$current[$part];
+            }
         }
 
         // At the end of the loop, set the value
@@ -152,7 +154,9 @@ class PathResolver
             }
 
             // Move the pointer
-            $current = &$current[$part];
+            if (isset($current[$part])) {
+                $current = &$current[$part];
+            }
         }
     }
 
