@@ -54,6 +54,12 @@ class PathResolver
 
     public static function setValueByPath(array &$data, string $path, $value)
     {
+        $exists = self::getValueByPath($data, $path);
+
+        if ($exists == null) {
+            return;
+        }
+
         $parts = explode('.', $path);
         $current = &$data;
 
@@ -99,9 +105,7 @@ class PathResolver
                 $current[$part] = [];
             }
             // Move the pointer
-            if (isset($current[$part])) {
-                $current = &$current[$part];
-            }
+            $current = &$current[$part];
         }
 
         // At the end of the loop, set the value
@@ -110,6 +114,13 @@ class PathResolver
 
     public static function removePath(array &$data, string $path)
     {
+
+        $exists = self::getValueByPath($data, $path);
+
+        if ($exists == null) {
+            return;
+        }
+
         $parts = explode('.', $path);
         $current = &$data;
 
@@ -154,9 +165,7 @@ class PathResolver
             }
 
             // Move the pointer
-            if (isset($current[$part])) {
-                $current = &$current[$part];
-            }
+            $current = &$current[$part];
         }
     }
 
