@@ -6,6 +6,7 @@ use ArrayJoin\Builder;
 use ArrayJoin\On;
 use FuzzyWuzzy\Fuzz;
 use FuzzyWuzzy\Process;
+use InvalidArgumentException;
 use PhelixJuma\GUIFlow\Actions\FunctionAction;
 use PhelixJuma\GUIFlow\Workflow;
 use PhelixJuma\GUIFlow\Exceptions\UnknownOperatorException;
@@ -1863,6 +1864,28 @@ class Utils
     public static function maxConcurrency(): float
     {
         return ceil(1 * self::count_vcpus());
+    }
+
+    /**
+     * @param $number
+     * @param $multiple
+     * @param $direction
+     * @return float|int
+     */
+    public static function roundToMultiple($number, $multiple, $direction = 'down') {
+
+        if ($multiple == 0) {
+            return 0; // Avoid division by zero
+        }
+
+        switch (strtolower($direction)) {
+            case 'up':
+                return $multiple * ceil($number / $multiple);
+            case 'down':
+                return $multiple * floor($number / $multiple);
+            default:
+                throw new InvalidArgumentException("Invalid direction: use 'up' or 'down'.");
+        }
     }
 
 }

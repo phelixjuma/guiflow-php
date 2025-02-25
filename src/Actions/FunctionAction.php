@@ -258,6 +258,8 @@ class FunctionAction implements ActionInterface
                 $newValue = UnitConverter::convert_multiple(...$paramValues);
             }  elseif (isset($this->function[1]) && $this->function['1'] == 'convert_units_v2') {
                 $newValue = UnitConverter::convert_units_v2(...$paramValues);
+            } elseif (isset($this->function[1]) && $this->function['1'] == 'round_to_multiple') {
+                $newValue = Utils::roundToMultiple(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'get_metric_conversion_table') {
                 $newValue = UnitConverter::get_metric_conversion_table();
             } elseif (isset($this->function[1]) && $this->function['1'] == 'model_mapping') {

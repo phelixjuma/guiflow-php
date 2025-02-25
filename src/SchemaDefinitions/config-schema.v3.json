@@ -3163,6 +3163,50 @@
       ],
       "unevaluatedProperties": false
     },
+    "roundToMultipleFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "round_to_multiple"
+              ]
+            },
+            "args": {
+              "description": "Round to multiples",
+              "type": "object",
+              "properties": {
+                "multiple": {
+                  "$ref": "#/definitions/valueOrPath"
+                },
+                "direction": {
+                  "description": "How to handle decimals ie round off, round up or round down",
+                  "type": "string",
+                  "enum": [
+                    "up",
+                    "down"
+                  ],
+                  "default": "up"
+                }
+              },
+              "required": [
+                "multiple",
+                "direction"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "getMetricConversionTableFunctionArgs": {
       "allOf": [
         {
@@ -5224,6 +5268,26 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_RoundToMultiple": {
+      "title": "Round to Multiple",
+      "description": "Round numbers to nearest multiples",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/roundToMultipleFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_GetMetricConversionTable": {
       "title": "Get Metric Conversion Table",
       "description": "Get data with metric conversion table",
@@ -5642,6 +5706,9 @@
           "$ref": "#/definitions/Action_Function_ConvertUnitsV2"
         },
         {
+          "$ref": "#/definitions/Action_Function_RoundToMultiple"
+        },
+        {
           "$ref": "#/definitions/Action_Function_GetMetricConversionTable"
         },
         {
@@ -5863,6 +5930,10 @@
         {
           "title": "Convert Units V2",
           "$ref": "#/definitions/convertUnitsV2FunctionArgs"
+        },
+        {
+          "title": "Round to Multiple",
+          "$ref": "#/definitions/roundToMultipleFunctionArgs"
         },
         {
           "title": "Get Metric Conversion Table",
