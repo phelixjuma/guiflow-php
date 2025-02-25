@@ -1867,12 +1867,13 @@ class Utils
     }
 
     /**
+     * @param $data
      * @param $number
      * @param $multiple
      * @param $direction
      * @return float|int
      */
-    public static function roundToMultiple($number, $multiple, $direction = 'down') {
+    public static function roundToMultiple($data, $number, $multiple, $direction = 'down') {
 
         if ($multiple == 0) {
             return 0; // Avoid division by zero

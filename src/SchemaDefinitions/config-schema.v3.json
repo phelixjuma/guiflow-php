@@ -3179,6 +3179,9 @@
               "description": "Round to multiples",
               "type": "object",
               "properties": {
+                "number": {
+                  "$ref": "#/definitions/valueOrPath"
+                },
                 "multiple": {
                   "$ref": "#/definitions/valueOrPath"
                 },
@@ -3193,6 +3196,7 @@
                 }
               },
               "required": [
+                "number",
                 "multiple",
                 "direction"
               ],
