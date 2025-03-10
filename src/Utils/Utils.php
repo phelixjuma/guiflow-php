@@ -281,6 +281,14 @@ class Utils
 
     /**
      * @param $data
+     * @return array
+     */
+    public static function make_list_unique($data) {
+        return array_values(array_unique($data));
+    }
+
+    /**
+     * @param $data
      * @param $pattern
      * @param $replacement
      * @return string
