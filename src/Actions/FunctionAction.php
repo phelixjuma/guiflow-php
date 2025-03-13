@@ -161,7 +161,7 @@ class FunctionAction implements ActionInterface
                             try {
                                 (new FunctionAction($path, [$this->function[0], $function], $args, $newField, $strict, $condition))->execute($value);
                             } catch (\Exception|\Throwable $e) {
-                                print "\nError in map function: ".$e->getMessage()." on line {$e->getLine()} of file {$e->getFile()}\n";
+                                print "\nError in map function: ".$e->getMessage()." on line {$e->getLine()} of file {$e->getFile()}: path: {$path} function {$function} args ".json_encode($args)." new_field: {$newField}\n";
                             }
                         }
                     }

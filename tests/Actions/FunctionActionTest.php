@@ -431,78 +431,18 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testExpandListFunction()
+    public function testExpandListFunction()
     {
 
-        $data = [[
-            'customer' => 'Naivas',
-            'location' => [
-                'address' => 'Kilimani',
-                'region' => 'Nairobi'
-            ],
-            'products' => [
-                [
-                    'name' => 'KFC CHICKEN BREAST FILLETS',
-                    'unit_of_measure' => [
-                        ['selling_quantity' => 2, 'scheduled_delivery_date_or_day_of_week' =>'Thursday'],
-                        ['selling_quantity' => 3, 'scheduled_delivery_date_or_day_of_week' =>'Saturday'],
-                    ]
-                ],
-                [
-                    'name' => 'KFC CHICKEN COB 9 PIECE',
-                    'unit_of_measure' => [
-                        ['selling_quantity' => 60, 'scheduled_delivery_date_or_day_of_week' =>'Tuesday'],
-                        ['selling_quantity' => 60, 'scheduled_delivery_date_or_day_of_week' =>'Thursday'],
-                        ['selling_quantity' => 60, 'scheduled_delivery_date_or_day_of_week' =>'Saturday'],
-                    ]
-                ],
-            ],
-            'total_unit_price' => 500
-        ]];
+        // ["preferences" => ["colors" => ["blue", "green"]]] becomes [["preferences.colors" => "blue"],["preferences.colors" => "green"]]
+        $data = [
+            "preferences" => [
+                "colors" => ["blue", "green"]
+            ]
+        ];
 
-        $data = json_decode('[{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC EASTLEIGH","customer_email":"","customer_phone":"","delivery_location":"EASTLEIGH","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN BREAST FILLETS","unit_of_measure":[{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-19"},{"selling_quantity":3,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]},{"serial_number":2,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":60,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-17"},{"selling_quantity":60,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-19"},{"selling_quantity":60,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]},{"serial_number":3,"description":"KFC CHICKEN NUGGETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]},{"serial_number":4,"description":"KFC CHICKEN STRIPS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]},{"serial_number":5,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-19"},{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]},{"serial_number":6,"description":"KFC FZN CHICKEN MINI FILLETS","unit_of_measure":[{"selling_quantity":3,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-19"},{"selling_quantity":3,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]}],"currency":"","total_number_of_items":10,"total_number_of_extracted_items":10,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"KFC Galleria","customer_name":"KFC Galleria","customer_email":"","customer_phone":"","delivery_location":"KFC Galleria","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN BREAST FILLETS","unit_of_measure":[{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]},{"serial_number":2,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":60,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":60,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]},{"serial_number":3,"description":"KFC CHICKEN NUGGETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"}]},{"serial_number":4,"description":"KFC CHICKEN STRIPS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"}]},{"serial_number":5,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]},{"serial_number":6,"description":"KFC FZN CHICKEN MINI FILLETS","unit_of_measure":[{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]}],"currency":"","total_number_of_items":10,"total_number_of_extracted_items":10,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC Garden City","customer_email":"","customer_phone":"","delivery_location":"Garden City","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":30,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-10"},{"selling_quantity":40,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-12"},{"selling_quantity":40,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-14"}]},{"serial_number":2,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-10"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-14"}]}],"currency":"","total_number_of_items":5,"total_number_of_extracted_items":5,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"KFC Junction","customer_name":"KFC Junction","customer_email":"","customer_phone":"","delivery_location":"KFC Junction","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN BREAST FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]},{"serial_number":2,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":50,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":50,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-05"},{"selling_quantity":50,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]},{"serial_number":3,"description":"KFC CHICKEN NUGGETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"}]},{"serial_number":4,"description":"KFC CHICKEN STRIPS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]},{"serial_number":5,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-05"},{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]}],"currency":"","total_number_of_items":10,"total_number_of_extracted_items":10,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC KAKAMEGA","customer_email":"","customer_phone":"","delivery_location":"KAKAMEGA","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":30,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":25,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-06"}]},{"serial_number":2,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-04"}]}],"currency":"KES","total_number_of_items":3,"total_number_of_extracted_items":3,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC KIAMBU ROAD","customer_email":"","customer_phone":"","delivery_location":"KIAMBU ROAD","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN BREAST FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]},{"serial_number":2,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":30,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":30,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]},{"serial_number":3,"description":"KFC CHICKEN NUGGETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"}]},{"serial_number":4,"description":"KFC CHICKEN STRIPS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]},{"serial_number":5,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]},{"serial_number":6,"description":"KFC FZN CHICKEN MINI FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-03"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-07"}]}],"currency":"","total_number_of_items":10,"total_number_of_extracted_items":10,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC LANGATA","customer_email":"","customer_phone":"","delivery_location":"KFC LANGATA","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN BREAST FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-19"}]},{"serial_number":2,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":30,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-17"},{"selling_quantity":40,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-19"},{"selling_quantity":30,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]},{"serial_number":3,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-17"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-19"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]},{"serial_number":4,"description":"KFC FZN CHICKEN MINI FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-19"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]}],"currency":"","total_number_of_items":9,"total_number_of_extracted_items":9,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC Limuru Road","customer_email":"","customer_phone":"","delivery_location":"Limuru Road","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":40,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-19"},{"selling_quantity":30,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]},{"serial_number":2,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-19"},{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]},{"serial_number":3,"description":"KFC FZN CHICKEN MINI FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-21"}]}],"currency":"","total_number_of_items":5,"total_number_of_extracted_items":5,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC MACHAKOS","customer_email":"","customer_phone":"","delivery_location":"MACHAKOS","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":20,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-23"},{"selling_quantity":30,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-26"}]},{"serial_number":2,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-26"}]}],"currency":"KES","total_number_of_items":3,"total_number_of_extracted_items":3,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC Meru","customer_email":"","customer_phone":"","delivery_location":"Meru","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN BREAST FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-25"}]},{"serial_number":2,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":70,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-25"}]},{"serial_number":3,"description":"KFC FZN CHICKEN MINI FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-25"}]}],"currency":"","total_number_of_items":3,"total_number_of_extracted_items":3,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC Mombasa CBD","customer_email":"","customer_phone":"","delivery_location":"Mombasa CBD","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":30,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-06"}]},{"serial_number":2,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-06"}]}],"currency":"KES","total_number_of_items":2,"total_number_of_extracted_items":2,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC NAKURU","customer_email":"","customer_phone":"","delivery_location":"NAKURU","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN BREAST FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-06-15"}],"pack_configuration":[],"unit_price":0,"total_price":0},{"serial_number":2,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":70,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-06-13"}],"pack_configuration":[],"unit_price":0,"total_price":0},{"serial_number":3,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":60,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-06-15"}],"pack_configuration":[],"unit_price":0,"total_price":0}],"currency":"","total_number_of_items":3,"total_number_of_extracted_items":3,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC NYALI","customer_email":"","customer_phone":"","delivery_location":"KFC NYALI","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN BREAST FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-10"}]},{"serial_number":2,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":40,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-10"},{"selling_quantity":30,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-13"}]},{"serial_number":3,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-10"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-13"}]},{"serial_number":4,"description":"KFC FZN CHICKEN MINI FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-10"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-13"}]}],"currency":"","total_number_of_items":7,"total_number_of_extracted_items":7,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"John Doe","customer_name":"KFC THIKA","customer_email":"","customer_phone":"","delivery_location":"THIKA","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":50,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-23"},{"selling_quantity":50,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-27"}]},{"serial_number":2,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-23"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-27"}]}],"currency":"","total_number_of_items":4,"total_number_of_extracted_items":4,"sub_total":0,"total_amount":0,"vat_no":""},{"purchase_order_number":"","order_date":"","ordered_by_name":"KFC WOODVALE","customer_name":"KFC WOODVALE","customer_email":"","customer_phone":"","delivery_location":"KFC WOODVALE","seller_name":"KENCHIC LIMITED","items":[{"serial_number":1,"description":"KFC CHICKEN BREAST FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-02"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-04"},{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-06"}]},{"serial_number":2,"description":"KFC CHICKEN COB 9 PIECE","unit_of_measure":[{"selling_quantity":60,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-02"},{"selling_quantity":60,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-04"},{"selling_quantity":60,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-06"}]},{"serial_number":3,"description":"KFC CHICKEN NUGGETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-06"}]},{"serial_number":4,"description":"KFC CHICKEN STRIPS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-02"},{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-06"}]},{"serial_number":5,"description":"KFC CHICKEN WINGLETS","unit_of_measure":[{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-02"},{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-04"},{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-06"}]},{"serial_number":6,"description":"KFC FZN CHICKEN MINI FILLETS","unit_of_measure":[{"selling_quantity":1,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-04"},{"selling_quantity":2,"selling_unit":"Pieces","scheduled_delivery_date_or_day_of_week":"2023-10-06"}]}],"currency":"","total_number_of_items":14,"total_number_of_extracted_items":14,"sub_total":0,"total_amount":0,"vat_no":""}]', JSON_FORCE_OBJECT);
 
-        foreach ($data as &$batchOrder) {
-
-            $batchOrder['items'] = Utils::expandList($batchOrder['items']);
-
-            // Rename the uom keys (removes the dot notation created by the expand list function)
-            foreach ($batchOrder['items'] as &$item) {
-                $newItem = [];
-                foreach ($item as $key => $value) {
-                    $keyParts = explode(".", $key);
-
-                    if (sizeof($keyParts) == 1) {
-                        $newItem[$key] = $value;
-                    } else {
-                        $newItem[$keyParts[0]][0][$keyParts[1]] = $value;
-                    }
-                }
-                $item = $newItem;
-            }
-        }
-
-        // Third, we set the delivery date on the LPO
-        foreach ($data as &$order) {
-
-            // We get the next delivery date
-            $nextDeliveryDate = trim(PathResolver::getValueByPath($order, 'items.0.scheduled_delivery_date_or_day_of_week'));
-
-            // If the next delivery date is a week day, we get the date
-            if (preg_match('/^[a-zA-Z]+$/', $nextDeliveryDate)) {
-                $dayDate = Utils::format_date("next $nextDeliveryDate", "Y-m-d");
-
-                if (!str_contains($dayDate, "Invalid date format")) {
-                    $nextDeliveryDate = $dayDate;
-                }
-
-            }
-
-            // Set the delivery date
-            PathResolver::setValueByPath($order, 'delivery_date', $nextDeliveryDate);
-        }
-
-        print_r(json_encode($data));
+        print_r($data);
 
         //$this->assertEquals($data, $expectedData);
     }
@@ -1890,35 +1830,36 @@ class FunctionActionTest extends TestCase
     public function _testDuplicator()
     {
         $data = [
-            "items" => [
-                    [
-                        "item_code" => "FG2001003",
-                        "item_quantity"=> 4,
-                        "uom_code"=> "22",
-                        "warehouse_code"=> "WH16"
-                    ],
-                    [
-                        "item_code"=> "FG4110002",
-                        "item_quantity" => 1,
-                        "uom_code" => "19",
-                        "warehouse_code" => "WH16"
-                    ]
-                ]
+
+            [
+                "item_code" => "FG2001003",
+                "item_quantity"=> 4,
+                "uom_code"=> "22",
+                "warehouse_code"=> "WH16"
+            ],
+            [
+                "item_code"=> "FG4110002",
+                "item_quantity" => 1,
+                "uom_code" => "19",
+                "warehouse_code" => "WH16"
+            ]
+
         ];
+
 
         $replacement = [
             [
-                "item_code" => "FG2001003",
-                "replacements"  => [
-                    "item_code" => "FG2001002",
-                    "uom_code"  => "23"
-                ]
-            ],
-            [
-                "item_code" => "FG2001002",
-                "replacements"  => [
-                    "item_code" => "FG2001003",
-                    "uom_code"  => "23"
+                "search_key" => "item_code",
+                "search_value" => "FG2001003",
+                "replacements" => [
+                    [
+                        "key" => "item_code",
+                        "replacement" => "FG2001002"
+                    ],
+                    [
+                        "key" => "uom_code",
+                        "replacement" => "23"
+                    ]
                 ]
             ]
         ];
@@ -1929,15 +1870,35 @@ class FunctionActionTest extends TestCase
             'value'     => ['FG2001003']
         ];
 
-        $expectedData = [];
+        $expectedData = [
 
-        $action = new FunctionAction("items", [$this, 'duplicate_list_item'], ['replacementKey' => 'item_code', 'replacement' => $replacement], '' , 0, $condition);
+            [
+                "item_code" => "FG2001003",
+                "item_quantity"=> 4,
+                "uom_code"=> "22",
+                "warehouse_code"=> "WH16"
+            ],
+            [
+                "item_code" => "FG2001002",
+                "item_quantity"=> 4,
+                "uom_code"=> "23",
+                "warehouse_code"=> "WH16"
+            ],
+            [
+                "item_code"=> "FG4110002",
+                "item_quantity" => 1,
+                "uom_code" => "19",
+                "warehouse_code" => "WH16"
+            ]
+        ];
+
+        $action = new FunctionAction("items", [$this, 'duplicate_list_item'], ['replacementKey' => 'item_code', 'replacement' => null], '' , 0, $condition);
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
-        $this->assertEquals($data, $expectedData);
+        //$this->assertEquals($data, $expectedData);
     }
 
     public function _testTemplateParser()
