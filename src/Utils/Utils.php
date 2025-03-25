@@ -990,8 +990,8 @@ class Utils
                     return $data['similarity'] == $topMatch;
                 });
             } else {
-                //$sortedData = array_slice($sortedData, 0, $n, true);
-                $sortedData = self::get_top_n_ranked_items_by_key($sortedData, 'similarity', $n);
+                $sortedData = array_slice($sortedData, 0, $n, true);
+                //$sortedData = self::get_top_n_ranked_items_by_key($sortedData, 'similarity', $n);
             }
 
             // min score given. We filter further to ensure none of the top n are below the min score
