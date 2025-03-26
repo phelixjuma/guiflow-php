@@ -165,6 +165,7 @@ class SimpleCondition implements ConditionInterface
                 case 'regex':
                     return is_string($pathValue) && preg_match($value, $pathValue) === 1;
                 case 'in':
+                    print "check if $pathValue in ".json_encode($value);
                     return in_array($pathValue, (array)$value);
                 case 'not in':
                     return !in_array($pathValue, (array)$value);
