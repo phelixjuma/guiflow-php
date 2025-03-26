@@ -3978,7 +3978,9 @@
                 "not in list any",
                 "like",
                 "validates",
-                "not validates"
+                "not validates",
+                "lists_have_intersection",
+                "lists_not_have_intersection"
               ]
             },
             "value": {
