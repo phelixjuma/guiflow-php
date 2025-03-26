@@ -50,8 +50,11 @@ class SimpleCondition implements ConditionInterface
         }
         $similarityThreshold = $this->condition['similarity_threshold'] ?? null;
 
+        // support lists
+        $supportsListByListComparison = in_array($operator, ["lists_have_intersection", "lists_not_have_intersection"]);
+
         // Handle wildcard paths
-        if ($hasWildcardPaths && is_array($pathValues) && !Utils::isObject($pathValues)) {
+        if ($hasWildcardPaths && !$supportsListByListComparison && is_array($pathValues) && !Utils::isObject($pathValues)) {
             foreach ($pathValues as $pathValue) {
                 if (self::compare($pathValue, $operator, $value, $similarityThreshold)) {
                     return true; // Return true as soon as one match is found
