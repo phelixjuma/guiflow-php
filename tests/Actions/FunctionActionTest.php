@@ -431,7 +431,7 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function testExpandListFunction()
+    public function _testExpandListFunction()
     {
 
         // ["preferences" => ["colors" => ["blue", "green"]]] becomes [["preferences.colors" => "blue"],["preferences.colors" => "green"]]

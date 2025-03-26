@@ -190,7 +190,9 @@
                 "not in list all",
                 "in list any",
                 "not in list any",
-                "like"
+                "like",
+                "lists_have_intersection",
+                "lists_not_have_intersection"
               ]
             },
             "key": {
@@ -4116,7 +4118,9 @@
                     "in list any",
                     "not in list any",
                     "like",
-                    "similar_to"
+                    "similar_to",
+                    "lists_have_intersection",
+                    "lists_not_have_intersection"
                   ]
                 },
                 "value": {

@@ -43,4 +43,23 @@ class PathResolverTest extends TestCase
         //$this->assertTrue(ConfigurationValidator::validate($data));
     }
 
+    public function testGetFromArray()
+    {
+
+        $data = [
+            [
+                "description" => "product 1"
+            ],
+            [
+                "description" => "product 2"
+            ]
+        ];
+        // validate the config
+        $response = PathResolver::getValueByPath($data, "*.description");
+
+        print_r($response);
+
+        //$this->assertTrue(ConfigurationValidator::validate($data));
+    }
+
 }
