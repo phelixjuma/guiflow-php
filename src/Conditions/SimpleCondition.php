@@ -238,6 +238,7 @@ class SimpleCondition implements ConditionInterface
                 case 'not validates':
                     return !DataValidator::validateDataStructure($pathValue, $value, false);
                 case 'lists_have_intersection':
+                    echo "checking intersection between ".json_encode($value)." and ".json_encode($pathValue);
                     return count(array_intersect($value, $pathValue)) > 0;
                 case 'lists_not_have_intersection':
                     return count(array_intersect($value, $pathValue)) == 0;
