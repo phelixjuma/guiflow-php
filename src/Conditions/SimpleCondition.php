@@ -170,7 +170,6 @@ class SimpleCondition implements ConditionInterface
                 case 'regex':
                     return is_string($pathValue) && preg_match($value, $pathValue) === 1;
                 case 'in':
-                    print "check if $pathValue in ".json_encode($value);
                     return in_array($pathValue, (array)$value);
                 case 'not in':
                     return !in_array($pathValue, (array)$value);
@@ -251,10 +250,10 @@ class SimpleCondition implements ConditionInterface
                 case 'lists_not_have_intersection':
                     return count(array_intersect($value, $pathValue)) == 0;
                 case 'list_contains_all':
-                    echo json_encode($pathValue).' list_contains_all '.json_encode($value);
-                    return empty(array_diff($pathValue, $value));
+                    $isTrue = empty(array_diff($value, $pathValue));
+                    return  $isTrue;
                 case 'list_not_contains_all':
-                    return !empty(array_diff($pathValue, $value));
+                    return !empty(array_diff($value, $pathValue));
                 default:
                     throw new UnknownOperatorException("Unknown operator: $operator");
             }

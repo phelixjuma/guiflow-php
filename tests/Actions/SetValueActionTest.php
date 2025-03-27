@@ -202,4 +202,176 @@ class SetValueActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
+    public function _testConditional()
+    {
+        $data = [
+            "customer_name_search" => "MAJID ALFUTTAIM HYPERMARKETS LTD",
+            "unique_brands" => [
+                "CHANDAN",
+                "BISCOLATA",
+                "CRISS CROSS",
+                "OZMO",
+                "MILANGO",
+                "BOOMBASTIC",
+                "PAPITA"
+            ],
+            "majid_brands" => [
+                "ky" => [
+                    "VELVEX",
+                    "NICE & SOFT",
+                    "ROSY",
+                    "TOILEX",
+                    "DAWN",
+                    "QIKDRI",
+                    "SAFARI",
+                    "ROYALE",
+                    "AZHAR",
+                    "AONE",
+                    "SINAR LINE",
+                    "SURECOPY",
+                    "SANDY",
+                    "FRESHEN UP",
+                    "CARREFOUR"
+                ],
+                "hyg" => [
+                    "SOFY",
+                    "WHITEDENT",
+                    "HIMALAYA",
+                    "TRESSA",
+                    "SIRI",
+                    "BANNISTERS",
+                    "BABY SOFT",
+                    "SKIN GLOW",
+                    "BODYLINE",
+                    "VELVEX CONFORTA",
+                    "VELVEX ADULT BODY",
+                    "VELVEX ANTIBACTERIAL",
+                    "VELVEX BABY WATER",
+                    "VELVEX BAMBOO",
+                    "VELVEX MAKE-UP"
+                ],
+                "sol"=> [
+                    "BISCOLATA",
+                    "CHANDAN",
+                    "OILYSSA",
+                    "OZMO",
+                    "MILANGO",
+                    "BOOMBASTIC",
+                    "PAPITA",
+                    "CRISS CROSS",
+                    "ONLI"
+                ],
+                "hky"=> [
+                    "ATA",
+                    "PERSIL"
+                ],
+                "tg"=> [
+                    "TONI GLASS",
+                    "PERRIER"
+                ],
+                "hbky"=> [
+                    "FA",
+                    "GOT2B"
+                ],
+                "mck"=> [
+                    "MACCOFFEE",
+                    "MACTEA",
+                    "KRACKS"
+                ],
+                "ken"=> [
+                    "KENTASTE"
+                ]
+            ],
+            "majid_same_brands_group"=> "No"
+        ];
+
+        $conditionalValue = json_decode('[
+            {
+              "condition": {
+                "operator": "AND",
+                "conditions": [
+                  {
+                    "path": "customer_name_search",
+                    "operator": "matches",
+                    "value": "MAJID"
+                  },
+                  {
+                    "operator": "OR",
+                    "conditions": [
+                      {
+                        "path": "majid_brands.ky",
+                        "operator": "list_contains_all",
+                        "value": {
+                          "path": "unique_brands"
+                        }
+                      },
+                      {
+                        "path": "majid_brands.hyg",
+                        "operator": "list_contains_all",
+                        "value": {
+                          "path": "unique_brands"
+                        }
+                      },
+                      {
+                        "path": "majid_brands.sol",
+                        "operator": "list_contains_all",
+                        "value": {
+                          "path": "unique_brands"
+                        }
+                      },
+                      {
+                        "path": "majid_brands.hky",
+                        "operator": "list_contains_all",
+                        "value": {
+                          "path": "unique_brands"
+                        }
+                      },
+                      {
+                        "path": "majid_brands.tg",
+                        "operator": "list_contains_all",
+                        "value": {
+                          "path": "unique_brands"
+                        }
+                      },
+                      {
+                        "path": "majid_brands.hbky",
+                        "operator": "list_contains_all",
+                        "value": {
+                          "path": "unique_brands"
+                        }
+                      },
+                      {
+                        "path": "majid_brands.mck",
+                        "operator": "list_contains_all",
+                        "value": {
+                          "path": "unique_brands"
+                        }
+                      },
+                      {
+                        "path": "majid_brands.ken",
+                        "operator": "list_contains_all",
+                        "value": {
+                          "path": "unique_brands"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "value": "Yes",
+              "valueFromField": "",
+              "use_data_as_path_value": "0"
+            }
+          ]', true);
+
+
+        $action = new SetValueAction("", null, null, null, $conditionalValue, 'majid_same_brands_group');
+
+        $action->execute($data);
+
+        print_r($data);
+
+        //$this->assertEquals($data, $expectedData);
+    }
+
 }
