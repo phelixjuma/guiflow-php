@@ -51,7 +51,12 @@ class SimpleCondition implements ConditionInterface
         $similarityThreshold = $this->condition['similarity_threshold'] ?? null;
 
         // support lists
-        $supportsListByListComparison = in_array($operator, ["lists_have_intersection", "lists_not_have_intersection"]);
+        $supportsListByListComparison = in_array($operator, [
+            "lists_have_intersection",
+            "lists_not_have_intersection",
+            "list_contains_all",
+            "list_not_contains_all"
+            ]);
 
         // Handle wildcard paths
         if ($hasWildcardPaths && !$supportsListByListComparison && is_array($pathValues) && !Utils::isObject($pathValues)) {
@@ -242,10 +247,13 @@ class SimpleCondition implements ConditionInterface
                 case 'not validates':
                     return !DataValidator::validateDataStructure($pathValue, $value, false);
                 case 'lists_have_intersection':
-                    echo "checking intersection between ".json_encode($value)." and ".json_encode($pathValue);
                     return count(array_intersect($value, $pathValue)) > 0;
                 case 'lists_not_have_intersection':
                     return count(array_intersect($value, $pathValue)) == 0;
+                case 'list_contains_all':
+                    return empty(array_diff($pathValue, $value));
+                case 'list_not_contains_all':
+                    return !empty(array_diff($pathValue, $value));
                 default:
                     throw new UnknownOperatorException("Unknown operator: $operator");
             }

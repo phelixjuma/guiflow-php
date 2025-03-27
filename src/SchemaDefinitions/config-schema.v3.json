@@ -192,7 +192,9 @@
                 "not in list any",
                 "like",
                 "lists_have_intersection",
-                "lists_not_have_intersection"
+                "lists_not_have_intersection",
+                "list_contains_all",
+                "list_not_contains_all"
               ]
             },
             "key": {
@@ -3980,7 +3982,9 @@
                 "validates",
                 "not validates",
                 "lists_have_intersection",
-                "lists_not_have_intersection"
+                "lists_not_have_intersection",
+                "list_contains_all",
+                "list_not_contains_all"
               ]
             },
             "value": {
@@ -4122,7 +4126,9 @@
                     "like",
                     "similar_to",
                     "lists_have_intersection",
-                    "lists_not_have_intersection"
+                    "lists_not_have_intersection",
+                    "list_contains_all",
+                    "list_not_contains_all"
                   ]
                 },
                 "value": {
