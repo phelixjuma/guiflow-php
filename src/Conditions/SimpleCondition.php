@@ -251,6 +251,7 @@ class SimpleCondition implements ConditionInterface
                 case 'lists_not_have_intersection':
                     return count(array_intersect($value, $pathValue)) == 0;
                 case 'list_contains_all':
+                    echo json_encode($pathValue).' list_contains_all '.json_encode($value);
                     return empty(array_diff($pathValue, $value));
                 case 'list_not_contains_all':
                     return !empty(array_diff($pathValue, $value));
