@@ -321,6 +321,10 @@ class FunctionAction implements ActionInterface
             // If strict is set, we only set data when new value is not empty
             if (!$this->strict || (!empty($newValue))) {
 
+                if (isset($this->function[1]) && $this->function['1'] == 'user_defined_function' && $paramValues[1] == 'similar_exported_purchase_order_exists') {
+                    print "target path is: {$this->targetPath} and response is .".json_encode($newValue);
+                }
+
                 if (empty($this->targetPath)) {
                     // If target path is not set, it means the whole data is to be updated
                     $data = $newValue;
