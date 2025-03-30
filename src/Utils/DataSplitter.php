@@ -69,11 +69,14 @@ class DataSplitter
 
             // Mark as split data
             $dataCopy['has_been_split'] = 1;
-            $dataCopy['split_type'] = 'categorical';
-            $dataCopy['split_path'] = $splitPath;
-            $dataCopy['criteria_path'] = $criteriaPath;
             $dataCopy['workflow_list_position'] = $index;
-
+            $dataCopy['split_meta_data'] = [
+                'has_been_split'            => 1,
+                'split_type'                => 'categorical',
+                'split_path'                => $splitPath,
+                'criteria_path'             => $criteriaPath,
+                'workflow_list_position'    => $index
+            ];
 
             $results[] = $dataCopy;
 
@@ -182,10 +185,14 @@ class DataSplitter
                 // Mark as split data
                 if ($wasSplit) {
                     $dataCopy['has_been_split'] = 1;
-                    $dataCopy['split_type'] = 'horizontal';
-                    $dataCopy['split_path'] = $splitPath;
-                    $dataCopy['criteria_path'] = $criteriaPath;
                     $dataCopy['workflow_list_position'] = $index;
+                    $dataCopy['split_meta_data'] = [
+                        'has_been_split'            => 1,
+                        'split_type'                => 'horizontal',
+                        'split_path'                => $splitPath,
+                        'criteria_path'             => $criteriaPath,
+                        'workflow_list_position'    => $index
+                    ];
                 }
 
 
@@ -266,10 +273,14 @@ class DataSplitter
 
                     // Mark as split data
                     $results[$i]['has_been_split'] = 1;
-                    $results[$i]['split_type'] = 'vertical';
-                    $results[$i]['split_path'] = $splitPath;
-                    $results[$i]['criteria_path'] = $criteriaPath;
                     $results[$i]['workflow_list_position'] = $i;
+                    $results[$i]['split_meta_data'] = [
+                        'has_been_split'            => 1,
+                        'split_type'                => 'vertical',
+                        'split_path'                => $splitPath,
+                        'criteria_path'             => $criteriaPath,
+                        'workflow_list_position'    => $i
+                    ];
                 }
             }
         }
