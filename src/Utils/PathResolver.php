@@ -52,6 +52,12 @@ class PathResolver
         return $current;
     }
 
+    /**
+     * @param array $data
+     * @param string $path
+     * @param $value
+     * @return void
+     */
     public static function setValueByPath(array &$data, string $path, $value)
     {
         $parts = explode('.', $path);

@@ -327,10 +327,6 @@ class FunctionAction implements ActionInterface
                 } else {
                     // Otherwise, we only update the relevant parts
                     PathResolver::setValueByPath($data, $this->targetPath, $newValue);
-
-                    if (isset($this->function[1]) && $this->function['1'] == 'user_defined_function' && $paramValues[1] == 'similar_exported_purchase_order_exists') {
-                        print "\ntarget path is: {$this->targetPath} and response is .".json_encode($newValue).".New data is: ".json_encode($data)."\n";
-                    }
                 }
             }
         }
