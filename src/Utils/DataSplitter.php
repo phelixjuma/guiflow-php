@@ -71,6 +71,7 @@ class DataSplitter
             $dataCopy['has_been_split'] = 1;
             $dataCopy['split_type'] = 'categorical';
             $dataCopy['split_path'] = $splitPath;
+            $dataCopy['criteria_path'] = $criteriaPath;
             $dataCopy['workflow_list_position'] = $index;
 
 
@@ -183,6 +184,7 @@ class DataSplitter
                     $dataCopy['has_been_split'] = 1;
                     $dataCopy['split_type'] = 'horizontal';
                     $dataCopy['split_path'] = $splitPath;
+                    $dataCopy['criteria_path'] = $criteriaPath;
                     $dataCopy['workflow_list_position'] = $index;
                 }
 
@@ -266,6 +268,7 @@ class DataSplitter
                     $results[$i]['has_been_split'] = 1;
                     $results[$i]['split_type'] = 'vertical';
                     $results[$i]['split_path'] = $splitPath;
+                    $results[$i]['criteria_path'] = $criteriaPath;
                     $results[$i]['workflow_list_position'] = $i;
                 }
             }
