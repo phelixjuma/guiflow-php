@@ -153,6 +153,10 @@ class SimpleCondition implements ConditionInterface
                     return empty($pathValue) || empty($value) || !str_contains($pathValue, $value);
                 case 'matches':
                     return is_string($pathValue) && preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
+                case 'is_substring':
+                    return !empty($pathValue) && !empty($value) && str_contains($value, $pathValue);
+                case 'is_not_substring':
+                    return empty($pathValue) || empty($value) || !str_contains($value, $pathValue);
                 case 'not matches':
                     return !is_string($pathValue) || !preg_match('/' . Utils::custom_preg_escape(Utils::full_unescape($value)) . '/i', $pathValue);
                 case 'exists':
