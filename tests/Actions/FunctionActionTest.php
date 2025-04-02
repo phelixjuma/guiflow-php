@@ -2422,4 +2422,50 @@ class FunctionActionTest extends TestCase
 
     }
 
+    public function _testWindowConditionalFilter()
+    {
+        $data = [
+            "products" => [
+                ['barcode' => '123', 'description' => 'Apple'],
+                ['barcode' => '123', 'description' => 'Green Apple'],
+                ['barcode' => '456', 'description' => 'Banana'],
+                ['barcode' => '789', 'description' => 'Cherry']
+            ],
+            "lookup"    => [
+                [
+                    "description"   => "Apple"
+                ]
+            ]
+        ];
+
+        $window_condition = [
+            "path"  => "",
+            "operator"  => "sizeofgt",
+            "value" => "1"
+        ];
+
+        $filters = [
+            "operator" => "AND",
+            "conditions" => [
+                [
+                    'path' => "description",
+                    "operator" => "in",
+                    "value" => [
+                        "path" => "lookup.*.description"
+                    ]
+                ]
+            ]
+        ];
+
+        $expectedData = [];
+
+        $action = new FunctionAction("products", [$this, 'window_conditional_filter'], ["grouping_key" => "barcode", "window_condition" => $window_condition, "filters" => $filters, "allow_empty_window" => "0"], 'filtered_products', 0, null);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        //$this->assertEquals($data, $expectedData);
+    }
+
 }

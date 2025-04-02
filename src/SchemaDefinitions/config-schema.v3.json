@@ -956,6 +956,53 @@
       ],
       "unevaluatedProperties": false
     },
+    "windowConditionalFilterFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "window_conditional_filter"
+              ]
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "grouping_key": {
+                  "type": "string"
+                },
+                "window_condition": {
+                  "$ref": "#/definitions/Condition"
+                },
+                "filters": {
+                  "$ref": "#/definitions/Condition"
+                },
+                "allow_empty_window": {
+                  "type": "string",
+                  "enum": ["0", "1"],
+                  "default": "0"
+                }
+              },
+              "required": [
+                "grouping_key",
+                "window_condition",
+                "filters",
+                "allow_empty_window"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "splitFunctionArgs": {
       "allOf": [
         {
@@ -4489,6 +4536,29 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_WindowConditionalFilter": {
+      "description": "Conditional filter of data based on a defined window",
+      "title": "Conditional Window Filter",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/windowConditionalFilterFunctionArgs"
+            }
+          },
+          "required": [
+            "params"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_Split": {
       "title": "Split",
       "description": "Split a list of data into separate and distinct lists. Supports horizontal, vertical and conditional split",
@@ -5645,6 +5715,9 @@
           "$ref": "#/definitions/Action_Function_Filter"
         },
         {
+          "$ref": "#/definitions/Action_Function_WindowConditionalFilter"
+        },
+        {
           "$ref": "#/definitions/Action_Function_Split"
         },
         {
@@ -5832,6 +5905,10 @@
         {
           "title": "Filter",
           "$ref": "#/definitions/filterFunctionArgs"
+        },
+        {
+          "title": "Window Conditional Filter",
+          "$ref": "#/definitions/windowConditionalFilterFunctionArgs"
         },
         {
           "title": "Split",

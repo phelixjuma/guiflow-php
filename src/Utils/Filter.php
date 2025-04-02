@@ -3,7 +3,9 @@
 namespace PhelixJuma\GUIFlow\Utils;
 
 use FuzzyWuzzy\Fuzz;
+use Kuza\Krypton\Framework\Services\DocuFlow\DataTransformerService;
 use PhelixJuma\GUIFlow\Conditions\SimpleCondition;
+use PhelixJuma\GUIFlow\Workflow;
 
 class Filter
 {
@@ -205,6 +207,43 @@ class Filter
             }
         }
         return array_values($array);  // Resetting the keys
+    }
+
+    public static function window_conditional_filter($data, $grouping_key, $window_condition, $filters, $allow_empty_window="0") {
+
+        // 1. we group the data based on the grouping key
+        $groups = [];
+        foreach ($data as $datum) {
+            $key = $datum[$grouping_key] ?? null;
+            if ($key !== null) {
+                $groups[$key][] = $datum;
+            }
+        }
+
+        // 2. We filter the data within its own window
+        $filtered = [];
+        foreach ($groups as $group) {
+            // The callback decides which items to keep based on the whole window/group.
+            if (!Workflow::evaluateCondition($group, $window_condition)) {
+                $filtered = array_merge($filtered, $group);
+            } else {
+                // we filter the group
+                $filteredGroup = [];
+                foreach ($group as $item) {
+                    if (Workflow::evaluateCondition($item, $filters)) {
+                        $filteredGroup[] = $item;
+                    }
+                }
+                // if group is filtered to emptiness but empty group is not allowed, we return everything
+                if (empty($filteredGroup) && $allow_empty_window == "0") {
+                    $filteredGroup = $group;
+                }
+                // Merge the filtered group back into the final result.
+                $filtered = array_merge($filtered, $filteredGroup);
+            }
+        }
+        return $filtered;
+
     }
 
 }
