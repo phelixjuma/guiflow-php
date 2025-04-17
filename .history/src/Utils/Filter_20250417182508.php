@@ -41,18 +41,16 @@ class Filter
      */
     private static function excludePatternFromData(&$data, $pattern) {
 
-        if (!is_null($data)) {
-            if (!is_array($data)) {
-                $data = preg_replace("/$pattern/i", '', $data);
-    
-                // Trim and remove multiple spaces to clean up the result
-                $data = preg_replace('/\s+/', ' ', trim($data));
-    
-            } else {
-                array_walk($data, function (&$v, $k) use($pattern) {
-                    self::excludePatternFromData($v, $pattern);
-                }) ;
-            }
+        if (!is_array($data)) {
+            $data = preg_replace("/$pattern/i", '', $data);
+
+            // Trim and remove multiple spaces to clean up the result
+            $data = preg_replace('/\s+/', ' ', trim($data));
+
+        } else {
+            array_walk($data, function (&$v, $k) use($pattern) {
+                self::excludePatternFromData($v, $pattern);
+            }) ;
         }
     }
 

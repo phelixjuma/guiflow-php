@@ -41,18 +41,16 @@ class Filter
      */
     private static function excludePatternFromData(&$data, $pattern) {
 
-        if (!is_null($data)) {
-            if (!is_array($data)) {
-                $data = preg_replace("/$pattern/i", '', $data);
-    
-                // Trim and remove multiple spaces to clean up the result
-                $data = preg_replace('/\s+/', ' ', trim($data));
-    
-            } else {
-                array_walk($data, function (&$v, $k) use($pattern) {
-                    self::excludePatternFromData($v, $pattern);
-                }) ;
-            }
+        if (!is_array($data)) {
+            $data = preg_replace("/$pattern/i", '', $data);
+
+            // Trim and remove multiple spaces to clean up the result
+            $data = preg_replace('/\s+/', ' ', trim($data));
+
+        } else {
+            array_walk($data, function (&$v, $k) use($pattern) {
+                self::excludePatternFromData($v, $pattern);
+            }) ;
         }
     }
 
@@ -68,7 +66,9 @@ class Filter
      */
     private static function matchValueAgainstFilter($value, $term, $mode, $similarityThreshold=self::DEFAULT_THRESHOLD, $termExclusionPattern = null, $valueExclusionPattern=null): bool|int
     {
-        
+        if (is_null($value)) {
+            return false;
+        }
         $term = is_array($term) ? array_map(function($item) {
             return is_string($item) ? strtolower(trim($item)) : $item;
         }, $term) : strtolower(trim($term));
