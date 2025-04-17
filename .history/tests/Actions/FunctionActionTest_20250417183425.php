@@ -2006,7 +2006,7 @@ class FunctionActionTest extends TestCase
         $data = [
             "products_list" => [
                 [
-                    "name" => ""
+                    "product_code" => ""
                 ],
                 [
                     "product_code" => "EX00100601"
