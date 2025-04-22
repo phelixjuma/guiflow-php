@@ -41,6 +41,19 @@
           "additionalProperties": false
         },
         {
+          "title": "Value from In Item Path",
+          "type": "object",
+          "properties": {
+            "in_item_path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
           "title": "Validation Data",
           "type": "array",
           "items": {
@@ -144,14 +157,7 @@
           "type": "object",
           "properties": {
             "term": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/valueOrPath"
-                },
-                {
-                  "$ref": "#/definitions/valueOrInItemPath"
-                }
-              ]
+              "$ref": "#/definitions/valueOrPath"
             },
             "mode": {
               "type": "string",
