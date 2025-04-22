@@ -49,7 +49,7 @@
             }
           },
           "required": [
-            "path"
+            "in_item_path"
           ],
           "additionalProperties": false
         },
