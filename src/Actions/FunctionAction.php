@@ -135,7 +135,7 @@ class FunctionAction implements ActionInterface
         if (empty($this->condition) || in_array($this->function['1'], ["map_parallel", "map"])  || Workflow::evaluateCondition($currentValues, $this->condition)) {
 
             if (isset($this->function[1]) && $this->function['1'] == 'filter') {
-                print_r($paramValues);
+                print_r($paramValues[1]);
                 $newValue = Filter::filterArray(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'window_conditional_filter') {
                 $newValue = Filter::window_conditional_filter(...$paramValues);
