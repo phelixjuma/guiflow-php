@@ -2001,7 +2001,7 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function _testFilterInArray()
+    public function testFilterInArray()
     {
         $data = [
             "products_list" => [
@@ -2015,17 +2015,17 @@ class FunctionActionTest extends TestCase
                         ["code" => "EX00100602"],
                         ["code" => "EX00100603"]
                     ]
-                ]
+                ],
+
             ]
-            
         ];
 
         $filterCriteria = [
             "operator" => "AND",
             "conditions" => [
                 [
-                    'term' => ["in_item_path" => "product_codes.*.code"],
-                    "mode" => "not in",
+                    'term' => ["path" => "product_codes.*.code"],
+                    "mode" => "not empty",
                     "key" => "product_code",
                     'threshold' => "",
                     "term_exclusion_pattern" => "",

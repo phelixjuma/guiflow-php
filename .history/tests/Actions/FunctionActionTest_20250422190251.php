@@ -2001,7 +2001,7 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function _testFilterInArray()
+    public function testFilterInArray()
     {
         $data = [
             "products_list" => [

@@ -84,7 +84,9 @@ class Filter
         }
 
         $fuzz = new Fuzz();
-
+        
+        print_r("term: " . json_encode($term) . "\n");
+        print_r("value: " . json_encode($value) . "\n");
 
         return match ($mode) {
             self::EQUAL => $term == $value,
@@ -112,18 +114,13 @@ class Filter
      * @param $filters
      * @return bool|int
      */
-    private static function matchesCriteria($data, $filters): bool|int
+    private static function matchesCriteria($value, $filters): bool|int
     {
 
-        
         // simple condition
         if (!isset($filters['operator'])) {
 
-            $value = PathResolver::getValueByPath($data, $filters['key']);
-
-            if (isset($filters['term']['in_item_path'])) {
-                $filters['term'] = PathResolver::getValueByPath($data, $filters['term']['in_item_path']);
-            }
+            $value = PathResolver::getValueByPath($value, $filters['key']);
 
             return self::matchValueAgainstFilter($value,
                 $filters['term'],
@@ -138,7 +135,7 @@ class Filter
 
             foreach ($filters['conditions'] as $filter) {
 
-                if (!self::matchesCriteria($data, $filter)) {
+                if (!self::matchesCriteria($value, $filter)) {
                     return false;
                 }
             }
@@ -146,7 +143,7 @@ class Filter
         }
         elseif (strtolower($filters['operator']) == 'or') {
             foreach ($filters['conditions'] as $filter) {
-                if (self::matchesCriteria($data, $filter)) {
+                if (self::matchesCriteria($value, $filter)) {
                     return true;
                 }
             }
@@ -164,31 +161,30 @@ class Filter
     public static function filterArray($array, $filters)
     {
 
-
         if (empty($array)) {
             return $array;
         }
 
-        foreach ($array as $key => $datum) {
+        foreach ($array as $key => $value) {
 
-            if (is_array($datum)) {
+            if (is_array($value)) {
 
                 // Check if it's an associative array (object)
-                if (array_keys($datum) !== range(0, count($datum) - 1)) {
+                if (array_keys($value) !== range(0, count($value) - 1)) {
 
-                    if (!self::matchesCriteria($datum, $filters)) {
+                    if (!self::matchesCriteria($value, $filters)) {
                         unset($array[$key]);
                     }
 
                 } else {
 
-                    $array[$key] = self::filterArray($datum, $filters);
+                    $array[$key] = self::filterArray($value, $filters);
                     if (empty($array[$key])) {
                         unset($array[$key]);
                     }
                 }
             } else {
-                if (!self::matchesCriteria($datum, $filters)) {
+                if (!self::matchesCriteria($value, $filters)) {
                     unset($array[$key]);
                 }
             }

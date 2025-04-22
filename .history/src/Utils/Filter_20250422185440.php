@@ -85,6 +85,8 @@ class Filter
 
         $fuzz = new Fuzz();
 
+        print_r("term: " . json_encode($term) . "\n");
+        print_r("value: " . json_encode($value) . "\n");
 
         return match ($mode) {
             self::EQUAL => $term == $value,
@@ -112,18 +114,14 @@ class Filter
      * @param $filters
      * @return bool|int
      */
-    private static function matchesCriteria($data, $filters): bool|int
+    private static function matchesCriteria($value, $filters): bool|int
     {
 
         
         // simple condition
         if (!isset($filters['operator'])) {
 
-            $value = PathResolver::getValueByPath($data, $filters['key']);
-
-            if (isset($filters['term']['in_item_path'])) {
-                $filters['term'] = PathResolver::getValueByPath($data, $filters['term']['in_item_path']);
-            }
+            $value = PathResolver::getValueByPath($value, $filters['key']);
 
             return self::matchValueAgainstFilter($value,
                 $filters['term'],
@@ -138,7 +136,7 @@ class Filter
 
             foreach ($filters['conditions'] as $filter) {
 
-                if (!self::matchesCriteria($data, $filter)) {
+                if (!self::matchesCriteria($value, $filter)) {
                     return false;
                 }
             }
@@ -146,7 +144,7 @@ class Filter
         }
         elseif (strtolower($filters['operator']) == 'or') {
             foreach ($filters['conditions'] as $filter) {
-                if (self::matchesCriteria($data, $filter)) {
+                if (self::matchesCriteria($value, $filter)) {
                     return true;
                 }
             }
@@ -163,7 +161,6 @@ class Filter
      */
     public static function filterArray($array, $filters)
     {
-
 
         if (empty($array)) {
             return $array;

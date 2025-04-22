@@ -85,6 +85,8 @@ class Filter
 
         $fuzz = new Fuzz();
 
+        print_r("term: " . json_encode($term) . "\n");
+        print_r("value: " . json_encode($value) . "\n");
 
         return match ($mode) {
             self::EQUAL => $term == $value,
@@ -121,9 +123,8 @@ class Filter
 
             $value = PathResolver::getValueByPath($data, $filters['key']);
 
-            if (isset($filters['term']['in_item_path'])) {
-                $filters['term'] = PathResolver::getValueByPath($data, $filters['term']['in_item_path']);
-            }
+            print_r("value: " . json_encode($value) . "\n");
+            print_r("filters: " . json_encode($filters) . "\n");
 
             return self::matchValueAgainstFilter($value,
                 $filters['term'],
@@ -163,7 +164,6 @@ class Filter
      */
     public static function filterArray($array, $filters)
     {
-
 
         if (empty($array)) {
             return $array;

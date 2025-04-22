@@ -85,6 +85,8 @@ class Filter
 
         $fuzz = new Fuzz();
 
+        print_r("term: " . json_encode($term) . "\n");
+        print_r("value: " . json_encode($value) . "\n");
 
         return match ($mode) {
             self::EQUAL => $term == $value,
