@@ -2484,7 +2484,7 @@ class FunctionActionTest extends TestCase
                     'unit'     => 'pcs',
                 ],
                 [
-                    'name'     => 'widget small',
+                    'name'     => 'PRIME PRIMALS-Qs Sliced',
                     'code'     => 'WS-123',
                     'quantity' => 5,
                     'unit'     => 'box',
@@ -2496,18 +2496,19 @@ class FunctionActionTest extends TestCase
             // exact-name match (as before)
             [
                 'key_name'   => 'name',
-                'key_value'  => 'widget small',
-                'pattern'    => '', 
+                'key_value'  => '',
+                'pattern'    => 'PRIME\s*PRIMALS\s*-\s*Qs', 
                 'overrides' => [
-                    [ 'name' => 'widget small xl' ],
+                    [ 'name' => 'PRIME PRIMALS-Qs Sliced XL' ],
                     [ 'quantity' => 100 ],
+                    [ 'unit' => 'set' ],
                 ],
             ],
             // regex on name: anything starting with "Product General"
             [
                 'key_name'   => 'name',
                 'key_value'  => '', 
-                'pattern'   => '/^Product General/i',
+                'pattern'   => 'Product General',
                 'overrides' => [
                     [ 'name' => 'product A' ],
                     [ 'name' => 'product B' ],

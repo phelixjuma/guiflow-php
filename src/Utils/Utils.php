@@ -704,8 +704,11 @@ class Utils
    
                // 1) try regex match if provided
                if (!empty($rule['pattern'])) {
-                   // pattern must include delimiters, e.g. '/^prod/i'
-                   if (@preg_match($rule['pattern'], $value)) {
+                   // Format pattern
+                   $pattern = str_ireplace("[space]", " ", $rule['pattern']);
+                   $pattern = "/{$pattern}/i";
+                   
+                   if (@preg_match($pattern, $value)) {
                        $isMatch = true;
                    }
                }
