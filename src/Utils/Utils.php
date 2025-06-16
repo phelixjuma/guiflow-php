@@ -657,6 +657,88 @@ class Utils
     }
 
     /**
+    * For each product in $products, look through each rule in $replacementSpecs:
+    *   – if 'pattern' is set, use preg_match() on $product[$keyName]
+    *   – otherwise if 'keyValue' is set, test strict equality
+    * When a rule matches, emit one new product per override, copying all fields
+    * then overlaying only the override fields.
+    * If no rule matches, emit the original product once.
+    *
+    * @param array $products
+    *   Array of products (each an assoc-array of fields)
+    * @param array $replacementSpecs
+    *   [
+    *     [
+    *       'keyName'   => string,        // e.g. 'name' or 'code'
+    *       // one of:
+    *       'keyValue'  => mixed,         // exact-match value
+    *       'pattern'   => string,        // PCRE regex, e.g. '/^widget/i'
+    *       'overrides' => array[         // list of assoc-arrays of fields to replace
+    *         [ 'name' => 'product A' ],
+    *         [ 'unit' => 'set' ],
+    *         …
+    *       ],
+    *     ],
+    *     … // more rules
+    *   ]
+    * @return array
+    *   Flattened list of data (with replacements applied)
+    */
+    public static function replicate_list_item_with_replacement(array $data, array $replacementSpecs): array
+   {
+       $result = [];
+   
+       foreach ($data as $datum) {
+           $matched = false;
+   
+           foreach ($replacementSpecs as $rule) {
+               $key = $rule['key_name'];
+   
+               // skip if the product doesn't even have that field
+               if (! array_key_exists($key, $datum)) {
+                   continue;
+               }
+   
+               $value = $datum[$key];
+               $isMatch = false;
+   
+               // 1) try regex match if provided
+               if (!empty($rule['pattern'])) {
+                   // pattern must include delimiters, e.g. '/^prod/i'
+                   if (@preg_match($rule['pattern'], $value)) {
+                       $isMatch = true;
+                   }
+               }
+               // 2) otherwise fall back to exact keyValue
+               elseif (!empty($rule['key_value'])) {
+                   if ($value === $rule['key_value']) {
+                       $isMatch = true;
+                   }
+               }
+   
+               if ($isMatch) {
+                   foreach ($rule['overrides'] as $override) {
+                       $newProduct = $datum;
+                       foreach ($override as $field => $val) {
+                           $newProduct[$field] = $val;
+                       }
+                       $result[] = $newProduct;
+                   }
+                   $matched = true;
+                   // stop at first matching rule
+                   break;
+               }
+           }
+   
+           if (! $matched) {
+               $result[] = $datum;
+           }
+       }
+   
+       return $result;
+   }
+
+    /**
      * @param $data
      * @param $operator
      * @param $operands

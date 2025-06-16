@@ -2473,4 +2473,58 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
+    public function testReplicateListItemWithReplacement()
+    {
+        $data = [
+            "products" => [
+                [
+                    'name'     => 'Product General XL',
+                    'code'     => 'PG-XL-001',
+                    'quantity' => 10,
+                    'unit'     => 'pcs',
+                ],
+                [
+                    'name'     => 'widget small',
+                    'code'     => 'WS-123',
+                    'quantity' => 5,
+                    'unit'     => 'box',
+                ],
+            ]
+        ];
+        
+        $replacementSpecs = [
+            // exact-name match (as before)
+            [
+                'key_name'   => 'name',
+                'key_value'  => 'widget small',
+                'pattern'    => '', 
+                'overrides' => [
+                    [ 'name' => 'widget small xl' ],
+                    [ 'quantity' => 100 ],
+                ],
+            ],
+            // regex on name: anything starting with "Product General"
+            [
+                'key_name'   => 'name',
+                'key_value'  => '', 
+                'pattern'   => '/^Product General/i',
+                'overrides' => [
+                    [ 'name' => 'product A' ],
+                    [ 'name' => 'product B' ],
+                    [ 'name' => 'product C', 'unit' => 'set' ],
+                ],
+            ],
+        ];
+        
+        $expectedData = [];
+
+        $action = new FunctionAction("products", [$this, 'replicate_list_item_with_replacement'], ["replacement_specs" => $replacementSpecs], 'replicated_products', 0, null);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        //$this->assertEquals($data, $expectedData);
+    }
+
 }

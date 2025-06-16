@@ -272,6 +272,8 @@ class FunctionAction implements ActionInterface
                 $newValue = Utils::make_list_unique(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'duplicate_list_item') {
                 $newValue = Utils::duplicate_list_item(...$paramValues);
+            } elseif (isset($this->function[1]) && $this->function['1'] == 'replicate_list_item_with_replacement') {
+                $newValue = Utils::replicate_list_item_with_replacement(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'get_random_string') {
                 // removes data from param values
                 array_shift($paramValues);

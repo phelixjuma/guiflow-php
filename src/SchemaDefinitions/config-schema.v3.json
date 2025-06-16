@@ -3502,6 +3502,73 @@
       ],
       "unevaluatedProperties": false
     },
+    "replicateListItemWithReplacementFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "replicate_list_item_with_replacement"
+              ]
+            },
+            "args": {
+              "description": "Replicate specific objects within a list. Has an option to modify the duplicated copy",
+              "type": "object",
+              "properties": {
+                "replacement_specs": {
+                  "description": "The replacement specs. For each replacement, add a new property defining the replacement_key name used for search",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key_name": {
+                        "description": "The key name to use for the replacement",
+                        "type": "string"
+                      },
+                      "key_value": {
+                        "description": "The key value to use for the replacement",
+                        "type": "string"
+                      },
+                      "pattern": {
+                        "description": "The pattern to use for the replacement",
+                        "type": "string"
+                      },
+                      "overrides": {
+                        "description": "The overrides to use for the replacement",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": true
+                        }
+                      }
+                    },
+                    "required": [
+                      "key_name",
+                      "key_value",
+                      "pattern",
+                      "overrides"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "replacement_specs"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "getRandomStringFunctionArgs": {
       "allOf": [
         {
@@ -5515,6 +5582,26 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_ReplicateListItemWithReplacement": {
+      "title": "Replicate List Item With Replacement",
+      "description": "Replicate items in an array with replacement",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/replicateListItemWithReplacementFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_GetRandomString": {
       "title": "Get Random String",
       "description": "Generate a random string",
@@ -5874,6 +5961,9 @@
           "$ref": "#/definitions/Action_Function_DuplicateListItem"
         },
         {
+          "$ref": "#/definitions/Action_Function_ReplicateListItemWithReplacement"
+        },
+        {
           "$ref": "#/definitions/Action_Function_GetRandomString"
         },
         {
@@ -6111,6 +6201,10 @@
         {
           "title": "Duplicate List Item",
           "$ref": "#/definitions/duplicateListItemFunctionArgs"
+        },
+        {
+          "title": "Replicate List Item With Replacement",
+          "$ref": "#/definitions/replicateListItemWithReplacementFunctionArgs"
         },
         {
           "title": "Get Random String",
