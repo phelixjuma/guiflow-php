@@ -3586,16 +3586,10 @@
               "type": "object",
               "properties": {
                 "subject": {
-                  "description": "The subject to replace",
-                  "type": "string"
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "lookup_table": {
-                  "description": "The lookup table to use for the replacement",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": true
-                  }
+                  "$ref": "#/definitions/valueOrPath"
                 },
                 "pattern_field": {
                   "description": "The field to use for the pattern",
