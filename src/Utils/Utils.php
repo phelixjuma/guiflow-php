@@ -1982,4 +1982,86 @@ class Utils
         }
     }
 
+    /**
+     * Apply regex‐driven replacements on $subject, sourcing patterns & replacements
+     * from a lookup‐table, with optional global exclude/require checks.
+     *
+     * All pattern arguments ($patternField values, $excludePattern, $requirePattern)
+     * are *raw* PCRE fragments.  We add delimiters and the `i` modifier based
+     * on $ignore_case.
+     *
+     * @param  string      $subject            The text to transform.
+     * @param  array       $lookupTable        Array of associative‐array rows.
+     * @param  string      $patternField       Key name for the raw regex pattern.
+     * @param  string      $replacementField   Key name for the replacement string.
+     * @param  bool        $use_word_boundary  Wrap each lookup pattern in \b…\b if true.
+     * @param  bool        $ignore_case        Add the `i` modifier to *all* patterns if true.
+     * @param  string|null $excludePattern     Raw PCRE fragment.  
+     *                                          If subject *matches* this, skip all replacements.
+     * @param  string|null $requirePattern     Raw PCRE fragment.  
+     *                                          If subject *does not* match this, skip all replacements.
+     * @return string                         The transformed text.
+     * @throws InvalidArgumentException       On regex compile/run error.
+     */
+    public static function regex_lookup_replace(
+        string  $subject,
+        array   $lookupTable,
+        string  $patternField,
+        string  $replacementField,
+        bool    $use_word_boundary  = false,
+        bool    $ignore_case        = false,
+        ?string $excludePattern     = null,
+        ?string $requirePattern     = null
+    ): string {
+        // helper to wrap raw fragments in delimiters + flags
+        $makeRegex = function(string $raw) use ($use_word_boundary, $ignore_case): string {
+            $inner = $use_word_boundary
+                ? '\b' . $raw . '\b'
+                : $raw;
+            $flags = $ignore_case ? 'i' : '';
+            return '/' . $inner . '/' . $flags;
+        };
+
+        // global exclude: if subject matches, return unchanged
+        if (!empty($excludePattern)) {
+            $excludeRegex = $makeRegex($excludePattern);
+            if (@preg_match($excludeRegex, $subject) === 1) {
+                return $subject;
+            }
+        }
+
+        // global require: if subject fails to match, return unchanged
+        if (!empty($requirePattern)) {
+            $requireRegex = $makeRegex($requirePattern);
+            if (@preg_match($requireRegex, $subject) !== 1) {
+                return $subject;
+            }
+        }
+
+        // apply each lookup‐row replacement in turn
+        foreach ($lookupTable as $row) {
+            if (! isset($row[$patternField], $row[$replacementField])) {
+                continue;
+            }
+
+            $regex       = $makeRegex($row[$patternField]);
+            $replacement = $row[$replacementField];
+
+            $result = @preg_replace($regex, $replacement, $subject);
+            if ($result === null && preg_last_error() !== PREG_NO_ERROR) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'regex_lookup_replace(): error with pattern %s (code %d)',
+                        $regex,
+                        preg_last_error()
+                    )
+                );
+            }
+
+            $subject = $result;
+        }
+
+        return $subject;
+    }
+
 }

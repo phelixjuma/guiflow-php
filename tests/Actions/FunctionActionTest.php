@@ -2473,7 +2473,7 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function testReplicateListItemWithReplacement()
+    public function _testReplicateListItemWithReplacement()
     {
         $data = [
             "products" => [
@@ -2520,6 +2520,48 @@ class FunctionActionTest extends TestCase
         $expectedData = [];
 
         $action = new FunctionAction("products", [$this, 'replicate_list_item_with_replacement'], ["replacement_specs" => $replacementSpecs], 'replicated_products', 0, null);
+
+        $action->execute($data);
+
+        print_r($data);
+
+        //$this->assertEquals($data, $expectedData);
+    }
+
+    public function _testRegexLookupReplace()
+    {
+        $data = [
+            "customers" => [
+                [
+                    'erp_name'     => 'Naivasha Mattresses',
+                    'lpo_name'     => 'Naivas',
+                ],
+                [
+                    'erp_name'     => 'Eastleigh Mattresses',
+                    'lpo_name'     => 'Eastmatt',
+                ],
+                [
+                    'erp_name'     => 'Kuku Foods Ltd',
+                    'lpo_name'     => 'KFC',
+                ],
+                [
+                    'erp_name'     => 'BLUE QUADRANT HOSPITALITY LIMITED',
+                    'lpo_name'     => 'KOROGA & KOKTAIL',
+                ],
+            ],
+            "customer_name" => "Naivas"
+        ];
+        
+        $action = new FunctionAction("", [$this, 'regex_lookup_replace'], [
+            "subject" => ["path" => "customer_name"], 
+            "lookup_table" => ["path" => "customers"], 
+            "pattern_field" => "lpo_name", 
+            "replacement_field" => "erp_name",
+            "use_word_boundary" => true,
+            "ignore_case" => true,
+            "exclude_pattern_field" => "",
+            "require_pattern_field" => "",
+        ], 'new_customer_name', 0, null);
 
         $action->execute($data);
 

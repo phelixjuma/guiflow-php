@@ -3569,6 +3569,90 @@
       ],
       "unevaluatedProperties": false
     },
+    "regexLookupReplaceFunctionArgs": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionFunctionSharedParams"
+        },
+        {
+          "properties": {
+            "function": {
+              "enum": [
+                "regex_lookup_replace"
+              ]
+            },
+            "args": {
+              "description": "Replace text based on a regex pattern",
+              "type": "object",
+              "properties": {
+                "subject": {
+                  "description": "The subject to replace",
+                  "type": "string"
+                },
+                "lookup_table": {
+                  "description": "The lookup table to use for the replacement",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                },
+                "pattern_field": {
+                  "description": "The field to use for the pattern",
+                  "type": "string"
+                },
+                "replacement_field": {
+                  "description": "The field to use for the replacement",
+                  "type": "string"
+                },
+                "use_word_boundary": {
+                  "description": "Whether to use word boundary",
+                  "type": "string",
+                  "enum": [
+                    "1",
+                    "0"
+                  ],
+                  "default": "1"
+                },
+                "ignore_case": {
+                  "description": "Whether to ignore case",
+                  "type": "string",
+                  "enum": [
+                    "1",
+                    "0"
+                  ],
+                  "default": "1"
+                },
+                "exclude_pattern_field": {
+                  "description": "The field to use for the exclude pattern",
+                  "type": "string"
+                },
+                "require_pattern_field": {
+                  "description": "The field to use for the require pattern",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "subject",
+                "lookup_table",
+                "pattern_field",
+                "replacement_field",
+                "use_word_boundary",
+                "ignore_case",
+                "exclude_pattern_field",
+                "require_pattern_field"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "function",
+            "args"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "getRandomStringFunctionArgs": {
       "allOf": [
         {
@@ -5602,6 +5686,26 @@
       ],
       "unevaluatedProperties": false
     },
+    "Action_Function_RegexLookupReplace": {
+      "title": "Regex Lookup Replace",
+      "description": "Replace text based on a regex pattern",
+      "allOf": [
+        {
+          "$ref": "#/definitions/actionBase"
+        },
+        {
+          "$ref": "#/definitions/functionAction"
+        },
+        {
+          "properties": {
+            "params": {
+              "$ref": "#/definitions/regexLookupReplaceFunctionArgs"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "Action_Function_GetRandomString": {
       "title": "Get Random String",
       "description": "Generate a random string",
@@ -5964,6 +6068,9 @@
           "$ref": "#/definitions/Action_Function_ReplicateListItemWithReplacement"
         },
         {
+          "$ref": "#/definitions/Action_Function_RegexLookupReplace"
+        },
+        {
           "$ref": "#/definitions/Action_Function_GetRandomString"
         },
         {
@@ -6205,6 +6312,10 @@
         {
           "title": "Replicate List Item With Replacement",
           "$ref": "#/definitions/replicateListItemWithReplacementFunctionArgs"
+        },
+        {
+          "title": "Regex Lookup Replace",
+          "$ref": "#/definitions/regexLookupReplaceFunctionArgs"
         },
         {
           "title": "Get Random String",

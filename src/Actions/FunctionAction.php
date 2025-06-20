@@ -274,6 +274,8 @@ class FunctionAction implements ActionInterface
                 $newValue = Utils::duplicate_list_item(...$paramValues);
             } elseif (isset($this->function[1]) && $this->function['1'] == 'replicate_list_item_with_replacement') {
                 $newValue = Utils::replicate_list_item_with_replacement(...$paramValues);
+            } elseif (isset($this->function[1]) && $this->function['1'] == 'regex_lookup_replace') {
+                $newValue = Utils::regex_lookup_replace(...array_slice($paramValues, 1));
             } elseif (isset($this->function[1]) && $this->function['1'] == 'get_random_string') {
                 // removes data from param values
                 array_shift($paramValues);
