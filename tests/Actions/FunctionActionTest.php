@@ -2533,6 +2533,11 @@ class FunctionActionTest extends TestCase
         $data = [
             "customer_name_lookup" => [
                 [
+                    "SYSTEM CODE" => "IS-BAT001",
+                    "SYSTEM NAME" => "BATA SHOE COMPANY (KENYA) LIMITED",
+                    "LPO NAME" => "KIATU SACCO / BATA"
+                ],
+                [
                     "SYSTEM CODE" => "IS-ACR003",
                     "SYSTEM NAME" => "ACROSS BORDERS EDUCATION GROUP LTD",
                     "LPO NAME" => "IUPC"
@@ -2553,7 +2558,7 @@ class FunctionActionTest extends TestCase
                     "LPO NAME" => "DEWBURY APARTMENTS MANAGEMENT"
                 ]
             ],
-            "customer_name" => "IUPC"
+            "customer_name" => "KIATU SACCO /  BATA"
         ];
         
         $action = new FunctionAction("", [$this, 'regex_lookup_replace'], [
