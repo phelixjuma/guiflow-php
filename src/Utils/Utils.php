@@ -2026,6 +2026,7 @@ class Utils
         if (!empty($excludePattern)) {
             $excludeRegex = $makeRegex($excludePattern);
             if (@preg_match($excludeRegex, $subject) === 1) {
+                print "exclude pattern matched. We stop ans return $subject\n";
                 return $subject;
             }
         }
@@ -2034,6 +2035,7 @@ class Utils
         if (!empty($requirePattern)) {
             $requireRegex = $makeRegex($requirePattern);
             if (@preg_match($requireRegex, $subject) !== 1) {
+                print "require pattern not matched. We stop ans return $subject\n";
                 return $subject;
             }
         }
@@ -2041,6 +2043,7 @@ class Utils
         // apply each lookup‐row replacement in turn
         foreach ($lookupTable as $row) {
             if (! isset($row[$patternField], $row[$replacementField])) {
+                print "row does not have pattern or replacement field. We skip it\n";
                 continue;
             }
 
@@ -2049,6 +2052,7 @@ class Utils
 
             $result = @preg_replace($regex, $replacement, $subject);
             if ($result === null && preg_last_error() !== PREG_NO_ERROR) {
+                print "preg_replace failed. We throw an error\n";
                 throw new InvalidArgumentException(
                     sprintf(
                         'regex_lookup_replace(): error with pattern %s (code %d)',
@@ -2060,6 +2064,8 @@ class Utils
 
             $subject = $result;
         }
+
+        print "Completed. Returning $subject\n";
 
         return $subject;
     }

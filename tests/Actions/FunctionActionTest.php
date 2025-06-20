@@ -2528,40 +2528,48 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function _testRegexLookupReplace()
+    public function testRegexLookupReplace()
     {
         $data = [
-            "customers" => [
+            "customer_name_lookup" => [
                 [
-                    'erp_name'     => 'Naivasha Mattresses',
-                    'lpo_name'     => 'Naivas',
+                    "SYSTEM CODE" => "IS-ACR003",
+                    "SYSTEM NAME" => "ACROSS BORDERS EDUCATION GROUP LTD",
+                    "LPO NAME" => "IUPC"
                 ],
                 [
-                    'erp_name'     => 'Eastleigh Mattresses',
-                    'lpo_name'     => 'Eastmatt',
+                    "SYSTEM CODE" => "IS-AFR016",
+                    "SYSTEM NAME" => "AFRICA INLAND CHURCH - AIC KIJABE HOSPITAL",
+                    "LPO NAME" => "AIC KIJABE HOSPITAL"
                 ],
                 [
-                    'erp_name'     => 'Kuku Foods Ltd',
-                    'lpo_name'     => 'KFC',
+                    "SYSTEM CODE" => "IS-AID003",
+                    "SYSTEM NAME" => "AIDS HEALTHCARE FOUNDATION KENYA",
+                    "LPO NAME" => "AHF AIDS"
                 ],
                 [
-                    'erp_name'     => 'BLUE QUADRANT HOSPITALITY LIMITED',
-                    'lpo_name'     => 'KOROGA & KOKTAIL',
-                ],
+                    "SYSTEM CODE" => "IS-AIR031",
+                    "SYSTEM NAME" => "AIR CASA LIMITED",
+                    "LPO NAME" => "DEWBURY APARTMENTS MANAGEMENT"
+                ]
             ],
-            "customer_name" => "Naivas"
+            "customer_name" => "IUPC"
         ];
         
         $action = new FunctionAction("", [$this, 'regex_lookup_replace'], [
-            "subject" => ["path" => "customer_name"], 
-            "lookup_table" => ["path" => "customers"], 
-            "pattern_field" => "lpo_name", 
-            "replacement_field" => "erp_name",
-            "use_word_boundary" => true,
-            "ignore_case" => true,
+            "subject" => [
+                "path" => "customer_name"
+            ], 
+            "lookup_table" => [
+                "path" => "customer_name_lookup"
+            ], 
+            "pattern_field" => "LPO NAME", 
+            "replacement_field" => "SYSTEM NAME",
+            "use_word_boundary" => "1",
+            "ignore_case" => "1",
             "exclude_pattern_field" => "",
             "require_pattern_field" => "",
-        ], 'new_customer_name', 0, null);
+        ], 'customer_name', 0, null);
 
         $action->execute($data);
 
