@@ -196,6 +196,56 @@ class Filter
         return array_values($array);  // Resetting the keys
     }
 
+    /**
+     * Performs conditional filtering on grouped data using a window-based approach.
+     * 
+     * This method first groups the input data by a specified grouping key, then applies
+     * conditional filtering within each group (window). The filtering behavior depends on
+     * whether a window condition is met:
+     * 
+     * - If the window condition is NOT met for a group: the entire group is kept unchanged
+     * - If the window condition IS met for a group: individual items are filtered using the provided filters
+     * - If filtering results in an empty group and empty windows are not allowed: the original group is preserved
+     * 
+     * This is particularly useful for scenarios where you want to apply different filtering
+     * logic based on the characteristics of the entire group/window of data.
+     * 
+     * Example use case: Filter transactions within account groups, but only apply strict
+     * filtering rules to accounts that meet certain criteria (e.g., high-value accounts).
+     * 
+     * @param array $data The input data array to be filtered. Each item should be an associative array.
+     * @param string $grouping_key The key/field name used to group the data items. Items with the same
+     *                            value for this key will be grouped together.
+     * @param array $window_condition The condition array used to evaluate each group/window. This follows
+     *                               the same format as Workflow::evaluateCondition() conditions.
+     * @param array $filters The filter criteria applied to individual items within groups where the
+     *                      window condition is met. This follows the same format as other filtering
+     *                      methods in this class.
+     * @param string $allow_empty_window Whether to allow empty groups after filtering. "0" (default) means
+     *                                  empty groups are not allowed and the original group will be preserved.
+     *                                  "1" means empty groups are allowed.
+     * 
+     * @return array The filtered data array with items that meet the criteria. Array keys are reset
+     *               to maintain sequential indexing.
+     * 
+     * @throws \Exception May throw exceptions from Workflow::evaluateCondition() if condition evaluation fails.
+     * 
+     * @example
+     * ```php
+     * $data = [
+     *     ['account_id' => 'A1', 'amount' => 100, 'type' => 'deposit'],
+     *     ['account_id' => 'A1', 'amount' => 50, 'type' => 'withdrawal'],
+     *     ['account_id' => 'A2', 'amount' => 1000, 'type' => 'deposit'],
+     *     ['account_id' => 'A2', 'amount' => 500, 'type' => 'withdrawal'],
+     * ];
+     * 
+     * // Only filter high-value accounts (groups with total > 800)
+     * $window_condition = ['key' => 'amount', 'mode' => '>', 'term' => 800];
+     * $filters = ['key' => 'type', 'mode' => '==', 'term' => 'deposit'];
+     * 
+     * $result = Filter::window_conditional_filter($data, 'account_id', $window_condition, $filters);
+     * ```
+     */
     public static function window_conditional_filter($data, $grouping_key, $window_condition, $filters, $allow_empty_window="0") {
 
         // 1. we group the data based on the grouping key

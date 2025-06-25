@@ -111,17 +111,7 @@ class FunctionAction implements ActionInterface
             foreach ($this->args as $param) {
 
                 if (!in_array($this->function['1'], ['map', 'map_parallel'])) {
-
                     $paramValues[] = self::resolveParam($data, $param);
-//                    if (is_array($param) && isset($param['path'])) {
-//
-//                        $paramPath = $param['path'];
-//                        $paramValue = PathResolver::getValueByPath($data, $paramPath);
-//                        $paramValues[] = $paramValue;
-//
-//                    } else {
-//                        $paramValues[] = self::getFilterCriteria($data, $param);
-//                    }
                 } else {
                     $paramValues[] = $param;
                 }

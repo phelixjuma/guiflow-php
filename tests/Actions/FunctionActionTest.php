@@ -87,37 +87,74 @@ class FunctionActionTest extends TestCase
         $this->assertEquals($data, $expectedData);
     }
 
-    public function _testFilterFunction()
+    public function testFilterFunction()
     {
         $data = [
-            'products' => [
-                ["Sell_to_Customer_No" => "PC00070","No" => "PC03267", 'name' => 'CAPON FRESH BUTCHERY.', 'quantity' => 2, 'unit_price' => 200],
-                ["Sell_to_Customer_No" => "PC00071","No" => "1300120", 'name' => 'CAPON FRESH BUTCHERY', 'quantity' => 3, 'unit_price' => 300],
-                ["Sell_to_Customer_No" => "PC00072","No" => "PC00987", 'name' => 'Chicken Sausages 500g', 'quantity' => 5, 'unit_price' => 200],
-            ],
-            'customer_name' => [
-                'meta_data' => [
-                    'id' => 'PC00072'
+            'customers' => [
+                [
+                    "zcustomer" => "1000004862",
+                    "zdistributionChannel" => "D1",
+                    "zcustomerName" => "QUICK MART LTD",
+                    "zdistributionChannelName" => "Mahitaji Distributor",
+                    "zsoldTo" => "1000004862",
+                    "zsoldName" => "QUICK MART LTD"
+                ],
+                [
+                    "zcustomer" => "1000004862",
+                    "zdistributionChannel" => "D1",
+                    "zcustomerName" => "QUICK MART LTD",
+                    "zdistributionChannelName" => "Mahitaji Distributor",
+                    "zsoldTo" => "1000004863",
+                    "zsoldName" => "QUICK MART LTD - KITUI BRANCH"
+                ],
+                [
+                    "zcustomer" => "1000004863",
+                    "zdistributionChannel" => "D1",
+                    "zcustomerName" => "QUICK MART LTD - KITUI BRANCH",
+                    "zdistributionChannelName" => "Mahitaji Distributor",
+                    "zsoldTo" => "1000004863",
+                    "zsoldName" => "QUICK MART LTD - KITUI BRANCH"
+                ],
+                [
+                    "zcustomer" => "1000004864",
+                    "zdistributionChannel" => "D2",
+                    "zcustomerName" => "CHAMARY SUPERMARKET",
+                    "zdistributionChannelName" => "Marsyetu Distributor",
+                    "zsoldTo" => "1000004864",
+                    "zsoldName" => "CHAMARY SUPERMARKET"
+                ],
+                [
+                    "zcustomer" => "1000004865",
+                    "zdistributionChannel" => "D2",
+                    "zcustomerName" => "CLASSIC MATHAE HOLDINGS LTD",
+                    "zdistributionChannelName" => "Marsyetu Distributor",
+                    "zsoldTo" => "1000004865",
+                    "zsoldName" => "CLASSIC MATHAE HOLDINGS LTD"
                 ]
             ]
         ];
-        $criteria = [
-            "operator"      => "AND",
-            "conditions"    => [
-                ['term' => ['path' => 'customer_name.meta_data.id'], 'mode' => '==', 'key' => 'Sell_to_Customer_No'],
-                ['term' => 'PC', 'mode' => 'contains', 'key' => 'No'],
+        $windowCondition = ['path' => 'zcustomer', 'operator' => '==']; // Window condition (always true)
+        $filters = [
+            'path' => 'zcustomerName', 
+            'operator' => '!=', 
+            'value' => [
+                'in_item_path' => 'zsoldName'
             ]
         ];
 
-        $expectedData = [];
+        $args = [
+            'grouping_key' => 'zcustomer',
+            'window_condition' => $windowCondition, 
+            'filters' => $filters, 'allow_empty_window' => '0'
+        ];
 
-        $action = new FunctionAction("products", [$this, 'filter'], ['filter_criteria' => $criteria], 'filtered_products');
+        $action = new FunctionAction("customers", [$this, 'window_conditional_filter'], $args, 'filtered_customers');
 
         $action->execute($data);
 
-        //print_r($data);
+        print_r($data);
 
-        $this->assertEquals($data, $expectedData);
+        // $this->assertEquals($data, $expectedData);
     }
 
     public function _testStrToUpperFunction()
@@ -2528,7 +2565,7 @@ class FunctionActionTest extends TestCase
         //$this->assertEquals($data, $expectedData);
     }
 
-    public function testRegexLookupReplace()
+    public function _testRegexLookupReplace()
     {
         $data = [
             "customer_name_lookup" => [

@@ -247,6 +247,25 @@ class Workflow
         }
     }
 
+    protected static function resolveInItemPaths($data, $param) {
+        if (is_array($param)) {
+            // Check if the array contains only the 'path' key
+            if (count($param) === 1 && isset($param['in_item_path'])) {
+                $paramPath = $param['in_item_path'];
+                return PathResolver::getValueByPath($data, $paramPath);
+            } else {
+                // Recursively resolve each element in the array
+                $resolvedArray = [];
+                foreach ($param as $key => $value) {
+                    $resolvedArray[$key] = self::resolveInItemPaths($data, $value);
+                }
+                return $resolvedArray;
+            }
+        }
+        // If param is not an array, return it as-is
+        return $param;
+    }
+
     /**
      * @param $data
      * @param $condition
@@ -255,6 +274,10 @@ class Workflow
      */
     public static function evaluateCondition($data, $condition, $useDataAsPathValue = false): mixed
     {
+
+        // We resolve in item paths 
+        $condition = self::resolveInItemPaths($data, $condition);
+        
         // We add path value, if set
         if ($useDataAsPathValue) {
             self::addPathValueToCondition($condition, $data);
